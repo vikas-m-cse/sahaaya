@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — Sahaaya</title>
+  <meta name="description" content="Platform administration portal for verifying old age homes, overseeing volunteer coordination, and monitoring community impact statistics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/states.css">
+  <link rel="stylesheet" href="../css/portal.css">
+</head>
+<body class="portal-body">
+
+  <!-- Portal Top Navigation -->
+  <header class="portal-navbar">
+    <div class="portal-nav-inner">
+      <a class="portal-brand" href="../index.html">
+        <div class="portal-brand-mark">S</div>
+        <div class="portal-brand-text">
+          <h1>Sahaaya</h1>
+          <span class="portal-role-tag">Platform Admin Portal</span>
+        </div>
+      </a>
+
+      <div class="portal-user-section">
+        <div class="portal-user-profile">
+          <div class="portal-avatar" id="adminAvatar">SK</div>
+          <div class="portal-user-meta">
+            <strong id="adminName">Sahana K</strong>
+            <small>Platform Administrator</small>
+          </div>
+        </div>
+        <button class="portal-logout-btn" id="logoutBtn" title="Sign out and return to landing page">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portal Main Body -->
+  <main class="portal-container">
+
+    <!-- Welcome Header & Quick Action -->
+    <div class="portal-welcome">
+      <div>
+        <h2>Platform Operations & Impact Overview 🛡️</h2>
+        <p>Vetting partner homes, monitoring live coordination pipelines, and ensuring community integrity.</p>
+      </div>
+      <div>
+        <button class="btn-secondary" id="exportReportBtn">
+          <span>📊</span> Export Platform Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon green">⏱</div>
+        <div class="kpi-data">
+          <strong id="kpiPlatformHours">39.5</strong>
+          <span>Total Volunteer Hours</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon peach">🏡</div>
+        <div class="kpi-data">
+          <strong id="kpiHomesCount">3</strong>
+          <span>Partner Senior Homes</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">👤</div>
+        <div class="kpi-data">
+          <strong id="kpiVolunteersCount">3</strong>
+          <span>Registered Volunteers</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple">⏳</div>
+        <div class="kpi-data">
+          <strong id="kpiPendingVerification">1</strong>
+          <span>Homes Pending Vetting</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="portal-tabs" role="tablist">
+      <button class="portal-tab-btn active" data-tab="verification" role="tab">
+        <span>🛡️</span> Home Verification Queue <span class="portal-tab-count" id="countPendingQueue">1</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="volunteers" role="tab">
+        <span>👥</span> Volunteer Directory
+      </button>
+      <button class="portal-tab-btn" data-tab="pipeline" role="tab">
+        <span>📋</span> Application Pipeline & Hours Log
+      </button>
+      <button class="portal-tab-btn" data-tab="homes" role="tab">
+        <span>🏡</span> All Registered Homes
+      </button>
+    </div>
+
+    <!-- TAB 1: HOME VERIFICATION QUEUE -->
+    <section class="portal-tab-content active" id="tab-verification">
+      <div id="verificationQueueContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 2: VOLUNTEERS DIRECTORY -->
+    <section class="portal-tab-content" id="tab-volunteers">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <h3>Registered Community Volunteers</h3>
+          <span style="font-size: 12px; color: var(--portal-muted);">Verified volunteers actively participating in senior home activities.</span>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Volunteer Name</th>
+                <th>Contact Details</th>
+                <th>Interests & Focus</th>
+                <th>Availability Windows</th>
+                <th>Total Verified Hours</th>
+                <th>Completed Sessions</th>
+              </tr>
+            </thead>
+            <tbody id="volunteersTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: APPLICATION PIPELINE & AUDIT LOG -->
+    <section class="portal-tab-content" id="tab-pipeline">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <h3>Platform Coordination Pipeline</h3>
+          <span style="font-size: 12px; color: var(--portal-muted);">Live status of applications submitted across all senior care homes.</span>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Applicant</th>
+                <th>Target Home & Activity</th>
+                <th>Compatibility Fit</th>
+                <th>Status</th>
+                <th>Applied On</th>
+                <th>Coordinator Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="pipelineTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ALL REGISTERED HOMES -->
+    <section class="portal-tab-content" id="tab-homes">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <h3>All Registered Senior Homes</h3>
+          <span style="font-size: 12px; color: var(--portal-muted);">Network of assisted living and senior care facilities.</span>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Home Name & Location</th>
+                <th>Registration No.</th>
+                <th>Superintendent</th>
+                <th>Resident Capacity</th>
+                <th>Verification Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allHomesTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts — plain scripts, Supabase via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/matching.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/admin-portal.js"></script>
+</body>
+</html>

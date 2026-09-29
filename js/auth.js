@@ -1,0 +1,384 @@
+/**
+ * SAHAAYA — Authentication & Session Layer
+ *
+ * Manages Supabase Auth (real auth) and Demo Mode sessions.
+ * This is a plain-script IIFE (no ES module imports) so it works
+ * consistently in all portal pages served without a build step.
+ *
+ * Supabase is loaded via CDN <script> tag in each HTML page,
+ * exposing the global `window.supabase` (from the CDN UMD build).
+ */
+
+const SahaayaAuth = (() => {
+  const CACHED_SESSION_KEY = "sahaaya_cached_session";
+
+  // -----------------------------------------------------------------------
+  // Supabase client initialisation
+  // -----------------------------------------------------------------------
+  // Read credentials stored by the HTML page (must be set before this script)
+  // We expose them through a global object set by the CDN build, or fall back
+  // to null so all auth methods gracefully degrade to demo-only mode.
+  function _getSupabaseClient() {
+    if (window._supabaseClient) return window._supabaseClient;
+
+    const url  = window.SAHAAYA_SUPABASE_URL  || null;
+    const key  = window.SAHAAYA_SUPABASE_KEY  || null;
+
+    if (url && key && window.supabase && typeof window.supabase.createClient === "function") {
+      window._supabaseClient = window.supabase.createClient(url, key);
+    } else {
+      window._supabaseClient = null;
+    }
+
+    return window._supabaseClient;
+  }
+
+  // -----------------------------------------------------------------------
+  // Determine root path dynamically for relative redirects
+  // -----------------------------------------------------------------------
+  function getBasePath() {
+    const path = window.location.pathname;
+    if (
+      path.includes("/volunteer/") ||
+      path.includes("/home/") ||
+      path.includes("/admin/")
+    ) {
+      return "../";
+    }
+    return "./";
+  }
+
+  // -----------------------------------------------------------------------
+  // Cached session helpers  (UI-layer session, not authoritative)
+  // -----------------------------------------------------------------------
+  function getCachedSession() {
+    try {
+      const data = localStorage.getItem(CACHED_SESSION_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function setCachedSession(sessionUser) {
+    try {
+      if (sessionUser) {
+        localStorage.setItem(CACHED_SESSION_KEY, JSON.stringify(sessionUser));
+      } else {
+        localStorage.removeItem(CACHED_SESSION_KEY);
+      }
+    } catch (e) {
+      console.warn("Storage warning:", e);
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Fetch complete user profile from Supabase
+  // -----------------------------------------------------------------------
+  async function fetchUserProfile(userId) {
+    const sb = _getSupabaseClient();
+    if (!sb) return null;
+
+    try {
+      const { data: profile, error: profErr } = await sb
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (profErr || !profile) return null;
+
+      let extra = {};
+
+      if (profile.role === "volunteer") {
+        const { data: vol } = await sb
+          .from("volunteers")
+          .select("*")
+          .eq("profile_id", userId)
+          .single();
+        if (vol) extra.volunteer = vol;
+      } else if (profile.role === "home") {
+        const { data: home } = await sb
+          .from("old_age_homes")
+          .select("*")
+          .eq("profile_id", userId)
+          .single();
+        if (home) extra.home = home;
+      }
+
+      const initials = (profile.full_name || "VO")
+        .split(" ")
+        .map(w => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+      const sessionUser = {
+        id: profile.id,
+        email: profile.email,
+        name: profile.full_name,
+        role: profile.role,
+        phone: profile.phone,
+        avatar_initials: initials,
+        ...extra
+      };
+
+      setCachedSession(sessionUser);
+      return sessionUser;
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+      return null;
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Get active session
+  // -----------------------------------------------------------------------
+  async function getSession() {
+    const sb = _getSupabaseClient();
+
+    // Demo mode always takes priority if no real Supabase session is active
+    const cached = getCachedSession();
+    if (cached && cached.isDemoSession) return cached;
+
+    if (!sb) return cached;
+
+    try {
+      const { data: { session }, error } = await sb.auth.getSession();
+      if (error || !session) {
+        // If Supabase has no session, clear any stale real-auth cache
+        if (cached && !cached.isDemoSession) setCachedSession(null);
+        return null;
+      }
+      return await fetchUserProfile(session.user.id);
+    } catch (err) {
+      console.warn("Auth getSession error:", err);
+      return cached;
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Sign Up — Volunteer
+  // -----------------------------------------------------------------------
+  async function registerVolunteer({ name, email, password, phone, interests, availability, preferred_area }) {
+    const sb = _getSupabaseClient();
+    if (!sb) throw new Error("Supabase is not connected. Please configure .env and use Vite dev server.");
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          phone: phone || "",
+          role: "volunteer",
+          interests: interests || ["companionship"],
+          availability: availability || ["sun_morning"],
+          preferred_area: preferred_area || "Bengaluru"
+        }
+      }
+    });
+
+    if (error) throw error;
+    if (!data.user) throw new Error("Registration failed.");
+
+    if (data.session) {
+      await sb.from("profiles").upsert({
+        id: data.user.id,
+        full_name: name,
+        email,
+        phone: phone || "",
+        role: "volunteer"
+      });
+
+      await sb.from("volunteers").upsert({
+        profile_id: data.user.id,
+        interests: interests || ["companionship"],
+        availability: availability || ["sun_morning"],
+        preferred_activity_types: [],
+        preferred_area: preferred_area || "Bengaluru"
+      });
+
+      const sessionUser = await fetchUserProfile(data.user.id);
+      return { user: data.user, sessionUser, needsConfirmation: false };
+    }
+
+    return {
+      user: data.user,
+      sessionUser: null,
+      needsConfirmation: true,
+      message: "Account created! Please check your email to confirm before signing in."
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // Sign Up — Old Age Home
+  // -----------------------------------------------------------------------
+  async function registerHome({ homeName, contactPerson, email, password, phone, address, city, description }) {
+    const sb = _getSupabaseClient();
+    if (!sb) throw new Error("Supabase is not connected. Please configure .env and use Vite dev server.");
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: contactPerson,
+          phone: phone || "",
+          role: "home",
+          home_name: homeName,
+          address: address || "Bengaluru",
+          city: city || "Bengaluru",
+          description: description || "Senior care residence."
+        }
+      }
+    });
+
+    if (error) throw error;
+    if (!data.user) throw new Error("Registration failed.");
+
+    if (data.session) {
+      await sb.from("profiles").upsert({
+        id: data.user.id,
+        full_name: contactPerson,
+        email,
+        phone: phone || "",
+        role: "home"
+      });
+
+      await sb.from("old_age_homes").upsert({
+        profile_id: data.user.id,
+        name: homeName,
+        description: description || "Senior care residence.",
+        address: address || "Bengaluru",
+        city: city || "Bengaluru",
+        contact_phone: phone || "",
+        verification_status: "pending"
+      });
+
+      const sessionUser = await fetchUserProfile(data.user.id);
+      return { user: data.user, sessionUser, needsConfirmation: false };
+    }
+
+    return {
+      user: data.user,
+      sessionUser: null,
+      needsConfirmation: true,
+      message: "Home registration received! Verify your email to sign in."
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // Login
+  // -----------------------------------------------------------------------
+  async function login(email, password) {
+    const sb = _getSupabaseClient();
+    if (!sb) throw new Error("Supabase is not connected.");
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (!data.user) throw new Error("Authentication failed.");
+
+    const sessionUser = await fetchUserProfile(data.user.id);
+    if (!sessionUser) {
+      throw new Error("User profile not found in database. Contact administrator.");
+    }
+
+    return sessionUser;
+  }
+
+  // -----------------------------------------------------------------------
+  // Logout
+  // -----------------------------------------------------------------------
+  async function logout() {
+    setCachedSession(null);
+    const sb = _getSupabaseClient();
+    if (sb) {
+      try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
+    }
+    window.location.href = getBasePath() + "index.html";
+  }
+
+  // -----------------------------------------------------------------------
+  // Route Guard
+  // -----------------------------------------------------------------------
+  async function checkAuthGuard(requiredRole) {
+    const sessionUser = await getSession();
+
+    if (!sessionUser) {
+      window.location.href = getBasePath() + "index.html?login_required=1";
+      return null;
+    }
+
+    // Admins can access any portal for oversight
+    if (sessionUser.role !== requiredRole && sessionUser.role !== "admin") {
+      console.warn(`Role mismatch: expected ${requiredRole}, got ${sessionUser.role}.`);
+      const map = { volunteer: "volunteer/", home: "home/", admin: "admin/" };
+      window.location.href = getBasePath() + (map[sessionUser.role] || "index.html");
+      return null;
+    }
+
+    return sessionUser;
+  }
+
+  // -----------------------------------------------------------------------
+  // Demo Role Switcher (evaluation only — not a security mechanism)
+  // -----------------------------------------------------------------------
+  async function switchDemoRole(targetRole) {
+    const personas = {
+      volunteer: {
+        id: "usr_vol_01",
+        name: "Ananya Sharma",
+        email: "demo.volunteer@sahaaya.org",
+        role: "volunteer",
+        phone: "+91 98450 12345",
+        avatar_initials: "AS",
+        isDemoSession: true
+      },
+      home: {
+        id: "usr_home_01",
+        name: "Rajesh Sen",
+        email: "demo.home@sahaaya.org",
+        role: "home",
+        phone: "+91 80 2845 0911",
+        avatar_initials: "SS",
+        home_id: "home_01",
+        isDemoSession: true
+      },
+      admin: {
+        id: "usr_admin_01",
+        name: "Sahana K",
+        email: "demo.admin@sahaaya.org",
+        role: "admin",
+        phone: "+91 99000 11223",
+        avatar_initials: "SK",
+        isDemoSession: true
+      }
+    };
+
+    const demoSession = personas[targetRole] || personas.volunteer;
+    setCachedSession(demoSession);
+
+    const base = getBasePath();
+    const urlMap = { volunteer: "volunteer/", home: "home/", admin: "admin/" };
+    window.location.href = base + (urlMap[targetRole] || "volunteer/");
+  }
+
+  // -----------------------------------------------------------------------
+  // Public API
+  // -----------------------------------------------------------------------
+  return {
+    getSession,
+    getCachedSession,
+    registerVolunteer,
+    registerHome,
+    login,
+    logout,
+    checkAuthGuard,
+    switchDemoRole,
+    getBasePath
+  };
+})();
+
+// Make globally available
+window.SahaayaAuth = SahaayaAuth;

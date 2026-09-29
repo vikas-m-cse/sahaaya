@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sahaaya — Volunteer Coordination</title>
+<meta name="description" content="Sahaaya connects volunteers with old age homes for meaningful companionship, activities and community support.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/states.css">
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<header class="nav">
+  <a class="brand" href="#home"><span class="brand-mark">S</span><span>Sahaaya</span></a>
+  <nav class="nav-links">
+    <a href="#opportunities">Opportunities</a>
+    <a href="#how">How it works</a>
+    <a href="#homes">Homes</a>
+    <a href="volunteer/">Volunteer Portal</a>
+    <a href="home/">Home Portal</a>
+    <a href="admin/">Admin</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="btn ghost" data-modal="login">Sign in</button>
+    <button class="btn primary" data-modal="join">Become a volunteer <span>↗</span></button>
+  </div>
+  <button class="menu-btn" id="menuBtn">☰</button>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="pulse"></span> Volunteer where your time matters</div>
+    <h1>Give time.<br><em>Share a moment.</em><br>Make someone’s day.</h1>
+    <p>Sahaaya connects compassionate volunteers with old age homes that need companionship, activities and community support — making every hour count.</p>
+    <div class="hero-actions">
+      <button class="btn primary xl" data-modal="join">Find a way to help <span>→</span></button>
+      <a class="btn secondary xl" href="#how">See how it works</a>
+    </div>
+    <div class="trust-row">
+      <div class="avatars"><span>R</span><span>A</span><span>P</span><span>K</span><b>+2k</b></div>
+      <div><strong>2,000+</strong><small>volunteers already showing up</small></div>
+    </div>
+  </div>
+  <div class="hero-art">
+    <div class="art-card main-photo">
+      <div class="photo-overlay"></div>
+      <div class="photo-copy"><span class="tag light">Sunday · 11:00 AM</span><h3>Sunday Social Afternoon</h3><p>Companionship · Games · Stories</p></div>
+    </div>
+    <div class="floating-card match-card">
+      <span class="mini-icon">♥</span>
+      <div><b>Good match</b><small>3 activities fit your interests</small></div>
+      <strong>→</strong>
+    </div>
+    <div class="floating-card hours-card"><strong>24</strong><span>hours<br>given</span><i>↗</i></div>
+  </div>
+</section>
+
+<section class="stats">
+  <div><strong>14</strong><span>verified homes</span></div>
+  <div><strong>86</strong><span>activities completed</span></div>
+  <div><strong>1,240</strong><span>volunteer hours</span></div>
+  <div><strong>4.9/5</strong><span>community experience</span></div>
+</section>
+
+<section class="section opportunities" id="opportunities">
+  <div class="section-head">
+    <div><div class="eyebrow">FIND YOUR FIT</div><h2>Small moments.<br><em>Real connection.</em></h2></div>
+    <a class="text-link" href="#opportunities">Explore all opportunities →</a>
+  </div>
+  <div class="filters">
+    <button class="filter active" data-filter="all">All</button>
+    <button class="filter" data-filter="companionship">Companionship</button>
+    <button class="filter" data-filter="recreation">Recreation</button>
+    <button class="filter" data-filter="creative">Creative</button>
+    <button class="filter" data-filter="events">Events</button>
+    <button class="filter" data-filter="outdoors">Outdoors</button>
+  </div>
+  <div class="opportunity-grid" id="opportunityGrid">
+    <article class="opp-card" data-type="companionship">
+      <div class="opp-top warm"><span class="category">COMPANIONSHIP</span><span class="heart">♡</span></div>
+      <div class="opp-body"><div class="home-line"><span class="home-logo">SS</span><span>Silver Springs Home</span><span class="verified">✓</span></div>
+      <h3>Sunday Social Afternoon</h3><p>A relaxed afternoon of conversation, stories and board games with residents.</p>
+      <div class="meta"><span>◷ Sun · 11:00–1:00</span><span>👥 3 spots</span></div>
+      <button class="apply" data-activity="Sunday Social Afternoon">View opportunity <span>→</span></button></div>
+    </article>
+    <article class="opp-card" data-type="recreation">
+      <div class="opp-top mint"><span class="category">RECREATION</span><span class="heart">♡</span></div>
+      <div class="opp-body"><div class="home-line"><span class="home-logo blue">BH</span><span>Bhavana Senior Care</span><span class="verified">✓</span></div>
+      <h3>Music & Antakshari</h3><p>Bring your favourite songs and spend an easy-going evening singing together.</p>
+      <div class="meta"><span>◷ Sat · 4:00–6:00</span><span>👥 4 spots</span></div>
+      <button class="apply" data-activity="Music & Antakshari">View opportunity <span>→</span></button></div>
+    </article>
+    <article class="opp-card" data-type="creative">
+      <div class="opp-top lilac"><span class="category">CREATIVE</span><span class="heart">♡</span></div>
+      <div class="opp-body"><div class="home-line"><span class="home-logo purple">AP</span><span>Ananda Park Home</span><span class="verified">✓</span></div>
+      <h3>Art & Memory Wall</h3><p>Create a shared memory wall with drawings, old stories and colourful moments.</p>
+      <div class="meta"><span>◷ Sun · 3:00–5:00</span><span>👥 5 spots</span></div>
+      <button class="apply" data-activity="Art & Memory Wall">View opportunity <span>→</span></button></div>
+    </article>
+  </div>
+</section>
+
+<section class="match-banner">
+  <div class="match-visual"><div class="circle c1"></div><div class="circle c2"></div><span>♥</span></div>
+  <div><div class="eyebrow">SMART MATCHING</div><h2>Not every volunteer is the same.<br><em>Your time should fit your interests.</em></h2><p>Sahaaya uses your interests, availability and preferred activities to surface opportunities that make sense for you.</p></div>
+  <button class="btn light-btn" data-modal="join">Build my profile →</button>
+</section>
+
+<section class="section how" id="how">
+  <div class="section-head centered"><div><div class="eyebrow">HOW SAHAAYA WORKS</div><h2>From “I want to help”<br>to <em>“I was glad I came.”</em></h2></div></div>
+  <div class="steps">
+    <div class="step"><span>01</span><div class="step-icon">♡</div><h3>Tell us what you enjoy</h3><p>Choose interests, preferred activities and the times you can volunteer.</p></div>
+    <div class="step"><span>02</span><div class="step-icon">⌁</div><h3>Discover your fit</h3><p>Browse real requirements from verified old age homes and see why they match.</p></div>
+    <div class="step"><span>03</span><div class="step-icon">✓</div><h3>Show up & connect</h3><p>Apply, get approved, attend the activity and record your contribution.</p></div>
+  </div>
+</section>
+
+<section class="section homes" id="homes">
+  <div class="section-head"><div><div class="eyebrow">OUR COMMUNITY</div><h2>Homes that<br><em>welcome your time.</em></h2></div><button class="btn secondary" data-modal="home">Register an old age home →</button></div>
+  <div class="home-grid">
+    <div class="home-card"><div class="home-avatar">SS</div><div><h3>Silver Springs Home</h3><p>Whitefield, Bengaluru · 48 residents</p><span>✓ Verified partner</span></div><b>→</b></div>
+    <div class="home-card"><div class="home-avatar blue">BH</div><div><h3>Bhavana Senior Care</h3><p>Indiranagar, Bengaluru · 32 residents</p><span>✓ Verified partner</span></div><b>→</b></div>
+    <div class="home-card"><div class="home-avatar purple">AP</div><div><h3>Ananda Park Home</h3><p>HSR Layout, Bengaluru · 27 residents</p><span>✓ Verified partner</span></div><b>→</b></div>
+  </div>
+</section>
+
+<section class="cta" id="about">
+  <div><span class="eyebrow light-eyebrow">YOUR TWO HOURS CAN BE SOMEONE'S FAVOURITE TWO HOURS.</span><h2>There is always room<br>for a little <em>more warmth.</em></h2><p>Start with one activity. One conversation. One Sunday.</p></div>
+  <button class="btn white-btn xl" data-modal="join">Join Sahaaya <span>→</span></button>
+</section>
+</main>
+
+<footer><div class="brand"><span class="brand-mark">S</span><span>Sahaaya</span></div><p>Volunteer coordination, with humanity at the centre.</p><span>© 2026 Sahaaya</span></footer>
+
+<div class="modal" id="modal">
+  <div class="modal-backdrop"></div><div class="modal-card">
+    <button class="close" id="closeModal">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/matching.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/components.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

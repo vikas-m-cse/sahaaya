@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Portal — Sahaaya</title>
+  <meta name="description" content="Volunteer coordination portal for discovering old age home requirements, tracking schedule, and logging volunteer hours.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/states.css">
+  <link rel="stylesheet" href="../css/portal.css">
+</head>
+<body class="portal-body">
+
+  <!-- Portal Top Navigation -->
+  <header class="portal-navbar">
+    <div class="portal-nav-inner">
+      <a class="portal-brand" href="../index.html">
+        <div class="portal-brand-mark">S</div>
+        <div class="portal-brand-text">
+          <h1>Sahaaya</h1>
+          <span class="portal-role-tag">Volunteer Portal</span>
+        </div>
+      </a>
+
+      <div class="portal-user-section">
+        <div class="portal-user-profile">
+          <div class="portal-avatar" id="userAvatar">AS</div>
+          <div class="portal-user-meta">
+            <strong id="userName">Ananya Sharma</strong>
+            <small id="userRoleBadge">Volunteer · Bangalore</small>
+          </div>
+        </div>
+        <button class="portal-logout-btn" id="logoutBtn" title="Sign out and return to landing page">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portal Main Body -->
+  <main class="portal-container">
+    
+    <!-- Welcome Header & Quick Action -->
+    <div class="portal-welcome">
+      <div>
+        <h2 id="welcomeGreeting">Welcome back, Ananya 👋</h2>
+        <p>Discover real volunteer requirements from verified old age homes, manage your schedule, and view your verified hours.</p>
+      </div>
+      <div>
+        <button class="btn-primary" id="editProfileQuickBtn">
+          <span>⚙</span> Edit Availability & Interests
+        </button>
+      </div>
+    </div>
+
+    <!-- Impact KPI Grid -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon green">⏱</div>
+        <div class="kpi-data">
+          <strong id="kpiTotalHours">14.5</strong>
+          <span>Verified Volunteer Hours</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon peach">♥</div>
+        <div class="kpi-data">
+          <strong id="kpiCompleted">5</strong>
+          <span>Activities Completed</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">📅</div>
+        <div class="kpi-data">
+          <strong id="kpiUpcoming">1</strong>
+          <span>Upcoming on Schedule</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple">⌁</div>
+        <div class="kpi-data">
+          <strong id="kpiPendingApps">1</strong>
+          <span>Applications in Review</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="portal-tabs" role="tablist">
+      <button class="portal-tab-btn active" data-tab="discover" role="tab">
+        <span>🔍</span> Discover Requirements <span class="portal-tab-count" id="countOpportunities">5</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="schedule" role="tab">
+        <span>📅</span> My Schedule <span class="portal-tab-count" id="countSchedule">1</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="applications" role="tab">
+        <span>📋</span> My Applications <span class="portal-tab-count" id="countApplications">2</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="hours" role="tab">
+        <span>🎖</span> Attendance & Hours Log <span class="portal-tab-count" id="countAttendance">2</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="profile" role="tab">
+        <span>👤</span> My Profile & Preferences
+      </button>
+    </div>
+
+    <!-- TAB 1: DISCOVER OPPORTUNITIES -->
+    <section class="portal-tab-content active" id="tab-discover">
+      <!-- Search & Filters -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div class="filters" id="categoryFilterBar" style="margin-bottom: 0;">
+          <button class="filter active" data-filter="all">All Requirements</button>
+          <button class="filter" data-filter="companionship">Companionship</button>
+          <button class="filter" data-filter="music">Music & Cultural</button>
+          <button class="filter" data-filter="assistive">Digital & Tech</button>
+          <button class="filter" data-filter="creative">Arts & Crafts</button>
+          <button class="filter" data-filter="outdoors">Outdoors & Walks</button>
+        </div>
+        <div style="font-size: 13px; color: var(--portal-muted);">
+          Sorted by: <strong>Transparent Compatibility Fit</strong>
+        </div>
+      </div>
+
+      <!-- Opportunities Grid -->
+      <div class="portal-grid" id="volunteerOppGrid">
+        <!-- Rendered dynamically by volunteer-portal.js -->
+      </div>
+    </section>
+
+    <!-- TAB 2: MY SCHEDULE -->
+    <section class="portal-tab-content" id="tab-schedule">
+      <div id="scheduleContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 3: MY APPLICATIONS -->
+    <section class="portal-tab-content" id="tab-applications">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <h3>Your Submitted Applications</h3>
+          <span style="font-size: 12px; color: var(--portal-muted);">Status is updated directly when the old age home coordinator reviews your request.</span>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Activity & Home</th>
+                <th>Scheduled Date & Time</th>
+                <th>Compatibility Match</th>
+                <th>Application Status</th>
+                <th>Coordinator Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="applicationsTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ATTENDANCE & HOURS HISTORY -->
+    <section class="portal-tab-content" id="tab-hours">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <div>
+            <h3>Verified Volunteer Service Log</h3>
+            <p style="margin: 4px 0 0; font-size: 12px; color: var(--portal-muted);">Each record is digitally verified by the coordinating old age home superintendent.</p>
+          </div>
+          <button class="btn-secondary btn-sm" id="downloadCertBtn">
+            <span>📄</span> Print Service Summary
+          </button>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Activity Name</th>
+                <th>Old Age Home</th>
+                <th>Verified Hours</th>
+                <th>Attendance Status</th>
+                <th>Experience Feedback</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: VOLUNTEER PROFILE -->
+    <section class="portal-tab-content" id="tab-profile">
+      <div class="portal-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="portal-card-header">
+          <h3 style="margin: 0; font-size: 18px;">Volunteer Profile & Preferences</h3>
+          <span class="badge badge-success">Active Profile</span>
+        </div>
+        <form class="portal-card-body" id="volunteerProfileForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="profName" required>
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="profEmail" readonly style="background: #f7f9f7;">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Contact Phone</label>
+              <input type="text" id="profPhone" required>
+            </div>
+            <div class="form-group">
+              <label>Emergency Contact (Name & Phone)</label>
+              <input type="text" id="profEmergency" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>About You & Why You Volunteer</label>
+            <textarea id="profBio" rows="3" placeholder="Share your background, passions, and how you like spending time with seniors..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Activity Interests (Select all you enjoy)</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;" id="interestsCheckboxes">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Weekly Availability Windows</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px;" id="availabilityCheckboxes">
+              <!-- Rendered dynamically -->
+            </div>
+            <span class="hint">Sahaaya uses your selected windows to calculate transparent match scores on requirements.</span>
+          </div>
+
+          <div style="margin-top: 24px; text-align: right;">
+            <button type="submit" class="btn-primary">Save Profile Preferences</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts — plain scripts (no ES modules), Supabase loaded via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/matching.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/volunteer-portal.js"></script>
+</body>
+</html>

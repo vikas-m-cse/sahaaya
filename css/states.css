@@ -1,0 +1,113 @@
+/**
+ * SAHAAYA — States Styling
+ * Empty states, banners, verification notices, loading skeletons
+ */
+
+/* -------------------------------------------------------------
+   ALERT & NOTICE BANNERS
+   ------------------------------------------------------------- */
+.portal-notice {
+  padding: 16px 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.notice-warning {
+  background: #fff8eb;
+  border: 1px solid #fedf9e;
+  color: #7d4e00;
+}
+
+.notice-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.notice-success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.notice-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notice-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* -------------------------------------------------------------
+   EMPTY STATES
+   ------------------------------------------------------------- */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  background: #fffdf8;
+  border: 1px dashed #d5ded9;
+  border-radius: 24px;
+  margin: 20px 0;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: #eef3ec;
+  color: #286c59;
+  font-size: 28px;
+  display: inline-grid;
+  place-items: center;
+  margin-bottom: 18px;
+}
+
+.empty-state h4 {
+  font-family: "Manrope", sans-serif;
+  font-size: 19px;
+  color: #18332f;
+  margin: 0 0 8px;
+}
+
+.empty-state p {
+  color: #687873;
+  font-size: 13px;
+  max-width: 440px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+
+/* -------------------------------------------------------------
+   LOADING SKELETONS
+   ------------------------------------------------------------- */
+.skeleton {
+  background: linear-gradient(90deg, #ecefe9 25%, #f7f9f5 50%, #ecefe9 75%);
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeletonPulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+  height: 14px;
+  margin-bottom: 8px;
+}
+
+.skeleton-card {
+  height: 160px;
+  border-radius: 18px;
+  margin-bottom: 16px;
+}

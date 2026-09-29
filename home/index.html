@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Old Age Home Portal — Sahaaya</title>
+  <meta name="description" content="Old Age Home portal for posting volunteer requirements, reviewing applicants, tracking attendance, and coordinating resident activities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/states.css">
+  <link rel="stylesheet" href="../css/portal.css">
+</head>
+<body class="portal-body">
+
+  <!-- Portal Top Navigation -->
+  <header class="portal-navbar">
+    <div class="portal-nav-inner">
+      <a class="portal-brand" href="../index.html">
+        <div class="portal-brand-mark">S</div>
+        <div class="portal-brand-text">
+          <h1>Sahaaya</h1>
+          <span class="portal-role-tag">Old Age Home Portal</span>
+        </div>
+      </a>
+
+      <div class="portal-user-section">
+        <div class="portal-user-profile">
+          <div class="portal-avatar" id="homeAvatar">SS</div>
+          <div class="portal-user-meta">
+            <strong id="homeCoordinatorName">Rajesh Sen</strong>
+            <small id="homeNameTag">Silver Springs Senior Care · Whitefield</small>
+          </div>
+        </div>
+        <button class="portal-logout-btn" id="logoutBtn" title="Sign out and return to landing page">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portal Main Body -->
+  <main class="portal-container">
+
+    <!-- Verification Notice Banner (Dynamic) -->
+    <div id="verificationNoticeArea"></div>
+    
+    <!-- Welcome Header & Quick Action -->
+    <div class="portal-welcome">
+      <div>
+        <h2 id="homeWelcomeTitle">Silver Springs Senior Care 🏡</h2>
+        <p>You define what assistance your residents need. Post requirements, review applicants, and confirm attendance.</p>
+      </div>
+      <div>
+        <button class="btn-primary" id="openCreateRequirementModalBtn">
+          <span>+</span> Define New Volunteer Requirement
+        </button>
+      </div>
+    </div>
+
+    <!-- Home KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon green">📋</div>
+        <div class="kpi-data">
+          <strong id="kpiActiveRequirements">3</strong>
+          <span>Open Requirements</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon peach">👥</div>
+        <div class="kpi-data">
+          <strong id="kpiPendingReviews">1</strong>
+          <span>Applications to Review</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">✓</div>
+        <div class="kpi-data">
+          <strong id="kpiApprovedVolunteers">2</strong>
+          <span>Approved Volunteers</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple">⏱</div>
+        <div class="kpi-data">
+          <strong id="kpiResidentCount">48</strong>
+          <span>Residents Accommodated</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="portal-tabs" role="tablist">
+      <button class="portal-tab-btn active" data-tab="applications" role="tab">
+        <span>📩</span> Review Applications <span class="portal-tab-count" id="countPendingReview">1</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="requirements" role="tab">
+        <span>📌</span> Our Requirements & Activities <span class="portal-tab-count" id="countRequirements">3</span>
+      </button>
+      <button class="portal-tab-btn" data-tab="attendance" role="tab">
+        <span>✅</span> Volunteer Attendance & Hours Verification
+      </button>
+      <button class="portal-tab-btn" data-tab="profile" role="tab">
+        <span>🏡</span> Home Details & Registration
+      </button>
+    </div>
+
+    <!-- TAB 1: REVIEW APPLICATIONS -->
+    <section class="portal-tab-content active" id="tab-applications">
+      <div id="applicationsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 2: REQUIREMENTS / ACTIVITIES -->
+    <section class="portal-tab-content" id="tab-requirements">
+      <div class="portal-grid" id="homeRequirementsGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 3: ATTENDANCE & HOURS SHEET -->
+    <section class="portal-tab-content" id="tab-attendance">
+      <div class="portal-table-card">
+        <div class="portal-table-header">
+          <div>
+            <h3>Activity Roster & Attendance Verification</h3>
+            <p style="margin: 4px 0 0; font-size: 12px; color: var(--portal-muted);">
+              Mark volunteers present when they arrive. Approved attendance automatically credits verified volunteer hours to their official record.
+            </p>
+          </div>
+        </div>
+        <div class="portal-table-responsive">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Volunteer Name</th>
+                <th>Activity Title</th>
+                <th>Scheduled Date & Time</th>
+                <th>Hours to Credit</th>
+                <th>Attendance Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceRosterBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: HOME PROFILE -->
+    <section class="portal-tab-content" id="tab-profile">
+      <div class="portal-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="portal-card-header">
+          <h3 style="margin: 0; font-size: 18px;">Senior Home Information</h3>
+          <span id="verificationBadgePlaceholder"></span>
+        </div>
+        <form class="portal-card-body" id="homeProfileForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Home Name</label>
+              <input type="text" id="profHomeName" required>
+            </div>
+            <div class="form-group">
+              <label>Government / NGO Registration No.</label>
+              <input type="text" id="profRegNo" readonly style="background: #f7f9f7;">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Resident Capacity / Count</label>
+              <input type="number" id="profResidentCount" required>
+            </div>
+            <div class="form-group">
+              <label>Chief Coordinator / Superintendent</label>
+              <input type="text" id="profContactPerson" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Neighborhood / Area</label>
+            <input type="text" id="profArea" required>
+          </div>
+
+          <div class="form-group">
+            <label>Complete Street Address</label>
+            <textarea id="profAddress" rows="2" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>About the Home & Resident Community</label>
+            <textarea id="profDescription" rows="3"></textarea>
+          </div>
+
+          <div style="margin-top: 24px; text-align: right;">
+            <button type="submit" class="btn-primary">Update Home Profile</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts — plain scripts, Supabase via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/matching.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/home-portal.js"></script>
+</body>
+</html>
