@@ -1,0 +1,260 @@
+/* Sahaaya — Unified Dark Portal Theme
+   Load AFTER portal.css, components.css, and states.css.
+*/
+
+:root {
+    --portal-bg: #05091a;
+    --portal-card: #0b1126;
+    --portal-card-2: #101936;
+    --portal-ink: #f5f7ff;
+    --portal-muted: #9aa7c2;
+    --portal-line: rgba(255, 255, 255, .10);
+    --portal-primary: #8b5cf6;
+    --portal-deep: #5b21b6;
+    --portal-blue: #21c8ff;
+    --portal-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+}
+
+/* Page */
+body.portal-body {
+    background:
+        radial-gradient(circle at 85% 10%, rgba(139, 92, 246, .14), transparent 28%),
+        radial-gradient(circle at 10% 20%, rgba(33, 200, 255, .08), transparent 25%),
+        var(--portal-bg) !important;
+    color: var(--portal-ink) !important;
+}
+
+/* Navbar */
+.portal-body .portal-navbar,
+.portal-body nav {
+    background: rgba(5, 9, 26, .92) !important;
+    border-bottom: 1px solid var(--portal-line) !important;
+    color: #fff !important;
+}
+
+.portal-body .brand,
+.portal-body .brand-name,
+.portal-body .brand-title,
+.portal-body .portal-brand,
+.portal-body .portal-brand * {
+    color: #fff !important;
+}
+
+.portal-body .brand-mark {
+    background: linear-gradient(135deg, #8b5cf6, #21c8ff) !important;
+    color: #fff !important;
+}
+
+.portal-body .role-tag {
+    background: rgba(139, 92, 246, .15) !important;
+    color: #cfc4ff !important;
+    border: 1px solid rgba(139, 92, 246, .28) !important;
+}
+
+/* Main headings */
+.portal-body h1,
+.portal-body h2,
+.portal-body h3,
+.portal-body h4,
+.portal-body strong {
+    color: #f7f8ff !important;
+}
+
+.portal-body p,
+.portal-body .muted,
+.portal-body .subtitle,
+.portal-body .description {
+    color: var(--portal-muted) !important;
+}
+
+/* Cards */
+.portal-body .card,
+.portal-body .panel,
+.portal-body .kpi-card,
+.portal-body .stat-card,
+.portal-body .dashboard-card,
+.portal-body .portal-card {
+    background: linear-gradient(145deg, #0d142d, #090f23) !important;
+    border: 1px solid var(--portal-line) !important;
+    color: var(--portal-ink) !important;
+    box-shadow: var(--portal-shadow) !important;
+}
+
+/* KPI/icon blocks */
+.portal-body .kpi-icon,
+.portal-body .stat-icon,
+.portal-body .icon-box {
+    background: rgba(139, 92, 246, .13) !important;
+    color: #cfc4ff !important;
+}
+
+/* Tabs */
+.portal-body .tabs,
+.portal-body .tab-list {
+    border-bottom: 1px solid var(--portal-line) !important;
+}
+
+.portal-body .tab,
+.portal-body .tabs button,
+.portal-body .tab-button {
+    color: #aeb8d0 !important;
+    background: transparent !important;
+}
+
+.portal-body .tab:hover,
+.portal-body .tabs button:hover,
+.portal-body .tab-button:hover,
+.portal-body .tab.active,
+.portal-body .tabs button.active,
+.portal-body .tab-button.active {
+    color: #fff !important;
+}
+
+.portal-body .tab.active,
+.portal-body .tabs button.active,
+.portal-body .tab-button.active {
+    border-bottom-color: var(--portal-primary) !important;
+}
+
+/* Tables */
+.portal-body table {
+    color: #eef2ff !important;
+    background: transparent !important;
+}
+
+.portal-body th {
+    background: #101936 !important;
+    color: #cbd5f1 !important;
+    border-color: var(--portal-line) !important;
+}
+
+.portal-body td {
+    background: #0b1126 !important;
+    color: #e8ecf8 !important;
+    border-color: var(--portal-line) !important;
+}
+
+.portal-body tr:hover td {
+    background: #101936 !important;
+}
+
+/* Forms */
+.portal-body input,
+.portal-body select,
+.portal-body textarea {
+    background: #080f23 !important;
+    color: #f5f7ff !important;
+    border: 1px solid rgba(255, 255, 255, .14) !important;
+}
+
+.portal-body input::placeholder,
+.portal-body textarea::placeholder {
+    color: #687592 !important;
+}
+
+.portal-body input:focus,
+.portal-body select:focus,
+.portal-body textarea:focus {
+    border-color: var(--portal-primary) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, .14) !important;
+}
+
+/* Buttons */
+.portal-body .btn-primary,
+.portal-body button.primary,
+.portal-body .primary-btn {
+    background: linear-gradient(135deg, #7c3aed, #21a9e8) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 8px 24px rgba(91, 33, 182, .25) !important;
+}
+
+.portal-body .btn-primary:hover,
+.portal-body button.primary:hover,
+.portal-body .primary-btn:hover {
+    filter: brightness(1.08);
+}
+
+.portal-body .btn-secondary,
+.portal-body .btn-ghost,
+.portal-body .ghost {
+    background: rgba(255, 255, 255, .04) !important;
+    color: #e8ecf8 !important;
+    border: 1px solid var(--portal-line) !important;
+}
+
+/* Badges / pills */
+.portal-body .badge,
+.portal-body .pill,
+.portal-body .status-badge {
+    background: rgba(139, 92, 246, .13) !important;
+    color: #d7ccff !important;
+    border: 1px solid rgba(139, 92, 246, .22) !important;
+}
+
+/* Notices / empty states */
+.portal-body .portal-notice,
+.portal-body .empty-state {
+    background: #0b1126 !important;
+    color: #e8ecf8 !important;
+    border-color: var(--portal-line) !important;
+}
+
+.portal-body .portal-notice p,
+.portal-body .empty-state p {
+    color: var(--portal-muted) !important;
+}
+
+/* Modal */
+.portal-body .modal,
+.portal-body .modal-content,
+.portal-body .dialog {
+    background: #0b1126 !important;
+    color: #f5f7ff !important;
+    border: 1px solid var(--portal-line) !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, .5) !important;
+}
+
+/* Footer */
+.portal-body footer {
+    background: #030615 !important;
+    color: #8e9ab4 !important;
+    border-top: 1px solid var(--portal-line) !important;
+}
+
+/* Links */
+.portal-body a {
+    color: #b9a4ff;
+}
+
+.portal-body a:hover {
+    color: #21c8ff;
+}
+
+/* Remove old green/cream surfaces that may come from shared CSS */
+.portal-body .surface,
+.portal-body .section-card,
+.portal-body .content-card {
+    background: #0b1126 !important;
+    border-color: var(--portal-line) !important;
+}
+
+/* Keep emoji/icons readable without neon effects */
+.portal-body .emoji,
+.portal-body .icon {
+    filter: none !important;
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+    body.portal-body {
+        background: #05091a !important;
+    }
+
+    .portal-body .card,
+    .portal-body .panel,
+    .portal-body .kpi-card,
+    .portal-body .stat-card {
+        border-radius: 16px !important;
+    }
+}

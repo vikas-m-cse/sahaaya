@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Volunteer Portal — Sahaaya</title>
-  <meta name="description" content="Volunteer coordination portal for discovering old age home requirements, tracking schedule, and logging volunteer hours.">
+  <meta name="description"
+    content="Volunteer coordination portal for discovering old age home requirements, tracking schedule, and logging volunteer hours.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/states.css">
   <link rel="stylesheet" href="../css/portal.css">
+  <link rel="stylesheet" href="../css/sahaaya-portal-dark-theme.css">
 </head>
+
 <body class="portal-body">
 
   <!-- Portal Top Navigation -->
@@ -44,12 +50,13 @@
 
   <!-- Portal Main Body -->
   <main class="portal-container">
-    
+
     <!-- Welcome Header & Quick Action -->
     <div class="portal-welcome">
       <div>
         <h2 id="welcomeGreeting">Welcome back, Ananya 👋</h2>
-        <p>Discover real volunteer requirements from verified old age homes, manage your schedule, and view your verified hours.</p>
+        <p>Discover real volunteer requirements from verified old age homes, manage your schedule, and view your
+          verified hours.</p>
       </div>
       <div>
         <button class="btn-primary" id="editProfileQuickBtn">
@@ -112,7 +119,8 @@
     <!-- TAB 1: DISCOVER OPPORTUNITIES -->
     <section class="portal-tab-content active" id="tab-discover">
       <!-- Search & Filters -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
         <div class="filters" id="categoryFilterBar" style="margin-bottom: 0;">
           <button class="filter active" data-filter="all">All Requirements</button>
           <button class="filter" data-filter="companionship">Companionship</button>
@@ -144,7 +152,8 @@
       <div class="portal-table-card">
         <div class="portal-table-header">
           <h3>Your Submitted Applications</h3>
-          <span style="font-size: 12px; color: var(--portal-muted);">Status is updated directly when the old age home coordinator reviews your request.</span>
+          <span style="font-size: 12px; color: var(--portal-muted);">Status is updated directly when the old age home
+            coordinator reviews your request.</span>
         </div>
         <div class="portal-table-responsive">
           <table class="portal-table">
@@ -171,7 +180,8 @@
         <div class="portal-table-header">
           <div>
             <h3>Verified Volunteer Service Log</h3>
-            <p style="margin: 4px 0 0; font-size: 12px; color: var(--portal-muted);">Each record is digitally verified by the coordinating old age home superintendent.</p>
+            <p style="margin: 4px 0 0; font-size: 12px; color: var(--portal-muted);">Each record is digitally verified
+              by the coordinating old age home superintendent.</p>
           </div>
           <button class="btn-secondary btn-sm" id="downloadCertBtn">
             <span>📄</span> Print Service Summary
@@ -229,22 +239,28 @@
 
           <div class="form-group">
             <label>About You & Why You Volunteer</label>
-            <textarea id="profBio" rows="3" placeholder="Share your background, passions, and how you like spending time with seniors..."></textarea>
+            <textarea id="profBio" rows="3"
+              placeholder="Share your background, passions, and how you like spending time with seniors..."></textarea>
           </div>
 
           <div class="form-group">
             <label>Activity Interests (Select all you enjoy)</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;" id="interestsCheckboxes">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;"
+              id="interestsCheckboxes">
               <!-- Rendered dynamically -->
             </div>
           </div>
 
           <div class="form-group">
             <label>Weekly Availability Windows</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px;" id="availabilityCheckboxes">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px;"
+              id="availabilityCheckboxes">
               <!-- Rendered dynamically -->
             </div>
-            <span class="hint">Sahaaya uses your selected windows to calculate transparent match scores on requirements.</span>
+            <span class="hint">Sahaaya uses your selected windows to calculate transparent match scores on
+              requirements.</span>
           </div>
 
           <div style="margin-top: 24px; text-align: right;">
@@ -265,4 +281,5 @@
   <script src="../js/components.js"></script>
   <script src="../js/volunteer-portal.js"></script>
 </body>
+
 </html>
