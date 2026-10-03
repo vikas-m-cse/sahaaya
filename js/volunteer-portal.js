@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
   }
   tabButtons.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  // Bind the profile shortcut immediately; do not wait for auth/data initialization.
   function showPortalInitError(message) {
     console.error('Volunteer portal initialization failed:', message);
     const container = document.querySelector('.portal-container');
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       banner.style.cssText = 'margin: 0 0 20px; padding: 14px 18px; border-radius: 12px;';
       container.prepend(banner);
     }
-    banner.textContent = 'Some volunteer data could not be loaded. You can still use the portal navigation. Please refresh or contact the administrator if this continues.';
+    banner.textContent = 'Volunteer portal initialization error: ' + String(message || 'Unknown error') + '. Navigation remains available; refresh after checking the error.';
   }
 
   // 1. Auth Guard
