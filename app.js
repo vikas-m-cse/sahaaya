@@ -52,8 +52,8 @@ function openLandingModal(type, activity) {
           <option value="weekday_evening">Weekday Evenings (5:00 PM – 8:00 PM)</option>
         </select>
         <button class="btn primary" type="submit" id="joinSubmitBtn">Create Volunteer Account →</button>
-        <p style="font-size: 12px; text-align: center; margin: 4px 0 0; color: #687873;">
-          Already have an account? <a href="#" id="switchToLogin" style="color: #286c59;">Sign in →</a>
+        <p style="font-size: 12px; text-align: center; margin: 8px 0 0; color: #9da7c6;">
+          Already have an account? <a href="#" id="switchToLogin" style="color: #21c8ff; font-weight: 600;">Sign in →</a>
         </p>
       </form>
     `;
@@ -66,24 +66,24 @@ function openLandingModal(type, activity) {
       <p>Enter your credentials to access your verified profile and portal.</p>
 
       <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: #f0f5f2; border: 1px solid #c6ddd3; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #174e43; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
+      <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.28); border-radius: 16px; padding: 16px; margin-bottom: 20px;">
+        <span style="font-size: 10px; font-weight: 800; color: #c4d8ff; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
           ⚡ 1-Click Demo Access for Evaluators
         </span>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
+          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
             <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
           </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
+          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
             <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
           </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
+          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
             <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
           </button>
         </div>
       </div>
 
-      <div style="text-align: center; color: #9eada8; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH REAL ACCOUNT —</div>
+      <div style="text-align: center; color: #9da7c6; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH CREDENTIALS —</div>
 
       <form class="form" id="loginForm">
         <input required type="email" id="loginEmail" placeholder="Email address">
@@ -269,8 +269,41 @@ document.querySelectorAll(".filter").forEach(btn => {
   });
 });
 
-document.getElementById("menuBtn")?.addEventListener("click", () => {
-  showLandingToast("Use the portal links in the nav, or explore the sections below.", "info");
+// Mobile Navigation Drawer logic
+const mobileDrawer = document.getElementById("mobileDrawer");
+const mobileDrawerClose = document.getElementById("mobileDrawerClose");
+const mobileDrawerBackdrop = document.getElementById("mobileDrawerBackdrop");
+
+function openMobileDrawer() {
+  if (mobileDrawer) {
+    mobileDrawer.classList.add("open");
+    mobileDrawer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closeMobileDrawer() {
+  if (mobileDrawer) {
+    mobileDrawer.classList.remove("open");
+    mobileDrawer.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+}
+
+document.getElementById("menuBtn")?.addEventListener("click", openMobileDrawer);
+mobileDrawerClose?.addEventListener("click", closeMobileDrawer);
+mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawer);
+
+document.querySelectorAll(".mobile-drawer .drawer-link").forEach(link => {
+  link.addEventListener("click", () => {
+    closeMobileDrawer();
+  });
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && mobileDrawer?.classList.contains("open")) {
+    closeMobileDrawer();
+  }
 });
 
 // Check if redirected due to login_required

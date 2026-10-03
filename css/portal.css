@@ -1,23 +1,33 @@
 /**
  * SAHAAYA — Portal Layout & Dashboard Styling
+ * Unified Dark Navy / Purple / Cyan Theme
  * Shared layout styles for Volunteer, Home, and Admin portals.
  */
 
 :root {
-  --portal-bg: #f5f4ee;
-  --portal-card: #ffffff;
-  --portal-ink: #18332f;
-  --portal-muted: #5e716c;
-  --portal-line: #e3e7df;
-  --portal-primary: #286c59;
-  --portal-deep: #174e43;
+  --portal-bg: #05091a;
+  --portal-bg-2: #080d25;
+  --portal-card: #0c1430;
+  --portal-card-2: #101a3d;
+  --portal-ink: #f7f8ff;
+  --portal-muted: #9da7c6;
+  --portal-muted-2: #7580a2;
+  --portal-line: rgba(139, 151, 220, 0.16);
+  --portal-primary: #8b5cf6;
+  --portal-primary-hover: #7c3aed;
+  --portal-blue: #21c8ff;
+  --portal-cyan: #43e5ff;
+  --portal-deep: #4c1d95;
   --portal-radius: 20px;
-  --portal-shadow: 0 10px 30px rgba(24, 51, 47, 0.06);
+  --portal-shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
 }
 
 body.portal-body {
   margin: 0;
-  background: var(--portal-bg);
+  background:
+    radial-gradient(circle at 85% 10%, rgba(139, 92, 246, 0.12), transparent 28%),
+    radial-gradient(circle at 10% 25%, rgba(33, 200, 255, 0.08), transparent 25%),
+    var(--portal-bg);
   color: var(--portal-ink);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
@@ -27,18 +37,20 @@ body.portal-body {
    PORTAL TOP NAVIGATION BAR
    ------------------------------------------------------------- */
 .portal-navbar {
-  background: #ffffff;
+  background: rgba(6, 11, 28, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--portal-line);
   position: sticky;
-  top: 40px; /* Below demo bar */
+  top: 42px; /* Below demo bar */
   z-index: 90;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .portal-nav-inner {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 12px 28px;
+  padding: 14px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,26 +61,28 @@ body.portal-body {
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  color: var(--portal-ink);
+  color: #ffffff;
 }
 
 .portal-brand-mark {
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: var(--portal-primary);
+  background: linear-gradient(135deg, #8b5cf6, #21c8ff);
   color: #fff;
   display: grid;
   place-items: center;
   font-family: "Manrope", sans-serif;
   font-weight: 800;
   font-size: 20px;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
 }
 
 .portal-brand-text h1 {
   font-family: "Manrope", sans-serif;
   font-size: 20px;
   font-weight: 800;
+  color: #ffffff;
   margin: 0;
   line-height: 1.1;
 }
@@ -77,10 +91,14 @@ body.portal-body {
   display: inline-block;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--portal-primary);
+  letter-spacing: 0.6px;
+  color: #c4d8ff;
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 2px 7px;
+  border-radius: 6px;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .portal-user-section {
@@ -99,20 +117,20 @@ body.portal-body {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #e2ede8;
-  color: var(--portal-deep);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(33, 200, 255, 0.25));
+  color: #ffffff;
   font-weight: 700;
   font-size: 13px;
   display: grid;
   place-items: center;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border: 1.5px solid rgba(139, 151, 220, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .portal-user-meta strong {
   display: block;
   font-size: 13px;
-  color: var(--portal-ink);
+  color: #ffffff;
 }
 
 .portal-user-meta small {
@@ -122,7 +140,7 @@ body.portal-body {
 }
 
 .portal-logout-btn {
-  background: #f7f9f6;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--portal-line);
   color: var(--portal-muted);
   padding: 7px 14px;
@@ -137,9 +155,9 @@ body.portal-body {
 }
 
 .portal-logout-btn:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
 }
 
 /* -------------------------------------------------------------
@@ -162,10 +180,10 @@ body.portal-body {
 
 .portal-welcome h2 {
   font-family: "Manrope", sans-serif;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
-  color: var(--portal-ink);
-  letter-spacing: -0.8px;
+  color: #ffffff;
+  letter-spacing: -0.6px;
   margin: 0 0 6px;
 }
 
@@ -173,6 +191,8 @@ body.portal-body {
   color: var(--portal-muted);
   font-size: 14px;
   margin: 0;
+  max-width: 650px;
+  line-height: 1.5;
 }
 
 /* -------------------------------------------------------------
@@ -186,7 +206,7 @@ body.portal-body {
 }
 
 .kpi-card {
-  background: var(--portal-card);
+  background: linear-gradient(145deg, #0d1430, #090f24);
   border: 1px solid var(--portal-line);
   border-radius: 18px;
   padding: 22px 24px;
@@ -194,12 +214,13 @@ body.portal-body {
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .kpi-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(24, 51, 47, 0.09);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
 }
 
 .kpi-icon {
@@ -211,17 +232,17 @@ body.portal-body {
   font-size: 22px;
 }
 
-.kpi-icon.green  { background: #e3f2ea; color: #1e7046; }
-.kpi-icon.peach  { background: #fbeee8; color: #b85c39; }
-.kpi-icon.blue   { background: #eaf1fb; color: #2b5c9e; }
-.kpi-icon.purple { background: #f2edf8; color: #6a4495; }
+.kpi-icon.green  { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.28); }
+.kpi-icon.peach  { background: rgba(244, 63, 94, 0.16);  color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.28); }
+.kpi-icon.blue   { background: rgba(33, 200, 255, 0.16); color: #7dd3fc; border: 1px solid rgba(33, 200, 255, 0.28); }
+.kpi-icon.purple { background: rgba(139, 92, 246, 0.16); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.28); }
 
 .kpi-data strong {
   display: block;
   font-family: "Manrope", sans-serif;
   font-size: 28px;
   font-weight: 800;
-  color: var(--portal-ink);
+  color: #ffffff;
   line-height: 1.1;
 }
 
@@ -239,10 +260,15 @@ body.portal-body {
 .portal-tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 2px solid var(--portal-line);
+  border-bottom: 1px solid var(--portal-line);
   margin-bottom: 28px;
   overflow-x: auto;
   padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.portal-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .portal-tab-btn {
@@ -250,7 +276,7 @@ body.portal-body {
   border: 0;
   padding: 12px 18px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--portal-muted);
   cursor: pointer;
@@ -264,11 +290,11 @@ body.portal-body {
 }
 
 .portal-tab-btn:hover {
-  color: var(--portal-ink);
+  color: #ffffff;
 }
 
 .portal-tab-btn.active {
-  color: var(--portal-primary);
+  color: #ffffff;
 }
 
 .portal-tab-btn.active::after {
@@ -278,13 +304,15 @@ body.portal-body {
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--portal-primary);
+  background: linear-gradient(90deg, #8b5cf6, #21c8ff);
   border-radius: 3px 3px 0 0;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
 }
 
 .portal-tab-count {
-  background: #e6ede9;
-  color: var(--portal-primary);
+  background: rgba(139, 92, 246, 0.18);
+  color: #c4d8ff;
+  border: 1px solid rgba(139, 92, 246, 0.3);
   padding: 2px 7px;
   border-radius: 10px;
   font-size: 11px;
@@ -314,24 +342,25 @@ body.portal-body {
 }
 
 .portal-card {
-  background: var(--portal-card);
+  background: linear-gradient(145deg, #0d1430, #080e25);
   border: 1px solid var(--portal-line);
   border-radius: var(--portal-radius);
   overflow: hidden;
   box-shadow: var(--portal-shadow);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .portal-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(24, 51, 47, 0.10);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
 }
 
 .portal-card-header {
   padding: 20px 24px 14px;
-  border-bottom: 1px solid #f4f6f2;
+  border-bottom: 1px solid rgba(139, 151, 220, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -346,7 +375,7 @@ body.portal-body {
 .portal-card-body h3 {
   font-family: "Manrope", sans-serif;
   font-size: 19px;
-  color: var(--portal-ink);
+  color: #ffffff;
   margin: 0 0 8px;
   line-height: 1.25;
 }
@@ -360,8 +389,8 @@ body.portal-body {
 
 .portal-card-footer {
   padding: 16px 24px;
-  background: #fbfcf9;
-  border-top: 1px solid var(--portal-line);
+  background: rgba(6, 10, 28, 0.5);
+  border-top: 1px solid rgba(139, 151, 220, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -369,8 +398,8 @@ body.portal-body {
 
 /* Matching Breakdown Accordion in Volunteer Cards */
 .match-explainer-box {
-  background: #f5f8f5;
-  border: 1px solid #dbe6dc;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.22);
   border-radius: 12px;
   padding: 12px 14px;
   margin: 14px 0;
@@ -378,7 +407,7 @@ body.portal-body {
 }
 
 .match-explainer-box strong {
-  color: var(--portal-deep);
+  color: #c4d8ff;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -388,18 +417,19 @@ body.portal-body {
 .match-explainer-box ul {
   margin: 0;
   padding-left: 18px;
-  color: #3b504b;
+  color: #cdd5ed;
 }
 
 .match-explainer-box li {
-  margin-bottom: 3px;
+  margin-bottom: 4px;
+  line-height: 1.45;
 }
 
 /* -------------------------------------------------------------
    ROSTERS, TABLES & LIST VIEWS
    ------------------------------------------------------------- */
 .portal-table-card {
-  background: var(--portal-card);
+  background: linear-gradient(145deg, #0d1430, #080e25);
   border: 1px solid var(--portal-line);
   border-radius: var(--portal-radius);
   box-shadow: var(--portal-shadow);
@@ -419,6 +449,7 @@ body.portal-body {
 .portal-table-header h3 {
   font-family: "Manrope", sans-serif;
   font-size: 18px;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -435,19 +466,19 @@ body.portal-body {
 }
 
 .portal-table th {
-  background: #f8faf6;
+  background: rgba(8, 14, 36, 0.85);
   color: var(--portal-muted);
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   padding: 14px 24px;
   border-bottom: 1px solid var(--portal-line);
 }
 
 .portal-table td {
   padding: 16px 24px;
-  border-bottom: 1px solid #f1f4ee;
+  border-bottom: 1px solid rgba(139, 151, 220, 0.1);
   color: var(--portal-ink);
   vertical-align: middle;
 }
@@ -457,14 +488,36 @@ body.portal-body {
 }
 
 .portal-table tr:hover td {
-  background: #fbfcf9;
+  background: rgba(139, 92, 246, 0.05);
 }
 
 /* Button variants in portal */
 .btn-primary {
-  background: var(--portal-primary);
-  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: #ffffff;
   border: 0;
+  padding: 9px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--portal-line);
+  color: var(--portal-ink);
   padding: 9px 18px;
   border-radius: 12px;
   font-size: 13px;
@@ -476,46 +529,62 @@ body.portal-body {
   transition: all 0.2s;
 }
 
-.btn-primary:hover {
-  background: var(--portal-deep);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: #fff;
-  border: 1px solid var(--portal-line);
-  color: var(--portal-ink);
-  padding: 9px 18px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
 .btn-secondary:hover {
-  background: #f4f6f1;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #ffffff;
 }
 
 .btn-danger {
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
   padding: 8px 14px;
   border-radius: 10px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: 0.2s;
 }
 
 .btn-danger:hover {
-  background: #fecaca;
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
 }
 
 .btn-sm {
   padding: 6px 12px;
   font-size: 12px;
+  border-radius: 9px;
+}
+
+/* Category filter buttons in Discover tab */
+.filters .filter {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--portal-line);
+  color: var(--portal-muted);
+  padding: 7px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filters .filter:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #ffffff;
+}
+
+.filters .filter.active {
+  background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+  border-color: rgba(167, 139, 250, 0.5);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.35);
 }
 
 /* Responsive */
@@ -532,5 +601,42 @@ body.portal-body {
   .portal-welcome {
     flex-direction: column;
     align-items: flex-start;
+  }
+  .portal-welcome h2 {
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 600px) {
+  .portal-navbar {
+    top: 54px; /* Stacked demo bar */
+  }
+  .portal-user-meta {
+    display: none;
+  }
+  .portal-tabs {
+    gap: 4px;
+  }
+  .portal-tab-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .kpi-card {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .kpi-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  .kpi-data strong {
+    font-size: 22px;
   }
 }

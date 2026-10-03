@@ -1,76 +1,73 @@
 /**
- * SAHAAYA — Old Age Home Portal Controller
+ * SAHAAYA — Old Age Home Portal Controller (Dual-Mode)
+ *
+ * session.id      = profiles.id (auth UID)
+ * session.home_id = old_age_homes.id (distinct from profiles.id)
+ * session.isDemoSession = true if demo mode
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
-  // 1. Authenticate Guard
-  const session = await SahaayaAuth.checkAuthGuard("home");
+document.addEventListener('DOMContentLoaded', async () => {
+  const session = await SahaayaAuth.checkAuthGuard('home');
   if (!session) return;
 
-  // DOM References
-  const homeAvatar = document.getElementById("homeAvatar");
-  const homeCoordinatorName = document.getElementById("homeCoordinatorName");
-  const homeNameTag = document.getElementById("homeNameTag");
-  const homeWelcomeTitle = document.getElementById("homeWelcomeTitle");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const verificationNoticeArea = document.getElementById("verificationNoticeArea");
+  const isDemoMode = !!(session.isDemoSession);
+  const isSupabaseReady = !isDemoMode && window.SahaayaSupabaseDB && SahaayaSupabaseDB.isAvailable();
 
-  logoutBtn.addEventListener("click", () => SahaayaAuth.logout());
+  const homeAvatar           = document.getElementById('homeAvatar');
+  const homeCoordinatorName  = document.getElementById('homeCoordinatorName');
+  const homeNameTag          = document.getElementById('homeNameTag');
+  const homeWelcomeTitle     = document.getElementById('homeWelcomeTitle');
+  const logoutBtn            = document.getElementById('logoutBtn');
+  const verificationNoticeArea = document.getElementById('verificationNoticeArea');
 
-  // State
+  logoutBtn.addEventListener('click', () => SahaayaAuth.logout());
+
   let currentHome = null;
-  let homeOpportunities = [];
+  let homeActivities = [];
   let homeApplications = [];
-  let allUsers = [];
 
-  // Tab Switching
-  const tabButtons = document.querySelectorAll(".portal-tab-btn");
-  const tabContents = document.querySelectorAll(".portal-tab-content");
-
+  const tabButtons  = document.querySelectorAll('.portal-tab-btn');
+  const tabContents = document.querySelectorAll('.portal-tab-content');
   function switchTab(tabId) {
-    tabButtons.forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.tab === tabId);
-    });
-    tabContents.forEach(content => {
-      content.classList.toggle("active", content.id === `tab-${tabId}`);
-    });
+    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+    tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
+  }
+  tabButtons.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+  // ---- Adapters ----
+  function adaptActivity(act) {
+    return {
+      id: act.id, home_id: act.home_id, title: act.title, category: act.activity_type,
+      description: act.description, date: act.date,
+      time_start: act.start_time, time_end: act.end_time,
+      duration_hours: calcDuration(act.start_time, act.end_time),
+      spots_needed: act.volunteers_required, spots_filled: act.spots_filled || 0,
+      required_skills: act.required_skills || [], status: act.status
+    };
+  }
+  function calcDuration(s, e) {
+    try { const [sh,sm]=s.split(':').map(Number), [eh,em]=e.split(':').map(Number); return parseFloat(((eh*60+em-sh*60-sm)/60).toFixed(1)); } catch(x) { return 2.0; }
+  }
+  function adaptApplication(app, activities) {
+    const act = app.activities || activities.find(a => a.id === app.activity_id) || {};
+    const vol = app.volunteers || {};
+    const prof = vol.profiles || {};
+    return {
+      id: app.id, activity_id: app.activity_id, opportunity_id: app.activity_id,
+      volunteer_id: app.volunteer_id, status: app.status, applied_at: app.applied_at,
+      coordinator_note: app.coordinator_note || null,
+      match_score: app.match_score || 85,
+      match_reasons: app.match_reasons || ['Compatible availability', 'Interest area match'],
+      _volunteer: { name: prof.full_name || 'Applicant', email: prof.email || '', phone: prof.phone || '' },
+      _activity: { title: (typeof act === 'object' ? act.title : '') || 'Activity', date: (typeof act === 'object' ? act.date : '') || '', time_start: (typeof act === 'object' ? act.start_time : '') || '', time_end: (typeof act === 'object' ? act.end_time : '') || '' }
+    };
   }
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-  });
-
-  // 2. Fetch Initial Data
+  // ---- Load Data ----
   async function loadData() {
-    allUsers = await SahaayaDB.getUsers();
-
-    // Find home linked to session or fallback to home_01
-    const homeId = session.home_id || "home_01";
-    currentHome = await SahaayaDB.getHomeById(homeId);
-
-    if (!currentHome) {
-      // Fallback
-      const homes = await SahaayaDB.getHomes();
-      currentHome = homes[0];
-    }
-
-    // Populate Topbar & Greetings
-    homeAvatar.textContent = currentHome.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-    homeCoordinatorName.textContent = session.name;
-    homeNameTag.textContent = `${currentHome.name} · ${currentHome.area}`;
-    homeWelcomeTitle.textContent = `${currentHome.name} 🏡`;
-
-    // Render Verification Notice Banner
+    if (isSupabaseReady) await loadRealData(); else await loadDemoData();
+    populateHeader();
     renderVerificationBanner();
-
-    // Fetch requirements & applications for this home
-    const allOpps = await SahaayaDB.getOpportunities();
-    homeOpportunities = allOpps.filter(o => o.home_id === currentHome.id);
-
-    const allApps = await SahaayaDB.getApplications();
-    const homeOppIds = new Set(homeOpportunities.map(o => o.id));
-    homeApplications = allApps.filter(a => homeOppIds.has(a.opportunity_id));
-
     renderKPIs();
     renderApplications();
     renderRequirements();
@@ -78,459 +75,296 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderProfileForm();
   }
 
-  // 3. Render Verification Banner
+  async function loadDemoData() {
+    const homeId = session.home_id || 'home_01';
+    currentHome = await SahaayaDB.getHomeById(homeId) || (await SahaayaDB.getHomes())[0];
+    const allOpps = await SahaayaDB.getOpportunities();
+    homeActivities = allOpps.filter(o => o.home_id === currentHome.id).map(o => ({ ...o, category: o.category }));
+    const allApps = await SahaayaDB.getApplications();
+    const ids = new Set(homeActivities.map(o => o.id));
+    homeApplications = allApps.filter(a => ids.has(a.opportunity_id)).map(app => {
+      const opp = homeActivities.find(o => o.id === app.opportunity_id) || {};
+      const vol = { name: app.volunteer_name || 'Volunteer', email: '', phone: '' };
+      return { ...app, _volunteer: vol, _activity: { title: opp.title, date: opp.date, time_start: opp.time_start, time_end: opp.time_end } };
+    });
+  }
+
+  async function loadRealData() {
+    const homeByProfile = await SahaayaSupabaseDB.getHomeByProfileId(session.id);
+    if (homeByProfile) {
+      currentHome = homeByProfile;
+      session.home_id = homeByProfile.id;
+    } else if (session.home_id) {
+      currentHome = await SahaayaSupabaseDB.getHomeById(session.home_id);
+    }
+    if (!currentHome) { console.error('Home not found for session'); return; }
+
+    const rawActivities = await SahaayaSupabaseDB.getActivities({ home_id: currentHome.id });
+    homeActivities = rawActivities.map(adaptActivity);
+
+    // Get applications for each activity
+    const allApps = [];
+    for (const act of rawActivities) {
+      const apps = await SahaayaSupabaseDB.getApplicationsByActivityId(act.id);
+      allApps.push(...apps);
+    }
+    homeApplications = allApps.map(app => adaptApplication(app, rawActivities));
+  }
+
+  function populateHeader() {
+    if (!currentHome) return;
+    if (homeAvatar) homeAvatar.textContent = currentHome.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    if (homeCoordinatorName) homeCoordinatorName.textContent = session.name;
+    if (homeNameTag) homeNameTag.textContent = currentHome.name + ' · ' + (currentHome.area || currentHome.city || 'Bengaluru');
+    if (homeWelcomeTitle) homeWelcomeTitle.textContent = currentHome.name + ' 🏡';
+  }
+
   function renderVerificationBanner() {
-    if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.PENDING) {
-      verificationNoticeArea.innerHTML = `
-        <div class="portal-notice notice-warning">
-          <div class="notice-content">
-            <span class="notice-icon">⏳</span>
-            <div>
-              <strong>Home Verification In Progress:</strong>
-              Your registration documents are being verified by Sahaaya Platform Administrators. You can configure requirements, and they will become publicly discoverable once approved.
-            </div>
-          </div>
-          <span class="badge badge-warning">Verification Pending</span>
-        </div>
-      `;
-    } else if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
-      verificationNoticeArea.innerHTML = `
-        <div class="portal-notice notice-success">
-          <div class="notice-content">
-            <span class="notice-icon">✓</span>
-            <div>
-              <strong>Verified Partner Home:</strong>
-              Registered NGO/Trust (${currentHome.registration_number}). Your volunteer requirements are actively recommended to verified volunteers.
-            </div>
-          </div>
-          <span class="badge badge-success">✓ Verified Partner</span>
-        </div>
-      `;
+    if (!verificationNoticeArea || !currentHome) return;
+    const status = currentHome.verification_status;
+    if (status === 'pending') {
+      verificationNoticeArea.innerHTML = '<div class="portal-notice notice-warning"><div class="notice-content"><span class="notice-icon">⏳</span><div><strong>Home Verification In Progress:</strong> Your registration documents are being verified by Sahaaya Platform Administrators. You can configure requirements, and they will become publicly discoverable once approved.</div></div><span class="badge badge-warning">Verification Pending</span></div>';
+    } else if (status === 'verified') {
+      verificationNoticeArea.innerHTML = '<div class="portal-notice notice-success"><div class="notice-content"><span class="notice-icon">✓</span><div><strong>Verified Partner Home:</strong> Registered NGO/Trust (' + (currentHome.registration_number || 'Verified') + '). Your volunteer requirements are actively recommended to verified volunteers.</div></div><span class="badge badge-success">✓ Verified Partner</span></div>';
     }
   }
 
-  // 4. Render KPIs
   function renderKPIs() {
-    const pendingReviews = homeApplications.filter(a => a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED).length;
-    const approvedVolunteers = homeApplications.filter(a => a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED || a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED).length;
-
-    document.getElementById("kpiActiveRequirements").textContent = homeOpportunities.length;
-    document.getElementById("kpiPendingReviews").textContent = pendingReviews;
-    document.getElementById("kpiApprovedVolunteers").textContent = approvedVolunteers;
-    document.getElementById("kpiResidentCount").textContent = currentHome.resident_count || 40;
-
-    document.getElementById("countPendingReview").textContent = pendingReviews;
-    document.getElementById("countRequirements").textContent = homeOpportunities.length;
+    const pendingReviews   = homeApplications.filter(a => a.status === 'applied').length;
+    const approvedVols     = homeApplications.filter(a => a.status === 'approved' || a.status === 'attended').length;
+    document.getElementById('kpiActiveRequirements')?.textContent && (document.getElementById('kpiActiveRequirements').textContent = homeActivities.length);
+    document.getElementById('kpiPendingReviews')?.textContent    && (document.getElementById('kpiPendingReviews').textContent    = pendingReviews);
+    document.getElementById('kpiApprovedVolunteers')?.textContent && (document.getElementById('kpiApprovedVolunteers').textContent = approvedVols);
+    document.getElementById('kpiResidentCount')?.textContent     && (document.getElementById('kpiResidentCount').textContent     = currentHome?.resident_count || 40);
+    document.getElementById('countPendingReview')?.textContent   && (document.getElementById('countPendingReview').textContent   = pendingReviews);
+    document.getElementById('countRequirements')?.textContent    && (document.getElementById('countRequirements').textContent    = homeActivities.length);
+    setTextSafe('kpiActiveRequirements', homeActivities.length);
+    setTextSafe('kpiPendingReviews',     pendingReviews);
+    setTextSafe('kpiApprovedVolunteers', approvedVols);
+    setTextSafe('kpiResidentCount',      currentHome?.resident_count || 40);
+    setTextSafe('countPendingReview',    pendingReviews);
+    setTextSafe('countRequirements',     homeActivities.length);
   }
+  function setTextSafe(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
 
-  // 5. Render Applications to Review
   function renderApplications() {
-    const container = document.getElementById("applicationsContainer");
-    container.innerHTML = "";
-
-    const pendingApps = homeApplications.filter(a => a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED);
-
+    const container = document.getElementById('applicationsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    const pendingApps = homeApplications.filter(a => a.status === 'applied');
     if (pendingApps.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">💌</div>
-          <h4>No pending applications to review</h4>
-          <p>You have reviewed all incoming applications. When volunteers discover your requirements and apply, their profiles will appear here for your approval.</p>
-        </div>
-      `;
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💌</div><h4>No pending applications to review</h4><p>You have reviewed all incoming applications. When volunteers discover your requirements and apply, their profiles will appear here for your approval.</p></div>';
       return;
     }
-
-    const grid = document.createElement("div");
-    grid.className = "portal-grid";
-
+    const grid = document.createElement('div');
+    grid.className = 'portal-grid';
     pendingApps.forEach(app => {
-      const opp = homeOpportunities.find(o => o.id === app.opportunity_id);
-      const volunteer = allUsers.find(u => u.id === app.volunteer_id) || { name: "Volunteer Applicant", email: "", phone: "" };
-
-      const card = document.createElement("div");
-      card.className = "portal-card";
-      card.innerHTML = `
-        <div class="portal-card-header">
-          <span class="badge badge-warning">Under Review</span>
-          <span class="match-pill match-high">★ ${app.match_score}% Fit</span>
-        </div>
-        <div class="portal-card-body">
-          <div style="font-size: 11px; font-weight: 700; color: var(--portal-muted); margin-bottom: 6px;">
-            ACTIVITY: ${opp?.title || "Volunteer Requirement"}
-          </div>
-          <h3 style="margin-bottom: 4px;">${volunteer.name}</h3>
-          <div style="font-size: 12px; color: var(--portal-muted); margin-bottom: 14px;">
-            📞 ${volunteer.phone || "Phone on file"} · ✉ ${volunteer.email}
-          </div>
-
-          <div style="background: #f7faf7; border-radius: 12px; padding: 14px; margin-bottom: 14px;">
-            <strong style="display: block; font-size: 12px; color: var(--portal-deep); margin-bottom: 6px;">
-              Volunteer's Application Message:
-            </strong>
-            <p style="margin: 0; font-size: 13px; font-style: italic; color: #2e443f;">
-              "${app.volunteer_note || "Willing and excited to participate!"}"
-            </p>
-          </div>
-
-          <div class="match-explainer-box">
-            <strong>Compatibility Breakdown:</strong>
-            <ul>
-              ${(app.match_reasons || ["Direct category interest"]).map(r => `<li>${r}</li>`).join("")}
-            </ul>
-          </div>
-        </div>
-        <div class="portal-card-footer">
-          <button class="btn-danger btn-sm decline-btn" data-app-id="${app.id}">
-            Decline
-          </button>
-          <button class="btn-primary btn-sm approve-btn" data-app-id="${app.id}" data-volunteer="${volunteer.name}">
-            Approve Volunteer ✓
-          </button>
-        </div>
-      `;
-
+      const opp = homeActivities.find(o => o.id === app.opportunity_id || o.id === app.activity_id);
+      const vol = app._volunteer || { name: 'Volunteer Applicant', email: '', phone: '' };
+      const card = document.createElement('div');
+      card.className = 'portal-card';
+      card.innerHTML = '<div class="portal-card-header"><span class="badge badge-warning">Under Review</span><span class="match-pill match-high">★ ' + (app.match_score || 85) + '% Fit</span></div>' +
+        '<div class="portal-card-body"><div style="font-size: 11px; font-weight: 700; color: var(--portal-muted); margin-bottom: 6px;">ACTIVITY: ' + (opp?.title || app._activity?.title || 'Volunteer Requirement') + '</div>' +
+        '<h3 style="margin-bottom: 4px;">' + vol.name + '</h3><div style="font-size: 12px; color: var(--portal-muted); margin-bottom: 14px;">📞 ' + (vol.phone || 'On file') + ' · ✉ ' + (vol.email || '') + '</div>' +
+        '<div style="background: #f7faf7; border-radius: 12px; padding: 14px; margin-bottom: 14px;"><strong style="display: block; font-size: 12px; color: var(--portal-deep); margin-bottom: 6px;">Application Message:</strong><p style="margin: 0; font-size: 13px; font-style: italic; color: #2e443f;">"' + (app.volunteer_note || 'Willing and excited to participate!') + '"</p></div>' +
+        '<div class="match-explainer-box"><strong>Compatibility Breakdown:</strong><ul>' + (app.match_reasons || ['Direct category interest']).map(r => '<li>' + r + '</li>').join('') + '</ul></div></div>' +
+        '<div class="portal-card-footer"><button class="btn-danger btn-sm decline-btn" data-app-id="' + app.id + '">Decline</button><button class="btn-primary btn-sm approve-btn" data-app-id="' + app.id + '" data-volunteer="' + vol.name + '">Approve Volunteer ✓</button></div>';
       grid.appendChild(card);
     });
-
     container.appendChild(grid);
-
-    // Event listeners
-    grid.querySelectorAll(".approve-btn").forEach(btn => {
-      btn.addEventListener("click", () => openApproveModal(btn.dataset.appId, btn.dataset.volunteer));
-    });
-
-    grid.querySelectorAll(".decline-btn").forEach(btn => {
-      btn.addEventListener("click", () => openDeclineModal(btn.dataset.appId));
-    });
+    grid.querySelectorAll('.approve-btn').forEach(btn => btn.addEventListener('click', () => openApproveModal(btn.dataset.appId, btn.dataset.volunteer)));
+    grid.querySelectorAll('.decline-btn').forEach(btn => btn.addEventListener('click', () => openDeclineModal(btn.dataset.appId)));
   }
 
-  // Approve Modal
   function openApproveModal(appId, volunteerName) {
     SahaayaUI.openModal({
-      title: `Approve ${volunteerName}`,
-      subtitle: "The activity will be automatically added to the volunteer's schedule.",
-      bodyHtml: `
-        <div class="form-group">
-          <label>Welcome Note / Instructions for the volunteer (Optional):</label>
-          <textarea id="approveNoteInput" rows="3" placeholder="e.g. Welcome! Please report to Reception Desk at 10:45 AM. Looking forward to having you."></textarea>
-        </div>
-      `,
-      footerHtml: `
-        <button class="btn-secondary" id="approveCancel">Cancel</button>
-        <button class="btn-primary" id="approveConfirm">Confirm Approval ✓</button>
-      `
+      title: 'Approve ' + volunteerName,
+      subtitle: 'The activity will be automatically added to the volunteer\'s schedule.',
+      bodyHtml: '<div class="form-group"><label>Welcome Note / Instructions for the volunteer (Optional):</label><textarea id="approveNoteInput" rows="3" placeholder="e.g. Welcome! Please report to Reception Desk at 10:45 AM."></textarea></div>',
+      footerHtml: '<button class="btn-secondary" id="approveCancel">Cancel</button><button class="btn-primary" id="approveConfirm">Confirm Approval ✓</button>'
     });
-
-    document.getElementById("approveCancel")?.addEventListener("click", SahaayaUI.closeModal);
-    document.getElementById("approveConfirm")?.addEventListener("click", async () => {
-      const note = document.getElementById("approveNoteInput").value.trim();
-      await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, note || "Application approved! See you soon.");
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast(`Approved ${volunteerName}! Added to their schedule.`, "success");
-      await loadData();
+    document.getElementById('approveCancel')?.addEventListener('click', SahaayaUI.closeModal);
+    document.getElementById('approveConfirm')?.addEventListener('click', async () => {
+      const note = document.getElementById('approveNoteInput').value.trim();
+      try {
+        if (isSupabaseReady) {
+          await SahaayaSupabaseDB.updateApplicationStatus(appId, 'approved');
+        } else {
+          await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, note || 'Application approved! See you soon.');
+        }
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast('Approved ' + volunteerName + '! Added to their schedule.', 'success');
+        await loadData();
+      } catch (err) { SahaayaUI.showToast('Error: ' + err.message, 'error'); }
     });
   }
 
-  // Decline Modal
   function openDeclineModal(appId) {
     SahaayaUI.openModal({
-      title: "Decline Volunteer Application",
-      subtitle: "Provide a gentle note explaining why this specific requirement is not suitable at this time.",
-      bodyHtml: `
-        <div class="form-group">
-          <label>Reason for declining:</label>
-          <select id="declineReasonSelect">
-            <option value="Spots for this session are currently full.">Spots for this session are currently full.</option>
-            <option value="Activity requires specialized medical or language training.">Activity requires specialized training.</option>
-            <option value="Schedule rescheduled or postponed by home.">Schedule postponed by the home.</option>
-          </select>
-        </div>
-      `,
-      footerHtml: `
-        <button class="btn-secondary" id="declineCancel">Cancel</button>
-        <button class="btn-danger" id="declineConfirm">Confirm Decline</button>
-      `
+      title: 'Decline Volunteer Application',
+      subtitle: 'Provide a gentle note explaining why this requirement is not suitable at this time.',
+      bodyHtml: '<div class="form-group"><label>Reason for declining:</label><select id="declineReasonSelect"><option value="Spots for this session are currently full.">Spots for this session are currently full.</option><option value="Activity requires specialized training.">Activity requires specialized training.</option><option value="Schedule rescheduled or postponed by home.">Schedule postponed by the home.</option></select></div>',
+      footerHtml: '<button class="btn-secondary" id="declineCancel">Cancel</button><button class="btn-danger" id="declineConfirm">Confirm Decline</button>'
     });
-
-    document.getElementById("declineCancel")?.addEventListener("click", SahaayaUI.closeModal);
-    document.getElementById("declineConfirm")?.addEventListener("click", async () => {
-      const reason = document.getElementById("declineReasonSelect").value;
-      await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.REJECTED, reason);
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast("Application updated.", "info");
-      await loadData();
+    document.getElementById('declineCancel')?.addEventListener('click', SahaayaUI.closeModal);
+    document.getElementById('declineConfirm')?.addEventListener('click', async () => {
+      const reason = document.getElementById('declineReasonSelect').value;
+      try {
+        if (isSupabaseReady) {
+          await SahaayaSupabaseDB.updateApplicationStatus(appId, 'rejected');
+        } else {
+          await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.REJECTED, reason);
+        }
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast('Application updated.', 'info');
+        await loadData();
+      } catch (err) { SahaayaUI.showToast('Error: ' + err.message, 'error'); }
     });
   }
 
-  // 6. Render Requirements & Activities
   function renderRequirements() {
-    const grid = document.getElementById("homeRequirementsGrid");
-    grid.innerHTML = "";
-
-    if (homeOpportunities.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1;">
-          <div class="empty-state-icon">📌</div>
-          <h4>No volunteer requirements posted yet</h4>
-          <p>As an Old Age Home, you define what assistance your residents need. Click the button above to publish your first requirement.</p>
-        </div>
-      `;
+    const grid = document.getElementById('homeRequirementsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (homeActivities.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-state-icon">📌</div><h4>No volunteer requirements posted yet</h4><p>As an Old Age Home, you define what assistance your residents need. Click the button above to publish your first requirement.</p></div>';
       return;
     }
-
-    homeOpportunities.forEach(opp => {
-      const card = document.createElement("div");
-      card.className = "portal-card";
-
+    homeActivities.forEach(opp => {
       const spotsLeft = Math.max(0, (opp.spots_needed || 1) - (opp.spots_filled || 0));
-
-      card.innerHTML = `
-        <div class="portal-card-header">
-          ${SahaayaUI.getCategoryBadge(opp.category)}
-          ${SahaayaUI.getStatusBadge(opp.status)}
-        </div>
-        <div class="portal-card-body">
-          <h3>${opp.title}</h3>
-          <p>${opp.description}</p>
-
-          <div style="background: #f8faf7; border-radius: 10px; padding: 12px; font-size: 12px; margin-bottom: 12px;">
-            <div><strong>🗓 Date:</strong> ${opp.date}</div>
-            <div><strong>⏰ Time:</strong> ${opp.time_start} – ${opp.time_end} (${opp.duration_hours} hrs)</div>
-            <div><strong>👥 Volunteers Needed:</strong> ${opp.spots_needed} (${opp.spots_filled || 0} approved)</div>
-          </div>
-
-          <div style="font-size: 12px; color: var(--portal-muted);">
-            <strong>Skills Requested:</strong> ${(opp.required_skills || []).join(", ") || "General empathy & patience"}
-          </div>
-        </div>
-        <div class="portal-card-footer">
-          <span style="font-size: 12px; font-weight: 700; color: ${spotsLeft === 0 ? '#991b1b' : 'var(--portal-primary)'};">
-            ${spotsLeft === 0 ? "All spots filled" : `${spotsLeft} spots remaining`}
-          </span>
-          <button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">
-            Edit Need
-          </button>
-        </div>
-      `;
+      const card = document.createElement('div');
+      card.className = 'portal-card';
+      card.innerHTML = '<div class="portal-card-header">' + SahaayaUI.getCategoryBadge(opp.category) + SahaayaUI.getStatusBadge(opp.status) + '</div>' +
+        '<div class="portal-card-body"><h3>' + opp.title + '</h3><p>' + opp.description + '</p>' +
+        '<div style="background: #f8faf7; border-radius: 10px; padding: 12px; font-size: 12px; margin-bottom: 12px;"><div><strong>🗓 Date:</strong> ' + opp.date + '</div><div><strong>⏰ Time:</strong> ' + opp.time_start + ' – ' + opp.time_end + ' (' + opp.duration_hours + ' hrs)</div><div><strong>👥 Volunteers Needed:</strong> ' + opp.spots_needed + ' (' + (opp.spots_filled || 0) + ' approved)</div></div>' +
+        '<div style="font-size: 12px; color: var(--portal-muted);"><strong>Skills Requested:</strong> ' + ((opp.required_skills || []).join(', ') || 'General empathy & patience') + '</div></div>' +
+        '<div class="portal-card-footer"><span style="font-size: 12px; font-weight: 700; color: ' + (spotsLeft === 0 ? '#991b1b' : 'var(--portal-primary)') + ';">' + (spotsLeft === 0 ? 'All spots filled' : spotsLeft + ' spots remaining') + '</span><button class="btn-secondary btn-sm" onclick="SahaayaUI.showToast(\' Requirement is live and receiving applications.\', \'info\')">View Details</button></div>';
       grid.appendChild(card);
-    });
-
-    grid.querySelectorAll(".edit-opp-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        SahaayaUI.showToast("Requirement is live and receiving applications.", "info");
-      });
     });
   }
 
-  // 7. Create New Requirement Modal
-  document.getElementById("openCreateRequirementModalBtn").addEventListener("click", () => {
+  // Create Requirement Modal
+  document.getElementById('openCreateRequirementModalBtn')?.addEventListener('click', () => {
     SahaayaUI.openModal({
-      title: "Define New Volunteer Requirement",
-      subtitle: "The Old Age Home decides what help it needs. Sahaaya helps coordinate volunteers.",
-      bodyHtml: `
-        <form id="createRequirementForm">
-          <div class="form-group">
-            <label>Requirement Title</label>
-            <input type="text" id="newReqTitle" required placeholder="e.g. Sunday Storytelling & Carrom Afternoon">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Activity Category</label>
-              <select id="newReqCategory" required>
-                ${SAHAAYA_CONFIG.CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join("")}
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Availability Time Window</label>
-              <select id="newReqSlot" required>
-                ${SAHAAYA_CONFIG.WEEKDAY_SLOTS.map(s => `<option value="${s.id}">${s.label}</option>`).join("")}
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Specific Resident Need & Description (Detailed instructions)</label>
-            <textarea id="newReqDesc" rows="3" required placeholder="Describe what residents would enjoy, any precautions, and how volunteers can help..."></textarea>
-            <span class="hint">Be specific so volunteers with the right temperament and interests apply.</span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Date</label>
-              <input type="date" id="newReqDate" required value="${new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0]}">
-            </div>
-            <div class="form-group">
-              <label>Number of Volunteers Needed</label>
-              <input type="number" id="newReqSpots" min="1" max="15" value="3" required>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Start Time</label>
-              <input type="text" id="newReqStart" value="11:00 AM" required>
-            </div>
-            <div class="form-group">
-              <label>End Time</label>
-              <input type="text" id="newReqEnd" value="01:00 PM" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Requested Skills (Comma-separated)</label>
-            <input type="text" id="newReqSkills" placeholder="e.g. Patience, Board games, Storytelling, Hindi/Kannada speaker">
-          </div>
-        </form>
-      `,
-      footerHtml: `
-        <button class="btn-secondary" id="cancelReqBtn">Cancel</button>
-        <button class="btn-primary" id="saveReqBtn">Publish Volunteer Requirement →</button>
-      `
+      title: 'Define New Volunteer Requirement',
+      subtitle: 'The Old Age Home decides what help it needs. Sahaaya helps coordinate volunteers.',
+      bodyHtml: '<form id="createRequirementForm"><div class="form-group"><label>Requirement Title</label><input type="text" id="newReqTitle" required placeholder="e.g. Sunday Storytelling & Carrom Afternoon"></div>' +
+        '<div class="form-row"><div class="form-group"><label>Activity Category</label><select id="newReqCategory" required>' + SAHAAYA_CONFIG.CATEGORIES.map(c => '<option value="' + c.id + '">' + c.icon + ' ' + c.label + '</option>').join('') + '</select></div>' +
+        '<div class="form-group"><label>Availability Time Window</label><select id="newReqSlot" required>' + SAHAAYA_CONFIG.WEEKDAY_SLOTS.map(s => '<option value="' + s.id + '">' + s.label + '</option>').join('') + '</select></div></div>' +
+        '<div class="form-group"><label>Specific Resident Need & Description</label><textarea id="newReqDesc" rows="3" required placeholder="Describe what residents would enjoy, any precautions..."></textarea></div>' +
+        '<div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="newReqDate" required value="' + new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0] + '"></div>' +
+        '<div class="form-group"><label>Number of Volunteers Needed</label><input type="number" id="newReqSpots" min="1" max="15" value="3" required></div></div>' +
+        '<div class="form-row"><div class="form-group"><label>Start Time (HH:MM)</label><input type="text" id="newReqStart" value="11:00" required placeholder="11:00"></div>' +
+        '<div class="form-group"><label>End Time (HH:MM)</label><input type="text" id="newReqEnd" value="13:00" required placeholder="13:00"></div></div>' +
+        '<div class="form-group"><label>Requested Skills (Comma-separated)</label><input type="text" id="newReqSkills" placeholder="e.g. Patience, Board games, Storytelling"></div></form>',
+      footerHtml: '<button class="btn-secondary" id="cancelReqBtn">Cancel</button><button class="btn-primary" id="saveReqBtn">Publish Volunteer Requirement →</button>'
     });
-
-    document.getElementById("cancelReqBtn")?.addEventListener("click", SahaayaUI.closeModal);
-    document.getElementById("saveReqBtn")?.addEventListener("click", async () => {
-      const form = document.getElementById("createRequirementForm");
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      const title = document.getElementById("newReqTitle").value.trim();
-      const category = document.getElementById("newReqCategory").value;
-      const slot_id = document.getElementById("newReqSlot").value;
-      const description = document.getElementById("newReqDesc").value.trim();
-      const date = document.getElementById("newReqDate").value;
-      const spots_needed = parseInt(document.getElementById("newReqSpots").value, 10);
-      const time_start = document.getElementById("newReqStart").value.trim();
-      const time_end = document.getElementById("newReqEnd").value.trim();
-      const skillsRaw = document.getElementById("newReqSkills").value;
-      const required_skills = skillsRaw ? skillsRaw.split(",").map(s => s.trim()).filter(Boolean) : ["Patience", "Empathy"];
-
-      await SahaayaDB.createOpportunity({
-        home_id: currentHome.id,
-        title,
-        category,
-        slot_id,
-        description,
-        date,
-        time_start,
-        time_end,
-        duration_hours: 2.0,
-        spots_needed,
-        required_skills
-      });
-
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast("Requirement published successfully! It is now open to volunteers.", "success");
-      await loadData();
-      switchTab("requirements");
+    document.getElementById('cancelReqBtn')?.addEventListener('click', SahaayaUI.closeModal);
+    document.getElementById('saveReqBtn')?.addEventListener('click', async () => {
+      const form = document.getElementById('createRequirementForm');
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const title = document.getElementById('newReqTitle').value.trim();
+      const category = document.getElementById('newReqCategory').value;
+      const description = document.getElementById('newReqDesc').value.trim();
+      const date = document.getElementById('newReqDate').value;
+      const spots_needed = parseInt(document.getElementById('newReqSpots').value, 10);
+      const start_time = document.getElementById('newReqStart').value.trim();
+      const end_time = document.getElementById('newReqEnd').value.trim();
+      const skillsRaw = document.getElementById('newReqSkills').value;
+      const required_skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : ['Patience', 'Empathy'];
+      try {
+        if (isSupabaseReady) {
+          await SahaayaSupabaseDB.createActivity({ home_id: currentHome.id, title, description, activity_type: category, date, start_time, end_time, volunteers_required: spots_needed });
+        } else {
+          await SahaayaDB.createOpportunity({ home_id: currentHome.id, title, category, slot_id: category, description, date, time_start: start_time, time_end: end_time, duration_hours: 2.0, spots_needed, required_skills });
+        }
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast('Requirement published successfully! It is now open to volunteers.', 'success');
+        await loadData();
+        switchTab('requirements');
+      } catch (err) { SahaayaUI.showToast('Error: ' + err.message, 'error'); }
     });
   });
 
-  // 8. Render Attendance & Hours Sheet
   function renderAttendanceRoster() {
-    const tbody = document.getElementById("attendanceRosterBody");
-    tbody.innerHTML = "";
-
-    const approvedApps = homeApplications.filter(a => a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED || a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED);
-
+    const tbody = document.getElementById('attendanceRosterBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    const approvedApps = homeApplications.filter(a => a.status === 'approved' || a.status === 'attended');
     if (approvedApps.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align: center; padding: 40px; color: var(--portal-muted);">
-            No volunteers approved yet. Once you approve volunteer applications, they will appear on this attendance roster.
-          </td>
-        </tr>
-      `;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--portal-muted);">No volunteers approved yet. Once you approve volunteer applications, they will appear on this attendance roster.</td></tr>';
       return;
     }
-
     approvedApps.forEach(app => {
-      const opp = homeOpportunities.find(o => o.id === app.opportunity_id);
-      const volunteer = allUsers.find(u => u.id === app.volunteer_id) || { name: "Volunteer", phone: "" };
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>
-          <strong>${volunteer.name}</strong><br>
-          <small style="color: var(--portal-muted);">${volunteer.phone}</small>
-        </td>
-        <td>${opp?.title || "Activity"}</td>
-        <td>
-          ${opp?.date || "—"}<br>
-          <small style="color: var(--portal-muted);">${opp?.time_start} – ${opp?.time_end}</small>
-        </td>
-        <td><strong>+${opp?.duration_hours || 2.0} hrs</strong></td>
-        <td>${SahaayaUI.getStatusBadge(app.status)}</td>
-        <td>
-          ${
-            app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED
-              ? `<span style="color: var(--portal-primary); font-size: 12px; font-weight: 700;">✓ Hours Credited</span>`
-              : `<button class="btn-primary btn-sm mark-present-btn" data-app-id="${app.id}" data-volunteer="${volunteer.name}" data-hours="${opp?.duration_hours || 2.0}">
-                   Mark Present ✓
-                 </button>`
-          }
-        </td>
-      `;
+      const opp = homeActivities.find(o => o.id === (app.opportunity_id || app.activity_id));
+      const vol = app._volunteer || { name: 'Volunteer', phone: '' };
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td><strong>' + vol.name + '</strong><br><small style="color: var(--portal-muted);">' + (vol.phone || '') + '</small></td>' +
+        '<td>' + (opp?.title || app._activity?.title || 'Activity') + '</td>' +
+        '<td>' + (opp?.date || app._activity?.date || '—') + '<br><small style="color: var(--portal-muted);">' + (opp?.time_start || '') + ' – ' + (opp?.time_end || '') + '</small></td>' +
+        '<td><strong>+' + (opp?.duration_hours || 2.0) + ' hrs</strong></td>' +
+        '<td>' + SahaayaUI.getStatusBadge(app.status) + '</td>' +
+        '<td>' + (app.status === 'attended'
+          ? '<span style="color: var(--portal-primary); font-size: 12px; font-weight: 700;">✓ Hours Credited</span>'
+          : '<button class="btn-primary btn-sm mark-present-btn" data-app-id="' + app.id + '" data-volunteer="' + vol.name + '" data-activity-id="' + (app.activity_id || app.opportunity_id) + '" data-volunteer-id="' + app.volunteer_id + '" data-hours="' + (opp?.duration_hours || 2.0) + '">Mark Present ✓</button>') + '</td>';
       tbody.appendChild(tr);
     });
-
-    tbody.querySelectorAll(".mark-present-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const appId = btn.dataset.appId;
-        const volName = btn.dataset.volunteer;
-        const hours = btn.dataset.hours;
-
-        await SahaayaDB.recordAttendance({
-          applicationId: appId,
-          status: "present",
-          markedByUserId: session.id
-        });
-
-        SahaayaUI.showToast(`Attendance verified! ${hours} hours credited to ${volName}.`, "success");
-        await loadData();
+    tbody.querySelectorAll('.mark-present-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          if (isSupabaseReady) {
+            await SahaayaSupabaseDB.markAttendance({ activity_id: btn.dataset.activityId, volunteer_id: btn.dataset.volunteerId, status: 'present', hours: parseFloat(btn.dataset.hours) });
+          } else {
+            await SahaayaDB.recordAttendance({ applicationId: btn.dataset.appId, status: 'present', markedByUserId: session.id });
+          }
+          SahaayaUI.showToast('Attendance verified! ' + btn.dataset.hours + ' hours credited to ' + btn.dataset.volunteer + '.', 'success');
+          await loadData();
+        } catch (err) { SahaayaUI.showToast('Error: ' + err.message, 'error'); }
       });
     });
   }
 
-  // 9. Profile Form
   function renderProfileForm() {
-    document.getElementById("profHomeName").value = currentHome.name;
-    document.getElementById("profRegNo").value = currentHome.registration_number;
-    document.getElementById("profResidentCount").value = currentHome.resident_count;
-    document.getElementById("profContactPerson").value = currentHome.contact_person;
-    document.getElementById("profArea").value = currentHome.area;
-    document.getElementById("profAddress").value = currentHome.address;
-    document.getElementById("profDescription").value = currentHome.description || "";
+    if (!currentHome) return;
+    const setValue = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setValue('profHomeName', currentHome.name);
+    setValue('profRegNo', currentHome.registration_number || 'N/A');
+    setValue('profResidentCount', currentHome.resident_count || 0);
+    setValue('profContactPerson', currentHome.contact_person || (currentHome.profiles && currentHome.profiles.full_name) || session.name);
+    setValue('profArea', currentHome.area || currentHome.city || 'Bengaluru');
+    setValue('profAddress', currentHome.address || '');
+    setValue('profDescription', currentHome.description || '');
 
-    const badgePlaceholder = document.getElementById("verificationBadgePlaceholder");
-    badgePlaceholder.innerHTML = SahaayaUI.getStatusBadge(currentHome.verification_status);
+    const badgePlaceholder = document.getElementById('verificationBadgePlaceholder');
+    if (badgePlaceholder) badgePlaceholder.innerHTML = SahaayaUI.getStatusBadge(currentHome.verification_status);
 
-    document.getElementById("homeProfileForm").addEventListener("submit", async e => {
+    const form = document.getElementById('homeProfileForm');
+    if (!form) return;
+    const freshForm = form.cloneNode(true);
+    form.parentNode.replaceChild(freshForm, form);
+    freshForm.addEventListener('submit', async e => {
       e.preventDefault();
-      currentHome.name = document.getElementById("profHomeName").value.trim();
-      currentHome.resident_count = parseInt(document.getElementById("profResidentCount").value, 10);
-      currentHome.contact_person = document.getElementById("profContactPerson").value.trim();
-      currentHome.area = document.getElementById("profArea").value.trim();
-      currentHome.address = document.getElementById("profAddress").value.trim();
-      currentHome.description = document.getElementById("profDescription").value.trim();
-
-      // Save via update
-      const homes = await SahaayaDB.getHomes();
-      const idx = homes.findIndex(h => h.id === currentHome.id);
-      if (idx !== -1) {
-        homes[idx] = currentHome;
-        localStorage.setItem(SAHAAYA_CONFIG.STORAGE_KEY_PREFIX + "homes", JSON.stringify(homes));
-      }
-
-      SahaayaUI.showToast("Home profile details updated successfully.", "success");
-      loadData();
+      const updates = {
+        name: document.getElementById('profHomeName')?.value.trim(),
+        resident_count: parseInt(document.getElementById('profResidentCount')?.value, 10),
+        contact_person: document.getElementById('profContactPerson')?.value.trim(),
+        area: document.getElementById('profArea')?.value.trim(),
+        address: document.getElementById('profAddress')?.value.trim(),
+        description: document.getElementById('profDescription')?.value.trim()
+      };
+      try {
+        if (isSupabaseReady) {
+          await SahaayaSupabaseDB.updateHome(currentHome.id, { name: updates.name, description: updates.description, address: updates.address, city: updates.area });
+        } else {
+          const homes = await SahaayaDB.getHomes();
+          const idx = homes.findIndex(h => h.id === currentHome.id);
+          if (idx !== -1) { homes[idx] = { ...homes[idx], ...updates }; localStorage.setItem(SAHAAYA_CONFIG.STORAGE_KEY_PREFIX + 'homes', JSON.stringify(homes)); }
+        }
+        SahaayaUI.showToast('Home profile details updated successfully.', 'success');
+        await loadData();
+      } catch (err) { SahaayaUI.showToast('Error saving profile: ' + err.message, 'error'); }
     });
   }
 
-  // Initial Load
   await loadData();
 });

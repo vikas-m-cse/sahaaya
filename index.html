@@ -35,8 +35,32 @@
       <button class="btn ghost" data-modal="login">Sign in</button>
       <button class="btn primary" data-modal="join">Become a volunteer <span>↗</span></button>
     </div>
-    <button class="menu-btn" id="menuBtn">☰</button>
+    <button class="menu-btn" id="menuBtn" aria-label="Open mobile navigation menu">☰</button>
   </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
+    <div class="mobile-drawer-panel">
+      <div class="mobile-drawer-header">
+        <a class="brand" href="#home"><span class="brand-mark">S</span><span>Sahaaya</span></a>
+        <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close menu">✕</button>
+      </div>
+      <nav class="mobile-drawer-nav">
+        <a href="#opportunities" class="drawer-link"><span>🔍</span> Opportunities</a>
+        <a href="#how" class="drawer-link"><span>💡</span> How it works</a>
+        <a href="#homes" class="drawer-link"><span>🏡</span> Partner Homes</a>
+        <div class="drawer-separator"></div>
+        <a href="volunteer/" class="drawer-link highlight"><span>👤</span> Volunteer Portal</a>
+        <a href="home/" class="drawer-link highlight"><span>🏡</span> Old Age Home Portal</a>
+        <a href="admin/" class="drawer-link highlight"><span>🛡️</span> Admin Portal</a>
+      </nav>
+      <div class="mobile-drawer-actions">
+        <button class="btn ghost" data-modal="login" style="width: 100%;">Sign in</button>
+        <button class="btn primary" data-modal="join" style="width: 100%;">Become a volunteer <span>↗</span></button>
+      </div>
+    </div>
+  </div>
 
   <main>
     <section class="hero" id="home">
@@ -225,7 +249,12 @@
       <div id="modalContent"></div>
     </div>
   </div>
+  <script>
+    window.SAHAAYA_SUPABASE_URL = "%VITE_SUPABASE_URL%";
+    window.SAHAAYA_SUPABASE_KEY = "%VITE_SUPABASE_PUBLISHABLE_KEY%";
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script type="module" src="js/env.js"></script>
   <script src="js/config.js"></script>
   <script src="js/db.js"></script>
   <script src="js/matching.js"></script>

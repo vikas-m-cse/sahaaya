@@ -1,26 +1,30 @@
-/* 3D BACKGROUND LAYER */
+/* SAHAAYA — 3D Hero Background Layer */
 .hero {
+    position: relative;
     isolation: isolate;
+    overflow: hidden;
 }
 
 #sahaaya-3d {
     position: absolute;
     inset: 0;
     z-index: 0;
-    pointer-events: none;
+    pointer-events: none !important;
     overflow: hidden;
-    opacity: .92;
+    opacity: 0.92;
 }
 
 #sahaaya-3d canvas {
     width: 100% !important;
     height: 100% !important;
     display: block;
+    pointer-events: none !important;
 }
 
 .hero-copy,
 .hero-art {
-    z-index: 2
+    position: relative;
+    z-index: 2;
 }
 
 .hero:after {
@@ -30,18 +34,18 @@
     z-index: 1;
     pointer-events: none;
     background:
-        radial-gradient(circle at 50% 50%, transparent 20%, rgba(5, 9, 26, .18) 70%, rgba(5, 9, 26, .55) 100%),
-        linear-gradient(90deg, rgba(5, 9, 26, .28), transparent 55%);
+        radial-gradient(circle at 75% 40%, transparent 25%, rgba(5, 9, 26, 0.4) 75%, rgba(5, 9, 26, 0.8) 100%),
+        linear-gradient(90deg, rgba(5, 9, 26, 0.45) 0%, transparent 60%);
 }
 
-@media(max-width:700px) {
+@media (max-width: 768px) {
     #sahaaya-3d {
-        opacity: .58
+        opacity: 0.65;
     }
 }
 
-@media(prefers-reduced-motion:reduce) {
+@media (prefers-reduced-motion: reduce) {
     #sahaaya-3d {
-        display: none
+        opacity: 0.45;
     }
 }

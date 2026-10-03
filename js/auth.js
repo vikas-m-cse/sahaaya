@@ -95,15 +95,25 @@ const SahaayaAuth = (() => {
           .from("volunteers")
           .select("*")
           .eq("profile_id", userId)
-          .single();
-        if (vol) extra.volunteer = vol;
+          .maybeSingle();
+        if (vol) {
+          // volunteer_id = volunteers.id (distinct from profiles.id!)
+          // Used as FK in applications.volunteer_id and attendance.volunteer_id
+          extra.volunteer_id = vol.id;
+          extra.volunteer = vol;
+        }
       } else if (profile.role === "home") {
         const { data: home } = await sb
           .from("old_age_homes")
           .select("*")
           .eq("profile_id", userId)
-          .single();
-        if (home) extra.home = home;
+          .maybeSingle();
+        if (home) {
+          // home_id = old_age_homes.id (distinct from profiles.id!)
+          // Used as FK in activities.home_id
+          extra.home_id = home.id;
+          extra.home = home;
+        }
       }
 
       const initials = (profile.full_name || "VO")
@@ -114,7 +124,7 @@ const SahaayaAuth = (() => {
         .slice(0, 2);
 
       const sessionUser = {
-        id: profile.id,
+        id: profile.id,          // profiles.id = auth.uid()
         email: profile.email,
         name: profile.full_name,
         role: profile.role,
@@ -191,13 +201,14 @@ const SahaayaAuth = (() => {
         role: "volunteer"
       });
 
-      await sb.from("volunteers").upsert({
+      const { error: volErr } = await sb.from("volunteers").upsert({
         profile_id: data.user.id,
         interests: interests || ["companionship"],
         availability: availability || ["sun_morning"],
         preferred_activity_types: [],
         preferred_area: preferred_area || "Bengaluru"
-      });
+      }, { onConflict: "profile_id" });
+      if (volErr) console.warn("Volunteer row upsert warning:", volErr);
 
       const sessionUser = await fetchUserProfile(data.user.id);
       return { user: data.user, sessionUser, needsConfirmation: false };
@@ -246,7 +257,7 @@ const SahaayaAuth = (() => {
         role: "home"
       });
 
-      await sb.from("old_age_homes").upsert({
+      const { error: homeErr } = await sb.from("old_age_homes").upsert({
         profile_id: data.user.id,
         name: homeName,
         description: description || "Senior care residence.",
@@ -254,7 +265,8 @@ const SahaayaAuth = (() => {
         city: city || "Bengaluru",
         contact_phone: phone || "",
         verification_status: "pending"
-      });
+      }, { onConflict: "profile_id" });
+      if (homeErr) console.warn("Home row upsert warning:", homeErr);
 
       const sessionUser = await fetchUserProfile(data.user.id);
       return { user: data.user, sessionUser, needsConfirmation: false };

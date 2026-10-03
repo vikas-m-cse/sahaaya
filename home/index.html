@@ -217,7 +217,12 @@
   </main>
 
   <!-- Scripts — plain scripts, Supabase via CDN -->
+  <script>
+    window.SAHAAYA_SUPABASE_URL = "%VITE_SUPABASE_URL%";
+    window.SAHAAYA_SUPABASE_KEY = "%VITE_SUPABASE_PUBLISHABLE_KEY%";
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script type="module" src="../js/env.js"></script>
   <script src="../js/config.js"></script>
   <script src="../js/db.js"></script>
   <script src="../js/matching.js"></script>

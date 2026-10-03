@@ -1,5 +1,6 @@
 /**
- * SAHAAYA — States Styling
+ * SAHAAYA — States & Alert Styling
+ * Unified Dark Navy / Purple / Cyan Theme
  * Empty states, banners, verification notices, loading skeletons
  */
 
@@ -16,24 +17,25 @@
   gap: 16px;
   font-size: 13px;
   line-height: 1.5;
+  backdrop-filter: blur(10px);
 }
 
 .notice-warning {
-  background: #fff8eb;
-  border: 1px solid #fedf9e;
-  color: #7d4e00;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  color: #fde68a;
 }
 
 .notice-info {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1e40af;
+  background: rgba(33, 200, 255, 0.12);
+  border: 1px solid rgba(33, 200, 255, 0.32);
+  color: #bae6fd;
 }
 
 .notice-success {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  color: #a7f3d0;
 }
 
 .notice-content {
@@ -52,9 +54,9 @@
    ------------------------------------------------------------- */
 .empty-state {
   text-align: center;
-  padding: 60px 24px;
-  background: #fffdf8;
-  border: 1px dashed #d5ded9;
+  padding: 56px 24px;
+  background: rgba(12, 20, 48, 0.55);
+  border: 1px dashed rgba(139, 151, 220, 0.22);
   border-radius: 24px;
   margin: 20px 0;
 }
@@ -63,8 +65,9 @@
   width: 64px;
   height: 64px;
   border-radius: 20px;
-  background: #eef3ec;
-  color: #286c59;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  color: #c4b5fd;
   font-size: 28px;
   display: inline-grid;
   place-items: center;
@@ -74,14 +77,14 @@
 .empty-state h4 {
   font-family: "Manrope", sans-serif;
   font-size: 19px;
-  color: #18332f;
+  color: #ffffff;
   margin: 0 0 8px;
 }
 
 .empty-state p {
-  color: #687873;
+  color: #9da7c6;
   font-size: 13px;
-  max-width: 440px;
+  max-width: 460px;
   margin: 0 auto 20px;
   line-height: 1.6;
 }
@@ -90,9 +93,9 @@
    LOADING SKELETONS
    ------------------------------------------------------------- */
 .skeleton {
-  background: linear-gradient(90deg, #ecefe9 25%, #f7f9f5 50%, #ecefe9 75%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(139, 92, 246, 0.1) 50%, rgba(255, 255, 255, 0.04) 75%);
   background-size: 200% 100%;
-  animation: skeletonPulse 1.5s infinite;
+  animation: skeletonPulse 1.6s infinite ease-in-out;
   border-radius: 8px;
 }
 

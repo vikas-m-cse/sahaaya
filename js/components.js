@@ -163,8 +163,8 @@ const SahaayaUI = (() => {
   function getCategoryBadge(catId) {
     const cat = (SAHAAYA_CONFIG.CATEGORIES || []).find(c => c.id === catId);
     if (!cat) return `<span class="cat-pill">${catId}</span>`;
-    return `<span class="cat-pill" style="background-color: ${cat.color}22; color: #174e43; border-color: ${cat.color}88">
-      <span>${cat.icon}</span> ${cat.label}
+    return `<span class="cat-pill" style="background-color: rgba(139, 92, 246, 0.16); color: #dcd6ff; border: 1px solid rgba(139, 92, 246, 0.35);">
+      <span style="color: #21c8ff;">${cat.icon}</span> ${cat.label}
     </span>`;
   }
 
