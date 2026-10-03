@@ -159,6 +159,35 @@ body.portal-body {
     box-shadow: 0 0 0 3px rgba(139, 92, 246, .14) !important;
 }
 
+/* Profile preference checkboxes — keep native controls compact and clickable */
+.portal-body #interestsCheckboxes label,
+.portal-body #availabilityCheckboxes label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100%;
+    min-width: 0;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.portal-body #interestsCheckboxes input[type="checkbox"],
+.portal-body #availabilityCheckboxes input[type="checkbox"] {
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+    display: inline-block !important;
+    flex: 0 0 17px !important;
+    width: 17px !important;
+    min-width: 17px !important;
+    max-width: 17px !important;
+    height: 17px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    accent-color: #8b5cf6 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
 /* Buttons */
 .portal-body .btn-primary,
 .portal-body button.primary,
