@@ -147,23 +147,27 @@ const SahaayaAuth = (() => {
   async function getSession() {
     const sb = _getSupabaseClient();
 
-    // Demo mode always takes priority if no real Supabase session is active
-    const cached = getCachedSession();
-    if (cached && cached.isDemoSession) return cached;
-
-    if (!sb) return cached;
+    // Production mode: only a valid Supabase Auth session is authoritative.
+    // Old demo/local cached sessions are deliberately ignored and removed.
+    if (!sb) {
+      setCachedSession(null);
+      return null;
+    }
 
     try {
-      const { data: { session }, error } = await sb.auth.getSession();
-      if (error || !session) {
-        // If Supabase has no session, clear any stale real-auth cache
-        if (cached && !cached.isDemoSession) setCachedSession(null);
+      const { data, error } = await sb.auth.getSession();
+      if (error) throw error;
+
+      if (!data.session?.user?.id) {
+        setCachedSession(null);
         return null;
       }
-      return await fetchUserProfile(session.user.id);
+
+      return await fetchUserProfile(data.session.user.id);
     } catch (err) {
-      console.warn("Auth getSession error:", err);
-      return cached;
+      console.error("Supabase session check failed:", err);
+      setCachedSession(null);
+      return null;
     }
   }
 
@@ -334,49 +338,6 @@ const SahaayaAuth = (() => {
   }
 
   // -----------------------------------------------------------------------
-  // Demo Role Switcher (evaluation only — not a security mechanism)
-  // -----------------------------------------------------------------------
-  async function switchDemoRole(targetRole) {
-    const personas = {
-      volunteer: {
-        id: "usr_vol_01",
-        name: "Ananya Sharma",
-        email: "demo.volunteer@sahaaya.org",
-        role: "volunteer",
-        phone: "+91 98450 12345",
-        avatar_initials: "AS",
-        isDemoSession: true
-      },
-      home: {
-        id: "usr_home_01",
-        name: "Rajesh Sen",
-        email: "demo.home@sahaaya.org",
-        role: "home",
-        phone: "+91 80 2845 0911",
-        avatar_initials: "SS",
-        home_id: "home_01",
-        isDemoSession: true
-      },
-      admin: {
-        id: "usr_admin_01",
-        name: "Sahana K",
-        email: "demo.admin@sahaaya.org",
-        role: "admin",
-        phone: "+91 99000 11223",
-        avatar_initials: "SK",
-        isDemoSession: true
-      }
-    };
-
-    const demoSession = personas[targetRole] || personas.volunteer;
-    setCachedSession(demoSession);
-
-    const base = getBasePath();
-    const urlMap = { volunteer: "volunteer/", home: "home/", admin: "admin/" };
-    window.location.href = base + (urlMap[targetRole] || "volunteer/");
-  }
-
-  // -----------------------------------------------------------------------
   // Public API
   // -----------------------------------------------------------------------
   return {
@@ -387,7 +348,6 @@ const SahaayaAuth = (() => {
     login,
     logout,
     checkAuthGuard,
-    switchDemoRole,
     getBasePath
   };
 })();
