@@ -33,10 +33,10 @@ function openLandingModal(type, activity) {
       <h2>Let's find your fit.</h2>
       <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
       <form class="form" id="joinForm">
-        <input required id="joinName" placeholder="Your full name" value="Ananya Sharma">
+        <input required id="joinName" placeholder="Your full name" >
         <input required id="joinEmail" type="email" placeholder="Email address" value="">
         <input required id="joinPassword" type="password" placeholder="Password (min 6 characters)" minlength="6">
-        <input id="joinPhone" placeholder="Phone number" value="+91 98450 12345">
+        <input id="joinPhone" placeholder="Phone number" >
         <select id="joinInterest">
           <option value="companionship">Companionship &amp; Storytelling</option>
           <option value="recreation">Recreation &amp; Board Games</option>
@@ -65,25 +65,7 @@ function openLandingModal(type, activity) {
       <h2>Sign in to Sahaaya</h2>
       <p>Enter your credentials to access your verified profile and portal.</p>
 
-      <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.28); border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #c4d8ff; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-          ⚡ 1-Click Demo Access for Evaluators
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
-            <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
-            <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 10px 14px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
-            <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
-          </button>
-        </div>
-      </div>
-
-      <div style="text-align: center; color: #9da7c6; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH CREDENTIALS —</div>
+      <p style="font-size: 13px; color: #9da7c6; margin: 0 0 16px;">Sign in with the email address and password you used to register.</p>
 
       <form class="form" id="loginForm">
         <input required type="email" id="loginEmail" placeholder="Email address">
@@ -99,14 +81,14 @@ function openLandingModal(type, activity) {
       <h2>Register your home.</h2>
       <p>Tell us what your residents need. You define the requirements; Sahaaya helps coordinate the right volunteers.</p>
       <form class="form" id="homeForm">
-        <input required id="homeRegName" placeholder="Old age home registered name" value="Vandana Senior Living">
-        <input required id="homeRegContact" placeholder="Chief Coordinator / Superintendent" value="Dr. S. K. Narayan">
-        <input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru">
-        <input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library">
+        <input required id="homeRegName" placeholder="Old age home registered name" >
+        <input required id="homeRegContact" placeholder="Chief Coordinator / Superintendent" >
+        <input required id="homeRegArea" placeholder="Area / neighbourhood" >
+        <input required id="homeRegAddress" placeholder="Full street address" >
         <input required id="homeRegEmail" type="email" placeholder="Contact email">
         <input required id="homeRegPassword" type="password" placeholder="Create password (min 6 characters)" minlength="6">
-        <input required id="homeRegPhone" placeholder="Contact telephone" value="+91 80 2663 1122">
-        <input required id="homeRegResidents" type="number" placeholder="Resident capacity" value="35">
+        <input required id="homeRegPhone" placeholder="Contact telephone" >
+        <input required id="homeRegResidents" type="number" placeholder="Resident capacity" >
         <button class="btn primary" type="submit" id="homeSubmitBtn">Register Home &amp; Create Account →</button>
       </form>
     `;
