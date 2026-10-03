@@ -15,77 +15,10 @@ const SahaayaUI = (() => {
   // getSession() is async so we render an optimistic bar first,
   // then update the active button once the session resolves.
   // -----------------------------------------------------------------------
+  // Demo role switching is disabled in real-account mode.
   function initDemoBar() {
-    if (document.getElementById("sahaayaDemoBar")) return;
-
-    const basePath = SahaayaAuth.getBasePath();
-
-    // Build bar with no active role yet — will be updated async
-    const bar = document.createElement("div");
-    bar.id = "sahaayaDemoBar";
-    bar.className = "demo-evaluation-bar";
-    bar.innerHTML = `
-      <div class="demo-bar-inner">
-        <div class="demo-badge-wrap">
-          <span class="demo-pulse"></span>
-          <span class="demo-badge">DEMO MODE</span>
-          <span class="demo-note">Role Switcher — for evaluation only (isolated from real auth)</span>
-        </div>
-
-        <div class="demo-role-buttons" id="demoRoleBtns">
-          <button type="button" class="demo-role-btn" data-switch-role="volunteer" id="demoRoleVolunteer"
-            title="Switch to Ananya Sharma (Volunteer Persona)">
-            <span class="icon">👤</span> <strong>Volunteer</strong> <span class="role-name">(Ananya)</span>
-          </button>
-          <button type="button" class="demo-role-btn" data-switch-role="home" id="demoRoleHome"
-            title="Switch to Silver Springs Senior Care (Old Age Home Persona)">
-            <span class="icon">🏡</span> <strong>Old Age Home</strong> <span class="role-name">(Silver Springs)</span>
-          </button>
-          <button type="button" class="demo-role-btn" data-switch-role="admin" id="demoRoleAdmin"
-            title="Switch to Platform Administrator Persona">
-            <span class="icon">🛡️</span> <strong>Admin</strong> <span class="role-name">(Platform)</span>
-          </button>
-        </div>
-
-        <div class="demo-actions">
-          <a href="${basePath}index.html" class="demo-link-btn" title="View Public Landing Page">
-            <span>🌐</span> Landing Page
-          </a>
-          <button type="button" class="demo-reset-btn" id="demoResetBtn" title="Reset all data to initial demo state">
-            <span>↻</span> Reset Data
-          </button>
-        </div>
-      </div>
-    `;
-
-    document.body.prepend(bar);
-
-    // Async: update active button once session is resolved
-    SahaayaAuth.getSession().then(session => {
-      const role = session ? session.role : null;
-      bar.querySelectorAll("[data-switch-role]").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.switchRole === role);
-      });
-    }).catch(() => {/* silent */});
-
-    // Role switch click handlers
-    bar.querySelectorAll("[data-switch-role]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        SahaayaAuth.switchDemoRole(btn.dataset.switchRole);
-      });
-    });
-
-    // Reset handler
-    const resetBtn = bar.querySelector("#demoResetBtn");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", async () => {
-        if (confirm("Reset all test data back to the clean initial demo seed? This will restore initial homes, opportunities and volunteer hours.")) {
-          await SahaayaDB.resetToDemoSeed();
-          showToast("Demo database reset to clean seed state.", "success");
-          setTimeout(() => window.location.reload(), 600);
-        }
-      });
-    }
+    const existingBar = document.getElementById("sahaayaDemoBar");
+    if (existingBar) existingBar.remove();
   }
 
   // -----------------------------------------------------------------------
