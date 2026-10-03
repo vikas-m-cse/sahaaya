@@ -12,8 +12,37 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
 
+  // Keep portal navigation responsive even if authentication or data loading fails.
+  const tabButtons = document.querySelectorAll('.portal-tab-btn');
+  const tabContents = document.querySelectorAll('.portal-tab-content');
+  function switchTab(tabId) {
+    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+    tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
+  }
+  tabButtons.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  function showPortalInitError(message) {
+    console.error('Volunteer portal initialization failed:', message);
+    const container = document.querySelector('.portal-container');
+    if (!container) return;
+    let banner = document.getElementById('volunteerInitError');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'volunteerInitError';
+      banner.className = 'portal-notice notice-warning';
+      banner.style.cssText = 'margin: 0 0 20px; padding: 14px 18px; border-radius: 12px;';
+      container.prepend(banner);
+    }
+    banner.textContent = 'Some volunteer data could not be loaded. You can still use the portal navigation. Please refresh or contact the administrator if this continues.';
+  }
+
   // 1. Auth Guard
-  const session = await SahaayaAuth.checkAuthGuard('volunteer');
+  let session;
+  try {
+    session = await SahaayaAuth.checkAuthGuard('volunteer');
+  } catch (error) {
+    showPortalInitError(error?.message || error);
+    return;
+  }
   if (!session) return;
 
   // 2. Dual-Mode Data Router
@@ -30,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (userAvatar)      userAvatar.textContent     = session.avatar_initials || 'VO';
   if (userName)        userName.textContent        = session.name;
-  if (welcomeGreeting) welcomeGreeting.textContent = 'Welcome back, ' + session.name.split(' ')[0] + ' \u{1F44B}';
+  if (welcomeGreeting) welcomeGreeting.textContent = 'Welcome back, ' + (session.name || session.email || 'Volunteer').split(' ')[0] + ' \u{1F44B}';
   if (logoutBtn) logoutBtn.addEventListener('click', () => SahaayaAuth.logout());
 
   if (modeBadge) {
@@ -48,14 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let allHomes = [];
   let selectedCategoryFilter = 'all';
 
-  // 5. Tab Switching
-  const tabButtons  = document.querySelectorAll('.portal-tab-btn');
-  const tabContents = document.querySelectorAll('.portal-tab-content');
-  function switchTab(tabId) {
-    tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
-    tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
-  }
-  tabButtons.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  // 5. Tab navigation was registered before authentication so it remains usable during data errors.
 
   // 6. Data Adapters
   function calcDurationHours(start, end) {
@@ -407,5 +429,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('downloadCertBtn')?.addEventListener('click', () => window.print());
 
   // 17. Initial Load
-  await loadData();
+  try {
+    await loadData();
+  } catch (error) {
+    showPortalInitError(error?.message || error);
+  }
 });
