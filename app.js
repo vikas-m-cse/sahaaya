@@ -33,19 +33,19 @@ function openLandingModal(type, activity) {
       <h2>Let's find your fit.</h2>
       <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
       <form class="form" id="joinForm">
-        <input required id="joinName" placeholder="Your full name" value="Ananya Sharma">
-        <input required id="joinEmail" type="email" placeholder="Email address" value="">
-        <input required id="joinPassword" type="password" placeholder="Password (min 6 characters)" minlength="6">
-        <input id="joinPhone" placeholder="Phone number" value="+91 98450 12345">
-        <select id="joinInterest">
+        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value="Ananya Sharma"></div>
+        <div class="field"><label for="joinEmail">Email</label><input required id="joinEmail" type="email" placeholder="you@example.com" value=""></div>
+        <div class="field"><label for="joinPassword">Password</label><input required id="joinPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
+        <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value="+91 98450 12345"></div>
+        <div class="field"><label for="joinInterest">I’d like to help with</label><select id="joinInterest">
           <option value="companionship">Companionship &amp; Storytelling</option>
           <option value="recreation">Recreation &amp; Board Games</option>
           <option value="music">Music &amp; Cultural</option>
           <option value="assistive">Digital &amp; Smartphone Help</option>
           <option value="creative">Creative &amp; Arts</option>
           <option value="outdoors">Outdoors &amp; Gentle Walks</option>
-        </select>
-        <select id="joinAvailability">
+        </select></div>
+        <div class="field"><label for="joinAvailability">When I’m free</label><select id="joinAvailability">
           <option value="sun_morning">Sunday Morning (9:00 AM – 1:00 PM)</option>
           <option value="sat_evening">Saturday Evening (4:00 PM – 7:00 PM)</option>
           <option value="sat_morning">Saturday Morning (9:00 AM – 1:00 PM)</option>
