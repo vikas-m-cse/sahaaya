@@ -155,47 +155,42 @@ document.addEventListener("DOMContentLoaded", async () => {
       const matchBadgeCls = match.matchLevel === "high" ? "match-high" : match.matchLevel === "medium" ? "match-medium" : "match-general";
 
       const card = document.createElement("article");
-      card.className = "portal-card";
+      const visualClass = opp.category === "music" ? "moment-music" : opp.category === "creative" ? "moment-creative" : opp.category === "outdoors" ? "moment-outdoors" : opp.category === "assistive" ? "moment-tech" : "moment-talk";
+      card.className = "portal-card moment-card";
       card.innerHTML = `
-        <div class="portal-card-header">
-          ${SahaayaUI.getCategoryBadge(opp.category)}
-          <span class="match-pill ${matchBadgeCls}" title="Matched with your interests & schedule">
-            ★ ${match.score}% Compatibility
-          </span>
-        </div>
-        <div class="portal-card-body">
-          <div style="font-size: 11px; font-weight: 700; color: var(--portal-muted); margin-bottom: 6px;">
-            🏡 ${home.name} · ${home.area}
+        <div class="moment-visual ${visualClass}">
+          <div class="moment-visual-top">
+            <span class="moment-category">${SahaayaUI.getCategoryBadge(opp.category)}</span>
+            <span class="moment-fit ${matchBadgeCls}"><b>${match.score}%</b> fit</span>
           </div>
+          <span class="moment-visual-label">A MOMENT WORTH SHOWING UP FOR</span>
+        </div>
+        <div class="moment-body">
+          <div class="moment-home">⌂ ${home.name} <span>· ${home.area}</span></div>
           <h3>${opp.title}</h3>
           <p>${opp.description}</p>
-
-          <div class="match-explainer-box">
-            <strong><span>✓</span> Why this matches your profile:</strong>
+          <div class="moment-details">
+            <span>◷ ${opp.date}</span>
+            <span>⏱ ${opp.duration_hours} hrs</span>
+            <span>⌖ ${home.area}</span>
+          </div>
+          <button class="moment-why" type="button">Why this fits you <span>+</span></button>
+          <div class="match-explainer-box moment-explainer">
+            <strong><span>✓</span> Why this matches your profile</strong>
             <ul>${match.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
           </div>
-
-          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--portal-muted); border-top: 1px solid #f1f4ee; padding-top: 12px; margin-top: 12px;">
-            <span>🗓 ${opp.date}</span>
-            <span>⏱ ${opp.time_start} – ${opp.time_end} (${opp.duration_hours} hrs)</span>
-          </div>
         </div>
-        <div class="portal-card-footer">
-          <span style="font-size: 12px; font-weight: 600; color: ${spotsLeft > 0 ? "var(--portal-primary)" : "#991b1b"};">
-            👥 ${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} available
-          </span>
+        <div class="moment-footer">
+          <span class="moment-spots"><i></i> ${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} open</span>
           ${
             applied
-              ? `<span class="badge ${applied.status === "approved" ? "badge-success" : "badge-warning"}">
-                   ${applied.status === "approved" ? "Approved & Scheduled" : "Application in Review"}
-                 </span>`
-              : `<button class="btn-primary btn-sm apply-btn" data-opp-id="${opp.id}">
-                   Apply to Help →
-                 </button>`
+              ? `<span class="badge ${applied.status === "approved" ? "badge-success" : "badge-warning"}">${applied.status === "approved" ? "Approved & Scheduled" : "Application in Review"}</span>`
+              : `<button class="btn-primary apply-btn" data-opp-id="${opp.id}">I can show up <span>↗</span></button>`
           }
         </div>
       `;
       grid.appendChild(card);
+      card.querySelector(".moment-why")?.addEventListener("click", () => card.classList.toggle("why-open"));
     });
 
     grid.querySelectorAll(".apply-btn").forEach(btn => {
