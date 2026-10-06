@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderKPIs();
     renderOpportunities();
+    renderHeroRecommendation();
     renderSchedule();
     renderApplicationsTable();
     renderAttendanceTable();
@@ -268,6 +269,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         SahaayaUI.showToast(err.message, "warning");
       }
     });
+  }
+
+  // -----------------------------------------------------------------------
+  // 7.5. Hero Recommendation — powered by the transparent matching engine
+  // -----------------------------------------------------------------------
+  function renderHeroRecommendation() {
+    const matches = allOpportunities.map(opp => ({
+      opp,
+      match: SahaayaMatching.calculateMatch(currentProfile, opp),
+      home: allHomes.find(h => h.id === opp.home_id) || { name: "Partner Senior Home", area: "Bengaluru" }
+    })).sort((a,b) => b.match.score - a.match.score);
+
+    const best = matches[0];
+    setTextSafe("heroMatchCount", matches.length);
+    if (!best) return;
+
+    const { opp, match, home } = best;
+    setTextSafe("heroOppTitle", opp.title || "A moment worth showing up for");
+    setTextSafe("heroOppHome", (home.name || "Partner Senior Home") + " · " + (home.area || "Bengaluru"));
+    setTextSafe("heroOppDescription", opp.description || "A meaningful activity with residents at a verified Sahaaya home.");
+    setTextSafe("heroOppScore", match.score + "%");
+    setTextSafe("heroOppTime", (opp.duration_hours || 1) + " hr" + (opp.duration_hours === 1 ? "" : "s") + " · " + (opp.date || "Upcoming"));
+    setTextSafe("heroNextWindow", "Your next opening · " + (opp.date || "upcoming"));
+    const fit = document.getElementById("heroFitLabel");
+    if (fit) fit.textContent = match.matchLevel === "high" ? "BEST FIT" : match.matchLevel === "medium" ? "GOOD FIT" : "WORTH A LOOK";
   }
 
   // -----------------------------------------------------------------------
