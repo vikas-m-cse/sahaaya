@@ -341,38 +341,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         phone: "+91 80 0000 0000"
       };
 
-      const card = document.createElement("div");
-      card.className = "portal-card";
+      const card = document.createElement("article");
+      card.className = "schedule-card portal-card";
       card.innerHTML = `
-        <div class="portal-card-header">
-          <span class="badge badge-success">✓ Scheduled & Confirmed</span>
-          <span style="font-size: 11px; font-weight: 700; color: var(--portal-muted);">CREDITS: ${opp?.duration_hours || 2} HRS</span>
-        </div>
-        <div class="portal-card-body">
-          <h3 style="margin-bottom: 6px;">${opp?.title || "Community Activity"}</h3>
-          <div style="font-size: 12px; color: var(--portal-muted); margin-bottom: 16px;">
-            🏡 <strong>${home.name}</strong><br>
-            📍 ${home.address}
+        <div class="schedule-card-top">
+          <div class="schedule-date-block">
+            <span>YOUR NEXT MOMENT</span>
+            <strong>${opp?.date || "Upcoming"}</strong>
           </div>
-          <div style="background: #f8faf7; border-radius: 12px; padding: 14px; font-size: 13px; margin-bottom: 16px;">
-            <div><strong>🗓 Date:</strong> ${opp?.date || "Upcoming"}</div>
-            <div><strong>⏰ Time:</strong> ${opp?.time_start} – ${opp?.time_end}</div>
-            <div><strong>👤 Contact:</strong> ${home.contact_person} (${home.phone})</div>
+          <span class="schedule-status">✓ CONFIRMED</span>
+        </div>
+        <div class="schedule-card-main">
+          <div class="schedule-time">${opp?.time_start || "Time TBC"} <span>— ${opp?.time_end || ""}</span></div>
+          <h3>${opp?.title || "Community Activity"}</h3>
+          <div class="schedule-home"><span>⌂</span><strong>${home.name}</strong><span class="schedule-dot">·</span><span>${home.address}</span></div>
+          <div class="schedule-details">
+            <div><small>DURATION</small><b>${opp?.duration_hours || 2} hrs</b></div>
+            <div><small>COORDINATOR</small><b>${home.contact_person || "Home team"}</b></div>
+            <div><small>CONTACT</small><b>${home.phone || "On file"}</b></div>
           </div>
-          ${app.coordinator_note
-            ? `<div style="font-size: 12px; color: #174e43; background: #eef5ef; padding: 10px 12px; border-radius: 8px;">
-                 <strong>Coordinator's Note:</strong> "${app.coordinator_note}"
-               </div>`
-            : ""}
+          ${app.coordinator_note ? `<div class="schedule-note"><span>“</span><div><small>FROM YOUR COORDINATOR</small><p>${app.coordinator_note}</p></div></div>` : ""}
         </div>
-        <div class="portal-card-footer">
-          <span style="font-size: 11px; color: var(--portal-muted);">Check-in recorded by home superintendent on arrival.</span>
-          <button class="btn-secondary btn-sm directions-btn" data-address="${encodeURIComponent((home.name || "") + " " + (home.address || ""))}">
-            View on Map ↗
-          </button>
+        <div class="schedule-card-footer">
+          <span><i></i> Check-in will be recorded by the home.</span>
+          <button class="btn-secondary btn-sm directions-btn" data-address="${encodeURIComponent((home.name || "") + " " + (home.address || ""))}">View route ↗</button>
         </div>
-      `;
-      grid.appendChild(card);
+      `;      grid.appendChild(card);
     });
 
     container.appendChild(grid);
