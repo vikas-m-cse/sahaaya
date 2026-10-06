@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 760">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9dfcf"/><stop offset=".52" stop-color="#d6e0d4"/><stop offset="1" stop-color="#c8d4d7"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-opacity=".14"/></filter>
+</defs>
+<rect width="1400" height="760" fill="url(#bg)"/>
+<circle cx="1190" cy="145" r="130" fill="#f1cd8c" opacity=".7"/>
+<path d="M0 590Q300 490 610 580T1400 520V760H0Z" fill="#aebea8"/>
+<rect x="70" y="80" width="370" height="300" rx="24" fill="#f7efe2" stroke="#315040" stroke-width="12"/>
+<path d="M100 110h310v240H100z" fill="#c8dcde"/>
+<path d="M255 110v240M100 230h310" stroke="#f7efe2" stroke-width="14"/>
+<g filter="url(#shadow)">
+ <ellipse cx="720" cy="560" rx="390" ry="85" fill="#5d4b3d" opacity=".22"/>
+ <ellipse cx="720" cy="515" rx="310" ry="78" fill="#c68b67"/>
+ <ellipse cx="720" cy="500" rx="290" ry="62" fill="#eee0cb"/>
+</g>
+<g>
+ <circle cx="480" cy="375" r="72" fill="#9c604d"/>
+ <path d="M408 585q0-155 72-165t72 165" fill="#4f6c57"/>
+ <path d="M448 570l-20 120M512 570l20 120" stroke="#314a3d" stroke-width="24" stroke-linecap="round"/>
+</g>
+<g>
+ <circle cx="710" cy="330" r="78" fill="#ce936f"/>
+ <path d="M632 585q0-175 78-185t78 185" fill="#d3a264"/>
+ <path d="M670 570l-20 120M750 570l20 120" stroke="#425249" stroke-width="24" stroke-linecap="round"/>
+</g>
+<g>
+ <circle cx="950" cy="375" r="72" fill="#8e5c4c"/>
+ <path d="M878 585q0-155 72-165t72 165" fill="#61748a"/>
+ <path d="M918 570l-20 120M982 570l20 120" stroke="#314a3d" stroke-width="24" stroke-linecap="round"/>
+</g>
+<g fill="#d98b63">
+ <circle cx="670" cy="485" r="13"/><circle cx="760" cy="485" r="13"/><circle cx="850" cy="500" r="13"/>
+</g>
+<path d="M550 455q160-115 320 0" fill="none" stroke="#315040" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+<text x="80" y="690" font-family="Georgia,serif" font-size="46" fill="#294738">one hour can become a memory</text>
+<text x="83" y="725" font-family="Arial,sans-serif" font-size="17" letter-spacing="5" fill="#647068">SAHAAYA / SHOW UP</text>
+</svg>
