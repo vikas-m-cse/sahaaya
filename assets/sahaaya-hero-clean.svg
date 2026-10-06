@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" role="img" aria-labelledby="title desc">
+<title id="title">A warm community moment</title>
+<desc id="desc">Editorial illustration of two people sharing time together in a sunlit room.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F4E7D5"/><stop offset="1" stop-color="#DCE7D6"/></linearGradient>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F1C979"/><stop offset="1" stop-color="#D98B63"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="24" stdDeviation="28" flood-opacity=".16"/></filter>
+</defs>
+<rect width="1200" height="1500" rx="34" fill="url(#bg)"/>
+<circle cx="920" cy="240" r="250" fill="#F6DCA6" opacity=".75"/>
+<path d="M0 1180 Q310 1060 610 1160 T1200 1110 V1500 H0Z" fill="#B9C9B2"/>
+<rect x="120" y="130" width="520" height="720" rx="24" fill="#F8F1E7" stroke="#2D4B3A" stroke-width="18"/>
+<path d="M170 180H590V790H170Z" fill="#CFE0E4"/>
+<path d="M380 180V790M170 485H590" stroke="#F8F1E7" stroke-width="18"/>
+<circle cx="495" cy="295" r="78" fill="#F0C56F" opacity=".9"/>
+<path d="M200 760 Q270 660 340 760 T480 760 T620 760" fill="#89A07F"/>
+<g filter="url(#shadow)">
+  <ellipse cx="640" cy="1110" rx="330" ry="88" fill="#6F4E3B" opacity=".28"/>
+  <rect x="420" y="930" width="520" height="230" rx="34" fill="#EEE1CF"/>
+  <rect x="460" y="970" width="440" height="150" rx="24" fill="#C98C6A"/>
+  <circle cx="680" cy="1045" r="46" fill="#F2C77C"/>
+  <path d="M640 1045h80" stroke="#2D4B3A" stroke-width="8" stroke-linecap="round"/>
+</g>
+<g>
+  <circle cx="300" cy="880" r="92" fill="#9C5D48"/>
+  <path d="M210 1110 Q205 945 300 930 Q395 945 390 1110Z" fill="#496A52"/>
+  <path d="M255 1110 L225 1320 M345 1110 L375 1320" stroke="#2D4B3A" stroke-width="30" stroke-linecap="round"/>
+  <path d="M235 1000 Q300 1045 365 1000" stroke="#EAC39C" stroke-width="18" fill="none" stroke-linecap="round"/>
+</g>
+<g>
+  <circle cx="865" cy="830" r="92" fill="#C78B67"/>
+  <path d="M775 1110 Q770 945 865 930 Q960 945 955 1110Z" fill="#D7A86D"/>
+  <path d="M820 1110 L790 1320 M910 1110 L940 1320" stroke="#3B4D43" stroke-width="30" stroke-linecap="round"/>
+  <path d="M800 950 Q865 1000 930 950" stroke="#F2D2AE" stroke-width="18" fill="none" stroke-linecap="round"/>
+</g>
+<path d="M575 1030 C520 980 490 930 520 880" stroke="#2D4B3A" stroke-width="12" fill="none" stroke-linecap="round"/>
+<circle cx="520" cy="880" r="18" fill="#D98B63"/>
+<text x="90" y="1420" font-family="Georgia,serif" font-size="38" fill="#2D4B3A">time, shared</text>
+<text x="90" y="1465" font-family="Arial,sans-serif" font-size="20" letter-spacing="5" fill="#6D756B">SAHAAYA / 01</text>
+</svg>
