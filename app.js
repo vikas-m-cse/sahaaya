@@ -280,3 +280,37 @@ if (window.location.search.includes("login_required=1")) {
     openLandingModal("login");
   }, 400);
 }
+
+
+/* Sahaaya signature motion layer */
+(() => {
+  const root = document.documentElement;
+  let tx = 50, ty = 50, rx = 50, ry = 50;
+  window.addEventListener("pointermove", e => {
+    tx = (e.clientX / innerWidth) * 100;
+    ty = (e.clientY / innerHeight) * 100;
+  }, {passive:true});
+  const tick = () => {
+    rx += (tx-rx)*0.045;
+    ry += (ty-ry)*0.045;
+    root.style.setProperty("--mx", rx + "%");
+    root.style.setProperty("--my", ry + "%");
+    requestAnimationFrame(tick);
+  };
+  tick();
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reveal = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          reveal.unobserve(entry.target);
+        }
+      });
+    }, {threshold:.12});
+    document.querySelectorAll(".manifesto,.signal-band,.opportunities,.connection,.match-section,.how,.homes,.closing").forEach(el => {
+      el.classList.add("reveal-section");
+      reveal.observe(el);
+    });
+  }
+})();
