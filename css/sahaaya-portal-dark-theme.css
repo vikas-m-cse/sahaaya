@@ -632,3 +632,27 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
 @media(max-width:780px){.impact-console{grid-template-columns:1fr;padding:25px;min-height:0}.impact-orbit{display:none}.impact-trail{margin-top:24px;padding:20px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.11);gap:8px}.impact-trail-item{min-width:0;flex:1}.impact-trail-line{height:38px}.impact-trail-item strong{font-size:25px}.impact-trail-item b{font-size:7px}.impact-trail-index{display:none}}
 @media(max-width:500px){.impact-console{border-radius:21px;padding:23px 20px}.impact-big-number strong{font-size:64px}.impact-trail{display:grid;grid-template-columns:1fr;gap:12px}.impact-trail-line{display:none}.impact-trail-item{grid-template-columns:28px auto 1fr;grid-template-rows:1fr;column-gap:8px}.impact-trail-item strong{grid-column:2}.impact-trail-item div{grid-column:3;margin:0}.impact-trail-item small{display:block}}
 @media(prefers-reduced-motion:reduce){.impact-orbit-dot{animation:none!important}}
+
+
+/* =========================================================
+   9 → 10 MICRO POLISH — RESTRAINT OVER EFFECTS
+   ========================================================= */
+.portal-body .btn-primary,.portal-body .btn-secondary,.portal-body .btn-danger{position:relative;overflow:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s,background .28s!important}.portal-body .btn-primary:active,.portal-body .btn-secondary:active{transform:translateY(1px) scale(.985)!important}.portal-body .btn-primary:after,.portal-body .btn-secondary:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.16) 48%,transparent 70%);transform:translateX(-130%);transition:transform .65s ease;pointer-events:none}.portal-body .btn-primary:hover:after,.portal-body .btn-secondary:hover:after{transform:translateX(130%)}
+/* subtle image drift — just enough to make the cards feel alive */
+.moment-card .moment-visual{transition:transform .8s cubic-bezier(.2,.8,.2,1),filter .45s}.moment-card:hover .moment-visual{transform:scale(1.018)!important;filter:saturate(1.03)}.moment-card .moment-visual:before{transition:opacity .45s}.moment-card:hover .moment-visual:before{opacity:.82}
+/* CTA arrow feels tactile */
+.moment-footer .apply-btn span,.next-hour-card .btn-primary span{display:inline-block;transition:transform .3s cubic-bezier(.2,.8,.2,1)}.moment-footer .apply-btn:hover span,.next-hour-card .btn-primary:hover span{transform:translate(3px,-2px)}
+/* cards reveal as a composed sequence */
+#volunteerOppGrid .moment-card{animation:momentRise .55s cubic-bezier(.2,.8,.2,1) both}.moment-card:nth-child(2){animation-delay:.05s}.moment-card:nth-child(3){animation-delay:.1s}.moment-card:nth-child(4){animation-delay:.15s}.moment-card:nth-child(5){animation-delay:.2s}@keyframes momentRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* impact console micro-depth */
+.impact-console{transition:box-shadow .4s ease,transform .4s cubic-bezier(.2,.8,.2,1)}.impact-console:hover{transform:translateY(-1px);box-shadow:0 28px 75px rgba(23,61,50,.19)}.impact-orbit-ring{transition:transform .8s cubic-bezier(.2,.8,.2,1),border-color .3s}.impact-console:hover .impact-orbit-ring{transform:scale(1.035);border-color:rgba(217,239,121,.25)}
+/* navigation has a tiny sliding feel */
+.workspace-nav .portal-tab-btn{transition:color .25s,background .25s,transform .25s!important}.workspace-nav .portal-tab-btn.active{box-shadow:inset 0 -1px rgba(23,61,50,.04)}.workspace-nav .portal-tab-btn:after{transition:transform .38s cubic-bezier(.2,.8,.2,1),left .25s,right .25s!important}
+/* focus rings: polished keyboard interaction too */
+.portal-body button:focus-visible,.portal-body a:focus-visible,.portal-body input:focus-visible,.portal-body select:focus-visible,.portal-body textarea:focus-visible{outline:2px solid rgba(40,108,89,.65)!important;outline-offset:3px!important}
+/* close button — exact requested interaction */
+.sahaaya-modal-close{transform:rotate(0deg);transition:transform .42s cubic-bezier(.2,.8,.2,1),background .2s,box-shadow .2s!important}.sahaaya-modal-close:hover{transform:rotate(180deg)!important;box-shadow:0 7px 20px rgba(23,61,50,.10)!important}
+/* gentle pointer-aware hero surface */
+.volunteer-hero{transition:box-shadow .5s ease}.volunteer-hero:hover{box-shadow:0 34px 88px rgba(23,61,50,.20)!important}.next-hour-card{transition:transform .45s cubic-bezier(.2,.8,.2,1),background .35s}.next-hour-card:hover{transform:translateY(-3px);background:rgba(250,248,241,.12)!important}
+/* don't let motion preferences get overridden */
+@media(prefers-reduced-motion:reduce){.portal-body .btn-primary,.portal-body .btn-secondary,.moment-card .moment-visual,#volunteerOppGrid .moment-card,.impact-console,.impact-orbit-ring,.workspace-nav .portal-tab-btn,.sahaaya-modal-close,.next-hour-card{animation:none!important;transition:none!important}.portal-body .btn-primary:after,.portal-body .btn-secondary:after{display:none}}
