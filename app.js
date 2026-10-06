@@ -99,14 +99,14 @@ function openLandingModal(type, activity) {
       <h2>Register your home.</h2>
       <p>Tell us what your residents need. You define the requirements; Sahaaya helps coordinate the right volunteers.</p>
       <form class="form" id="homeForm">
-        <input required id="homeRegName" placeholder="Old age home registered name" value="Vandana Senior Living">
-        <input required id="homeRegContact" placeholder="Chief Coordinator / Superintendent" value="Dr. S. K. Narayan">
-        <input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru">
-        <input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library">
-        <input required id="homeRegEmail" type="email" placeholder="Contact email">
-        <input required id="homeRegPassword" type="password" placeholder="Create password (min 6 characters)" minlength="6">
-        <input required id="homeRegPhone" placeholder="Contact telephone" value="+91 80 2663 1122">
-        <input required id="homeRegResidents" type="number" placeholder="Resident capacity" value="35">
+        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value="Vandana Senior Living"></div>
+        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value="Dr. S. K. Narayan"></div>
+        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru"></div>
+        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library"></div>
+        <div class="field"><label>Contact email</label><input required id="homeRegEmail" type="email" placeholder="name@home.org"></div>
+        <div class="field"><label>Password</label><input required id="homeRegPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
+        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value="+91 80 2663 1122"></div>
+        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" value="35"></div>
         <button class="btn primary" type="submit" id="homeSubmitBtn">Register Home &amp; Create Account →</button>
       </form>
     `;
