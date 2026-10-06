@@ -150,10 +150,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     withScores.sort((a, b) => b.match.score - a.match.score);
+    setTextSafe("discoverLiveCount", filtered.length);
 
-    withScores.forEach(({ opp, match, home, applied }) => {
+    withScores.forEach(({ opp, match, home, applied }, index) => {
       const spotsLeft = Math.max(0, (opp.spots_needed || 1) - (opp.spots_filled || 0));
       const matchBadgeCls = match.matchLevel === "high" ? "match-high" : match.matchLevel === "medium" ? "match-medium" : "match-general";
+      const fitLabel = index === 0
+        ? "BEST MATCH"
+        : match.score >= 85
+          ? "GREAT FIT"
+          : match.score >= 70
+            ? "GOOD FIT"
+            : match.score >= 55
+              ? "POSSIBLE FIT"
+              : "EXPLORE";
 
       const card = document.createElement("article");
       const visualClass = opp.category === "music" ? "moment-music" : opp.category === "creative" ? "moment-creative" : opp.category === "outdoors" ? "moment-outdoors" : opp.category === "assistive" ? "moment-tech" : "moment-talk";
@@ -162,7 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="moment-visual ${visualClass}">
           <div class="moment-visual-top">
             <span class="moment-category">${SahaayaUI.getCategoryBadge(opp.category)}</span>
-            <span class="moment-fit ${matchBadgeCls}"><b>${match.score}%</b> fit</span>
+            <span class="moment-fit ${matchBadgeCls}"><b>${match.score}%</b> ${fitLabel}</span>
           </div>
           <span class="moment-visual-label">A MOMENT WORTH SHOWING UP FOR</span>
         </div>
