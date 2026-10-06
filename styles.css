@@ -135,3 +135,43 @@ a{text-decoration:none;color:inherit}button{font:inherit;color:inherit}h1,h2,h3,
  .scroll-marquee div{font-size:12px}.connection-badge{width:88px;height:88px;font-size:7px}
  .how:after{width:100%;height:210px}.section-transition{font-size:8px}
 }
+
+
+/* =========================================================
+   SAHAAYA — CINEMATIC MODAL / FORM SYSTEM
+   ========================================================= */
+.modal{padding:24px;backdrop-filter:none}
+.modal.open .modal-card{animation:modalEnter .55s cubic-bezier(.16,1,.3,1) both}
+.modal-backdrop{background:rgba(16,35,30,.66)!important;backdrop-filter:blur(18px) saturate(.8)}
+.modal-card{width:min(720px,calc(100vw - 32px));max-height:min(820px,92vh);overflow:auto;padding:0!important;border:1px solid rgba(255,253,248,.38)!important;border-radius:30px!important;background:var(--cream)!important;box-shadow:0 45px 120px rgba(12,28,24,.38)!important}
+.modal-card:before{content:"SAHAAYA  ·  A MOMENT WORTH SHOWING UP FOR";display:block;padding:13px 30px;background:var(--forest);color:#dce8df;font-size:8px;letter-spacing:2.2px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1)}
+.modal-card:after{content:"";position:absolute;inset:0 0 auto;height:180px;pointer-events:none;background:radial-gradient(circle at 86% 30%,rgba(199,154,88,.22),transparent 32%),radial-gradient(circle at 70% 10%,rgba(185,104,77,.13),transparent 25%);z-index:0}
+.modal-card #modalContent{position:relative;z-index:1;padding:36px 42px 42px}
+.modal-card .close{top:54px;right:26px;width:40px;height:40px;border:1px solid rgba(23,35,31,.12);border-radius:50%;background:rgba(251,248,241,.78);font-size:24px;line-height:1;z-index:5;transition:.25s}
+.modal-card .close:hover{background:var(--forest);color:var(--paper);transform:rotate(90deg)}
+.modal-card .eyebrow{font-size:9px;letter-spacing:2.4px;color:var(--clay);font-weight:800;margin-bottom:10px}
+.modal-card h2{font-family:var(--serif);font-size:clamp(38px,5vw,56px);font-weight:500;line-height:.98;letter-spacing:-2px;max-width:560px;margin-bottom:14px}
+.modal-card> #modalContent > p{font-size:14px;line-height:1.65;color:#66736d;max-width:570px;margin-bottom:26px}
+.modal-card .form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.modal-card .form input,.modal-card .form select,.modal-card .form textarea{width:100%;height:50px;border:1px solid #d9ded5;border-radius:14px;background:#fffdf8;color:var(--ink);padding:0 15px;font:500 13px var(--sans);outline:none;transition:.22s;box-shadow:0 4px 15px rgba(23,35,31,.025)}
+.modal-card .form input::placeholder{color:#9aa49e}
+.modal-card .form input:hover,.modal-card .form select:hover{border-color:#c2cec5}
+.modal-card .form input:focus,.modal-card .form select:focus{border-color:var(--forest);box-shadow:0 0 0 4px rgba(24,59,50,.09),0 7px 20px rgba(23,35,31,.06)}
+.modal-card .form .field{min-width:0}
+.modal-card .form .field label{display:block;margin:0 0 7px 3px;font-size:9px;text-transform:uppercase;letter-spacing:1.4px;font-weight:800;color:#66736d}
+.modal-card .form .field-wide{grid-column:1/-1}
+.modal-card .form button{grid-column:1/-1;justify-content:center;height:52px;border-radius:999px;font-size:13px;box-shadow:0 13px 28px rgba(24,59,50,.17)}
+.modal-card .form>input,.modal-card .form>select{grid-column:1/-1}
+.modal-card .form>p{grid-column:1/-1}
+.modal-card #loginForm{grid-template-columns:1fr;max-width:500px}
+.modal-card #loginForm button{grid-column:1}
+.modal-card #joinForm #joinName,.modal-card #joinForm #joinEmail,.modal-card #joinForm #joinPassword,.modal-card #joinForm #joinPhone{grid-column:auto}
+.modal-card #joinForm #joinInterest,.modal-card #joinForm #joinAvailability{grid-column:1/-1}
+.modal-card #homeForm{grid-template-columns:1fr 1fr}
+.modal-card #homeForm button{grid-column:1/-1}
+.modal-card #homeForm .field-wide{grid-column:1/-1}
+.modal-card #applyBtn{margin-top:12px;height:50px;padding:0 24px}
+@keyframes modalEnter{from{opacity:0;transform:translateY(26px) scale(.97);filter:blur(2px)}to{opacity:1;transform:none;filter:none}}
+@media(max-width:650px){
+ .modal{padding:10px}.modal-card{width:100%;border-radius:24px!important}.modal-card #modalContent{padding:28px 22px 28px}.modal-card .form,.modal-card #homeForm{grid-template-columns:1fr}.modal-card .form .field,.modal-card .form .field-wide,.modal-card .form button{grid-column:1/-1}.modal-card h2{font-size:39px}.modal-card:before{padding-left:22px;font-size:7px}.modal-card .close{top:49px;right:16px}
+}
