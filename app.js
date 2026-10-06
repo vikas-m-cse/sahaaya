@@ -314,3 +314,21 @@ if (window.location.search.includes("login_required=1")) {
     });
   }
 })();
+
+
+/* Sahaaya interaction layer — product-first finder */
+(() => {
+  const map={
+    conversation:{sunday:['Sunday Social Afternoon','Conversation, board games and an unhurried afternoon in Whitefield.'],saturday:['Weekend Conversation Circle','Stories, tea and relaxed conversation in Indiranagar.'],weekday:['Afternoon Companionship','A quieter weekday hour with residents in Whitefield.']},
+    music:{sunday:['Sunday Music Circle','Bring a favourite song and spend an afternoon singing together.'],saturday:['Music & Antakshari','Bring a favourite song. Someone may already know every word.'],weekday:['Midweek Music Hour','Songs, rhythm and a little energy for the afternoon.']},
+    creative:{sunday:['Art & Memory Wall','Turn drawings, stories and small memories into something shared.'],saturday:['Creative Saturday','Make, sketch and create something residents can keep.'],weekday:['Creative Hour','A relaxed making session built around simple materials.']},
+    recreation:{sunday:['Sunday Game Table','Board games, cards and a table full of easy conversation.'],saturday:['Saturday Game Hour','Bring your favourite game and stay for a while.'],weekday:['Weekday Games','A friendly hour of cards, puzzles and company.']}
+  };
+  let interest='conversation',day='sunday';
+  const title=document.getElementById('finderTitle'),textEl=document.getElementById('finderText');
+  function update(){const x=(map[interest]||map.conversation)[day]||map.conversation.sunday; if(title)title.textContent=x[0];if(textEl)textEl.textContent=x[1];}
+  document.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>{const row=btn.closest('.choice-row');row.querySelectorAll('.choice').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(row.dataset.choice==='interest')interest=btn.dataset.value;else day=btn.dataset.value;update();}));
+  const progress=document.getElementById('progress');
+  window.addEventListener('scroll',()=>{if(progress)progress.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%';},{passive:true});
+  update();
+})();
