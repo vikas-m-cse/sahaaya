@@ -54,76 +54,47 @@
     <!-- Welcome Header & Quick Action -->
     <section class="volunteer-hero">
       <div class="volunteer-hero-copy">
-        <span class="portal-eyebrow">YOUR SAHAAYA SPACE · VOLUNTEER</span>
+        <span class="portal-eyebrow">SAHAAYA · YOUR VOLUNTEER SPACE</span>
         <h2 id="welcomeGreeting">Welcome back, Ananya <span>👋</span></h2>
-        <p>There are meaningful hours waiting for you. Discover verified needs, find your fit, and choose where your next hour belongs.</p>
+        <p>One good hour can become a meaningful memory. Find a real need that fits your interests, your time, and your way of showing up.</p>
         <div class="hero-intent-row">
-          <span><i></i> 5 moments match your profile</span>
+          <span><i></i> <b id="heroMatchCount">5</b> moments fit you</span>
           <span>·</span>
-          <span>Next opening · Sunday</span>
+          <span id="heroNextWindow">Your next opening · Sunday</span>
         </div>
       </div>
       <div class="volunteer-hero-action">
         <div class="next-hour-card">
-          <span>RECOMMENDED NEXT</span>
-          <strong>Sunday Social Afternoon</strong>
-          <small>Silver Springs · Whitefield</small>
-          <div><b>98%</b><span>compatibility</span><em>2 hrs · 3.2 km</em></div>
-          <button class="btn-primary" id="editProfileQuickBtn"><span>⚙</span> Tune my preferences</button>
+          <div class="next-card-heading"><span>THE MOMENT I THINK YOU'LL LOVE</span><em id="heroFitLabel">BEST FIT</em></div>
+          <strong id="heroOppTitle">Sunday Social Afternoon</strong>
+          <small id="heroOppHome">Silver Springs · Whitefield</small>
+          <p id="heroOppDescription">A relaxed afternoon of games, stories and warm conversation with residents.</p>
+          <div class="next-card-meta">
+            <b id="heroOppScore">98%</b><span>fit for you</span><em id="heroOppTime">2 hrs · Sunday</em>
+          </div>
+          <button class="btn-primary" id="editProfileQuickBtn"><span>→</span> Tune my preferences</button>
         </div>
       </div>
     </section>
 
     <!-- Impact KPI Grid -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-icon green">⏱</div>
-        <div class="kpi-data">
-          <strong id="kpiTotalHours">14.5</strong>
-          <span>Verified Volunteer Hours</span>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon peach">♥</div>
-        <div class="kpi-data">
-          <strong id="kpiCompleted">5</strong>
-          <span>Activities Completed</span>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon blue">📅</div>
-        <div class="kpi-data">
-          <strong id="kpiUpcoming">1</strong>
-          <span>Upcoming on Schedule</span>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon purple">⌁</div>
-        <div class="kpi-data">
-          <strong id="kpiPendingApps">1</strong>
-          <span>Applications in Review</span>
-        </div>
-      </div>
+    <section class="impact-strip" aria-label="Your impact">
+      <div class="impact-intro"><span>YOUR IMPACT</span><strong>What you've already given</strong></div>
+      <div class="impact-stat"><strong id="kpiTotalHours">14.5</strong><span>verified hours</span></div>
+      <div class="impact-stat"><strong id="kpiCompleted">5</strong><span>moments completed</span></div>
+      <div class="impact-stat"><strong id="kpiUpcoming">1</strong><span>coming up</span></div>
+      <div class="impact-stat impact-stat-last"><strong id="kpiPendingApps">1</strong><span>awaiting review</span></div>
     </section>
 
     <!-- Navigation Tabs -->
-    <div class="portal-tabs" role="tablist">
-      <button class="portal-tab-btn active" data-tab="discover" role="tab">
-        <span>🔍</span> Discover Requirements <span class="portal-tab-count" id="countOpportunities">5</span>
-      </button>
-      <button class="portal-tab-btn" data-tab="schedule" role="tab">
-        <span>📅</span> My Schedule <span class="portal-tab-count" id="countSchedule">1</span>
-      </button>
-      <button class="portal-tab-btn" data-tab="applications" role="tab">
-        <span>📋</span> My Applications <span class="portal-tab-count" id="countApplications">2</span>
-      </button>
-      <button class="portal-tab-btn" data-tab="hours" role="tab">
-        <span>🎖</span> Attendance & Hours Log <span class="portal-tab-count" id="countAttendance">2</span>
-      </button>
-      <button class="portal-tab-btn" data-tab="profile" role="tab">
-        <span>👤</span> My Profile & Preferences
-      </button>
-    </div>
+    <nav class="portal-tabs workspace-nav" role="tablist" aria-label="Your Sahaaya workspace">
+      <div class="workspace-nav-label">YOUR SPACE</div>
+      <button class="portal-tab-btn active" data-tab="discover" role="tab"><span>01</span> Discover <i id="countOpportunities">5</i></button>
+      <button class="portal-tab-btn" data-tab="schedule" role="tab"><span>02</span> Schedule <i id="countSchedule">1</i></button>
+      <button class="portal-tab-btn" data-tab="applications" role="tab"><span>03</span> Applications <i id="countApplications">2</i></button>
+      <button class="portal-tab-btn" data-tab="hours" role="tab"><span>04</span> Hours <i id="countAttendance">2</i></button>
+      <button class="portal-tab-btn" data-tab="profile" role="tab"><span>05</span> Profile</button>
+    </nav>
 
     <!-- TAB 1: DISCOVER OPPORTUNITIES -->
     <section class="portal-tab-content active" id="tab-discover">
