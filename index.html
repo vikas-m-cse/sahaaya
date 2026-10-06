@@ -1,93 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sahaaya — Show up for something real.</title>
 <meta name="description" content="Sahaaya connects volunteers with real needs from verified old age homes.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="css/sahaaya-3d.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/states.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/sahaaya-3d.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/states.css">
 </head>
 <body>
-<div class="progress" id="progress"></div>
-<div class="cursor-dot"></div><div class="cursor-ring"></div>
-<header class="nav">
- <a class="brand" href="#home"><span class="brand-mark">sa</span><span>Sahaaya</span></a>
- <nav class="nav-links"><a href="#moments">Moments</a><a href="#story">Story</a><a href="#how">How it works</a></nav>
- <div class="nav-actions"><button class="btn ghost" data-modal="login">Sign in</button><button class="btn primary" data-modal="join">I want to help <span>↗</span></button></div>
- <button class="menu-btn" id="menuBtn">☰</button>
+<div class="site-progress" id="progress"></div>
+<header class="site-nav">
+  <a class="brand" href="#home"><span class="brand-mark">sa</span><span>Sahaaya</span></a>
+  <nav class="nav-links"><a href="#moments">Find a moment</a><a href="#how">How it works</a><a href="#homes">For homes</a></nav>
+  <div class="nav-actions"><button class="nav-login" data-modal="login">Sign in</button><button class="nav-cta" data-modal="join">I want to help <span>↗</span></button></div>
+  <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
 </header>
 
 <main>
-<section class="goat-hero" id="home">
- <div id="sahaaya-3d" aria-hidden="true"></div>
- <div class="hero-topline"><span>SAHAAYA / 2026</span><span>BENGALURU · INDIA</span></div>
- <div class="hero-word">SAHAAYA</div>
- <div class="hero-copy-goat">
-   <p class="eyebrow">A different kind of volunteering.</p>
-   <h1>Show up<br><i>for something real.</i></h1>
-   <p>One conversation. One song. One ordinary afternoon that becomes a memory.</p>
-   <button class="btn lime-btn" data-modal="join">Find your moment <span>↗</span></button>
- </div>
- <div class="hero-photo">
-   <img src="https://images.unsplash.com/photo-1763631045896-04d2e60048ae?auto=format&fit=crop&fm=jpg&q=82&w=2200" alt="People sharing a moment together">
-   <div class="photo-tag"><span>01</span><strong>TIME, GIVEN MEANING.</strong></div>
- </div>
- <div class="hero-scroll">SCROLL TO MEET THE PEOPLE <span>↓</span></div>
+<section class="hero-product" id="home">
+  <div id="sahaaya-3d" aria-hidden="true"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-copy">
+    <div class="live-label"><span class="live-dot"></span> VOLUNTEERING, MADE HUMAN</div>
+    <h1>Someone could use <em>an hour</em> of your time.</h1>
+    <p class="hero-lead">Sahaaya connects you with verified old age homes and the moments they genuinely need help with — conversation, music, games, creativity and company.</p>
+    <div class="hero-actions">
+      <button class="hero-primary" data-modal="join">Find my moment <span>↗</span></button>
+      <a class="hero-secondary" href="#moments">See what's needed <span>↓</span></a>
+    </div>
+    <div class="trust-row"><span>✓ Verified homes</span><span>•</span><span>Transparent matching</span><span>•</span><span>Real local needs</span></div>
+  </div>
+  <div class="hero-experience">
+    <div class="experience-head"><div><span class="tiny-label">NEEDED RIGHT NOW</span><strong>Sunday · Whitefield</strong></div><span class="status-pill">3 spots</span></div>
+    <div class="experience-photo"><img src="https://images.unsplash.com/photo-1773227059881-ef8ecf22aac8?auto=format&fit=crop&fm=jpg&q=86&w=1600" alt="Two older adults talking together"><div class="photo-chip">01 / CONVERSATION</div></div>
+    <div class="experience-body">
+      <div class="verified-line"><span>✓</span> SILVER SPRINGS HOME · VERIFIED</div>
+      <h2>Sunday Social Afternoon</h2>
+      <p>Stories, board games and an unhurried table full of conversation.</p>
+      <div class="experience-meta"><span>11:00 AM—1:00 PM</span><span>2 hours</span><span>3.2 km</span></div>
+      <button class="experience-action apply" data-activity="Sunday Social Afternoon">I can show up <span>→</span></button>
+    </div>
+  </div>
+  <div class="hero-foot"><span>SCROLL TO DISCOVER</span><span>↓</span></div>
 </section>
 
-<section class="statement" id="story">
- <div class="statement-number">01</div>
- <div class="statement-main"><p class="eyebrow">The idea</p><h2>Not every act of care needs to be <i>grand.</i></h2></div>
- <div class="statement-side"><p>Sometimes it is two people talking over tea. Sometimes it is a board game. Sometimes it is simply being there.</p><span>THAT'S ENOUGH.</span></div>
+<section class="proof-strip">
+  <div><strong>14</strong><span>partner homes</span></div>
+  <div><strong>1,240+</strong><span>volunteer hours</span></div>
+  <div><strong>86</strong><span>moments shared</span></div>
+  <p>Small hours. Real people. <em>Meaningful days.</em></p>
 </section>
 
-<section class="moments" id="moments">
- <div class="section-rail"><span>02</span><span>REAL NEEDS</span></div>
- <div class="moments-head"><p class="eyebrow">The invitation</p><h2>Pick a moment.<br><i>Not a mission.</i></h2><p>Verified homes tell us what would genuinely help. You decide what feels right.</p></div>
- <div class="moment-stack">
-  <article class="moment-card"><div class="moment-image photo-one"><span>01</span><b>CONVERSATION</b></div><div class="moment-info"><small>SILVER SPRINGS · VERIFIED</small><h3>Sunday Social Afternoon</h3><p>Stories, board games and an unhurried table full of conversation.</p><div><span>Sun · 11:00—1:00</span><button class="apply" data-activity="Sunday Social Afternoon">Step in ↗</button></div></div></article>
-  <article class="moment-card"><div class="moment-image photo-two"><span>02</span><b>PLAY / MUSIC</b></div><div class="moment-info"><small>BHAVANA SENIOR CARE · VERIFIED</small><h3>Music & Antakshari</h3><p>Bring a favourite song. Someone may already know every word.</p><div><span>Sat · 4:00—6:00</span><button class="apply" data-activity="Music & Antakshari">Step in ↗</button></div></div></article>
-  <article class="moment-card"><div class="moment-image photo-three"><span>03</span><b>MAKE SOMETHING</b></div><div class="moment-info"><small>ANANDA PARK HOME · VERIFIED</small><h3>Art & Memory Wall</h3><p>Turn old stories, drawings and small memories into one shared wall.</p><div><span>Sun · 3:00—5:00</span><button class="apply" data-activity="Art & Memory Wall">Step in ↗</button></div></div></article>
- </div>
+<section class="intro-section" id="story">
+  <div class="section-kicker"><span>01</span><span>WHY SAHAAYA</span></div>
+  <div class="intro-content">
+    <div><p class="eyebrow">The idea</p><h2>Care doesn't always need a grand gesture. <em>Sometimes it needs a person.</em></h2></div>
+    <div class="intro-aside"><p>A conversation over tea. A familiar song. Someone willing to sit down and play one more game.</p><span>That is where Sahaaya begins.</span></div>
+  </div>
 </section>
 
-<section class="big-story">
- <div class="big-story-image"><img src="https://images.unsplash.com/photo-1758686254457-6aaca1ca78e0?auto=format&fit=crop&fm=jpg&q=82&w=2200" alt="A community moment"></div>
- <div class="big-story-copy"><span class="story-number">03</span><p class="eyebrow">Why Sahaaya exists</p><h2>You don't have to change a life.<br><i>You can change a Tuesday.</i></h2><p>We built Sahaaya around small, repeatable acts of care — the kind that make a day feel a little more human.</p><a href="#how">See how it works ↓</a></div>
+<section class="needs-section" id="moments">
+  <div class="section-heading">
+    <div><div class="eyebrow">REAL NEEDS, RIGHT NOW</div><h2>Find something<br><em>worth showing up for.</em></h2></div>
+    <p>Every requirement comes from a partner home. You choose the activity, time and place that feel right.</p>
+  </div>
+  <div class="filter-row">
+    <button class="filter active" data-filter="all">All moments</button>
+    <button class="filter" data-filter="conversation">Conversation</button>
+    <button class="filter" data-filter="music">Music</button>
+    <button class="filter" data-filter="creative">Creative</button>
+  </div>
+  <div class="needs-grid">
+    <article class="need-card opp-card" data-type="conversation">
+      <div class="need-image image-conversation"><span class="need-number">01</span><span class="need-tag">CONVERSATION</span></div>
+      <div class="need-content"><div class="home-label">SILVER SPRINGS HOME <span>✓ VERIFIED</span></div><h3>Sunday Social Afternoon</h3><p>Stories, board games and an unhurried table full of conversation.</p><div class="need-meta"><span>Sun · 11—1</span><span>Whitefield</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Sunday Social Afternoon">View opportunity <b>↗</b></button></div>
+    </article>
+    <article class="need-card opp-card featured" data-type="music">
+      <div class="need-image image-music"><span class="need-number">02</span><span class="need-tag">PLAY / MUSIC</span></div>
+      <div class="need-content"><div class="home-label">BHAVANA SENIOR CARE <span>✓ VERIFIED</span></div><h3>Music & Antakshari</h3><p>Bring a favourite song. Someone may already know every word.</p><div class="need-meta"><span>Sat · 4—6</span><span>Indiranagar</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Music & Antakshari">View opportunity <b>↗</b></button></div>
+    </article>
+    <article class="need-card opp-card" data-type="creative">
+      <div class="need-image image-creative"><span class="need-number">03</span><span class="need-tag">CREATIVE</span></div>
+      <div class="need-content"><div class="home-label">ANANDA PARK HOME <span>✓ VERIFIED</span></div><h3>Art & Memory Wall</h3><p>Turn old stories, drawings and small memories into one shared wall.</p><div class="need-meta"><span>Sun · 3—5</span><span>HSR Layout</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Art & Memory Wall">View opportunity <b>↗</b></button></div>
+    </article>
+  </div>
 </section>
 
-<section class="how-goat" id="how">
- <div class="how-head"><span>04 / THE RHYTHM</span><h2>One hour.<br><i>Three moves.</i></h2></div>
- <div class="how-grid">
-  <div><span>01</span><h3>Tell us<br><i>what matters.</i></h3><p>Your interests, availability and the way you like spending time.</p></div>
-  <div><span>02</span><h3>Find a<br><i>real need.</i></h3><p>See requirements written by verified homes — and know why they fit.</p></div>
-  <div><span>03</span><h3>Just<br><i>show up.</i></h3><p>Apply. Get approved. Share the hour. Leave a little warmer.</p></div>
- </div>
+<section class="match-section" id="how">
+  <div class="match-visual">
+    <div class="match-orbit orbit-one"></div><div class="match-orbit orbit-two"></div>
+    <div class="match-card">
+      <span class="tiny-label">YOUR PROFILE</span><strong>Conversation</strong><span>Sunday mornings</span><span>2–3 hours</span>
+    </div>
+    <div class="match-plus">+</div>
+    <div class="match-card need-match"><span class="tiny-label">REAL NEED</span><strong>Social afternoon</strong><span>Whitefield</span><span>Sunday · 11 AM</span></div>
+    <div class="match-result">GOOD FIT <span>✓</span></div>
+  </div>
+  <div class="match-copy">
+    <div class="eyebrow">02 / MATCHING</div>
+    <h2>Know <em>why</em><br>something fits.</h2>
+    <p>No mysterious score. Sahaaya explains the connection using the things that actually matter: your interests, availability, duration and area.</p>
+    <div class="match-points"><span><b>01</b> Interest</span><span><b>02</b> Availability</span><span><b>03</b> Distance</span></div>
+    <button class="dark-cta" data-modal="join">Build my preferences <span>→</span></button>
+  </div>
 </section>
 
-<section class="match-goat">
- <div class="match-word">MATCH</div>
- <div class="match-circle"><span>YOU</span><b>×</b><span>THE NEED</span></div>
- <div class="match-copy"><span>05 / NO MYSTERY SCORE</span><h2>Know <i>why</i><br>it fits.</h2><p>Interest. Availability. Duration. Area. Nothing hidden behind an arbitrary number.</p><button class="btn dark-btn" data-modal="join">Build my preferences →</button></div>
+<section class="story-section">
+  <div class="story-photo"><img src="https://images.unsplash.com/photo-1758686254457-6aaca1ca78e0?auto=format&fit=crop&fm=jpg&q=86&w=1800" alt="Older couple connecting over a video call"></div>
+  <div class="story-copy"><div class="eyebrow">03 / THE WHY</div><h2>You don't have to change a life.<br><em>You can change a Tuesday.</em></h2><p>We built Sahaaya for the ordinary hours that are easy to overlook — because companionship, attention and a little shared joy matter.</p><div class="story-signature"><span>SAHAAYA</span><span>PEOPLE · CARE · COMMUNITY</span></div></div>
 </section>
 
-<section class="homes-goat">
- <div><p class="eyebrow">06 / THE PLACES</p><h2>Real homes.<br><i>Real welcomes.</i></h2></div>
- <div class="home-list">
-  <div><span>01</span><strong>Silver Springs Home</strong><small>Whitefield · 48 residents · ✓ Verified</small><b>↗</b></div>
-  <div><span>02</span><strong>Bhavana Senior Care</strong><small>Indiranagar · 32 residents · ✓ Verified</small><b>↗</b></div>
-  <div><span>03</span><strong>Ananda Park Home</strong><small>HSR Layout · 27 residents · ✓ Verified</small><b>↗</b></div>
- </div>
- <button class="btn secondary" data-modal="home">Partner your home →</button>
+<section class="steps-section">
+  <div class="steps-title"><div class="eyebrow">04 / HOW IT WORKS</div><h2>One hour.<br><em>Three moves.</em></h2><p>Nothing complicated. Just a clearer way to turn spare time into human connection.</p></div>
+  <div class="steps-list">
+    <div class="step-item"><span>01</span><div><h3>Tell us what you enjoy.</h3><p>Choose your interests, availability and preferred area.</p></div><b>→</b></div>
+    <div class="step-item"><span>02</span><div><h3>Discover a real need.</h3><p>Browse requirements written by verified homes.</p></div><b>→</b></div>
+    <div class="step-item"><span>03</span><div><h3>Show up.</h3><p>Apply, get approved and share the hour.</p></div><b>✓</b></div>
+  </div>
 </section>
 
-<section class="goat-end">
- <div class="end-orbit"></div><span>07 / YOUR NEXT HOUR</span>
- <h2>Leave a little<br><i>warmer.</i></h2>
- <p>Start with one activity. One conversation. One Sunday.</p>
- <button class="btn lime-btn xl" data-modal="join">Join Sahaaya <span>→</span></button>
- <footer><span>PEOPLE · CARE · COMMUNITY</span><span>© 2026 SAHAAYA</span></footer>
+<section class="homes-section" id="homes">
+  <div class="section-heading"><div><div class="eyebrow">05 / FOR HOMES</div><h2>Tell people what<br><em>your residents need.</em></h2></div><p>Homes define the requirements. Sahaaya coordinates volunteers around those real needs.</p></div>
+  <div class="home-rows">
+    <div class="home-row"><span>01</span><div><strong>Silver Springs Home</strong><small>Whitefield · 48 residents · Verified</small></div><b>↗</b></div>
+    <div class="home-row"><span>02</span><div><strong>Bhavana Senior Care</strong><small>Indiranagar · 32 residents · Verified</small></div><b>↗</b></div>
+    <div class="home-row"><span>03</span><div><strong>Ananda Park Home</strong><small>HSR Layout · 27 residents · Verified</small></div><b>↗</b></div>
+  </div>
+  <button class="outline-cta" data-modal="home">Partner your home <span>→</span></button>
+</section>
+
+<section class="final-section">
+  <div class="final-noise"></div><div class="final-orbit"></div>
+  <div class="eyebrow">06 / YOUR NEXT HOUR</div>
+  <h2>Show up for<br><em>something real.</em></h2>
+  <p>Start with one activity. One conversation. One Sunday.</p>
+  <button class="final-cta" data-modal="join">Join Sahaaya <span>↗</span></button>
+  <footer><span>SAHAAYA</span><span>PEOPLE · CARE · COMMUNITY</span><span>© 2026</span></footer>
 </section>
 </main>
 
@@ -95,4 +148,5 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script><script src="js/db.js"></script><script src="js/matching.js"></script><script src="js/auth.js"></script><script src="js/components.js"></script><script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script><script src="js/sahaaya-3d.js"></script>
-</body></html>
+</body>
+</html>
