@@ -374,3 +374,19 @@ if (window.location.search.includes("login_required=1")) {
   days.forEach(x=>x.addEventListener('click',()=>{days.forEach(y=>y.classList.remove('active'));x.classList.add('active');d=x.dataset.day;update();}));
   explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth',block:'start'}));
 })();
+
+
+/* Living hour dock — keeps the chosen intention present while exploring */
+(() => {
+  const dock=document.getElementById('hourDock'), dockSummary=document.getElementById('dockSummary'), dockCount=document.getElementById('dockCount'), explore=document.getElementById('dockExplore');
+  const hero=document.querySelector('.hero-product');
+  if(!dock||!hero) return;
+  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
+  let h='1',d='Sunday';
+  const refresh=()=>{dockSummary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;dockCount.textContent=(counts[h+'|'+d]||3)+' nearby';};
+  document.querySelectorAll('.hour-chip').forEach(x=>x.addEventListener('click',()=>{h=x.dataset.hours;refresh();}));
+  document.querySelectorAll('.day-chip').forEach(x=>x.addEventListener('click',()=>{d=x.dataset.day;refresh();}));
+  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth'}));
+  const onScroll=()=>dock.classList.toggle('visible',scrollY>hero.offsetHeight*.72);
+  addEventListener('scroll',onScroll,{passive:true});onScroll();refresh();
+})();
