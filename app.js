@@ -390,3 +390,31 @@ if (window.location.search.includes("login_required=1")) {
   const onScroll=()=>dock.classList.toggle('visible',scrollY>hero.offsetHeight*.72);
   addEventListener('scroll',onScroll,{passive:true});onScroll();refresh();
 })();
+
+
+/* Signature page choreography */
+(() => {
+  const nav=document.querySelector('.site-nav'), rail=document.querySelector('.chapter-rail'), fill=document.getElementById('railFill');
+  const targets=[...document.querySelectorAll('.rail-dot')].map(x=>({btn:x,el:document.getElementById(x.dataset.target)})).filter(x=>x.el);
+  const sections=[...document.querySelectorAll('main > section')];
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveal=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');reveal.unobserve(e.target);}}),{threshold:.14});
+  document.querySelectorAll('.intro-section,.needs-section,.match-section,.story-section,.steps-section,.homes-section,.portal-bridge,.final-section').forEach((el,i)=>{el.classList.add('reveal-orchestrated');el.dataset.delay=String(i%5);reveal.observe(el);});
+  const update=()=>{
+    nav?.classList.toggle('scrolled',scrollY>45);
+    const y=scrollY+innerHeight*.38;
+    let active=targets[0]; targets.forEach(t=>{if(t.el.offsetTop<=y) active=t;});
+    targets.forEach(t=>t.btn.classList.toggle('active',t===active));
+    if(fill&&active){const idx=targets.indexOf(active);fill.style.height=((idx)/(Math.max(targets.length-1,1))*100)+'%';}
+  };
+  addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+  targets.forEach(t=>t.btn.addEventListener('click',()=>t.el.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'})));
+})();
+
+/* Hero image follows the pointer by a few pixels — intentionally restrained */
+(() => {
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const card=document.querySelector('.hero-experience'); const img=card?.querySelector('img'); if(!card||!img) return;
+  card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;img.style.setProperty('--img-x',(x*5)+'px');img.style.setProperty('--img-y',(y*4)+'px');});
+  card.addEventListener('pointerleave',()=>{img.style.setProperty('--img-x','0px');img.style.setProperty('--img-y','0px');});
+})();
