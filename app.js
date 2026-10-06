@@ -360,3 +360,17 @@ if (window.location.search.includes("login_required=1")) {
     });
   });
 })();
+
+
+/* Signature Sahaaya hour selector */
+(() => {
+  const hours=document.querySelectorAll('.hour-chip'), days=document.querySelectorAll('.day-chip');
+  const summary=document.getElementById('hourSummary'), match=document.getElementById('hourMatch'), box=document.querySelector('.hour-picker'), explore=document.getElementById('hourExplore');
+  if(!summary||!match) return;
+  let h='1', d='Sunday';
+  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
+  const update=()=>{summary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;match.textContent=(counts[h+'|'+d]||3)+' moments nearby';box.classList.remove('is-updating');void box.offsetWidth;box.classList.add('is-updating');};
+  hours.forEach(x=>x.addEventListener('click',()=>{hours.forEach(y=>y.classList.remove('active'));x.classList.add('active');h=x.dataset.hours;update();}));
+  days.forEach(x=>x.addEventListener('click',()=>{days.forEach(y=>y.classList.remove('active'));x.classList.add('active');d=x.dataset.day;update();}));
+  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth',block:'start'}));
+})();
