@@ -97,37 +97,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.className = "portal-grid";
 
     pendingHomes.forEach(home => {
-      const card = document.createElement("div");
-      card.className = "portal-card";
+      const card = document.createElement("article");
+      card.className = "portal-card admin-verify-card";
       card.innerHTML = `
         <div class="portal-card-header">
-          <span class="badge badge-warning">Verification Required</span>
-          <span style="font-size: 11px; font-weight: 700; color: var(--portal-muted);">REG: ${home.registration_number}</span>
+          <div>
+            <span class="badge badge-warning">VERIFICATION REQUIRED</span>
+            <div class="admin-verify-meta">REGISTRATION · ${home.registration_number || "Pending record"}</div>
+          </div>
+          <span class="admin-verify-meta">NEW PARTNER REQUEST</span>
         </div>
         <div class="portal-card-body">
-          <h3 style="margin-bottom: 4px;">${home.name}</h3>
-          <div style="font-size: 12px; color: var(--portal-muted); margin-bottom: 14px;">
-            📍 ${home.address} (${home.area})<br>
-            👤 Superintendent: <strong>${home.contact_person}</strong>
-          </div>
-
-          <div style="background: #fdfaf3; border: 1px solid #fae8c8; border-radius: 12px; padding: 14px; margin-bottom: 14px; font-size: 13px;">
-            <div><strong>Resident Capacity:</strong> ${home.resident_count} elderly residents</div>
-            <div style="margin-top: 6px;"><strong>About:</strong> ${home.description || "Senior living and assisted care."}</div>
-            <div style="margin-top: 6px; color: #8a6100; font-size: 12px;"><strong>Vetting Note:</strong> ${home.verification_notes || "Certificate inspection pending."}</div>
+          <div class="admin-verify-body">
+            <div>
+              <span class="admin-eyebrow">PARTNER HOME</span>
+              <h3>${home.name}</h3>
+              <div style="font-size:10px;color:var(--portal-muted);line-height:1.55;">
+                <strong>${home.area || "Bengaluru"}</strong><br>
+                ${home.address || "Address on registration"}<br>
+                Superintendent · <strong>${home.contact_person || "Not provided"}</strong>
+              </div>
+              <div class="admin-verify-facts">
+                <div class="admin-verify-fact"><small>RESIDENTS</small><strong>${home.resident_count || 0}</strong></div>
+                <div class="admin-verify-fact"><small>REGISTRATION</small><strong>${home.registration_number || "—"}</strong></div>
+              </div>
+            </div>
+            <div class="admin-verify-note">
+              <small>VETTING CONTEXT</small>
+              <p><strong>About:</strong> ${home.description || "Senior living and assisted care."}</p>
+              <p style="margin-top:9px;"><strong>Verification note:</strong> ${home.verification_notes || "Certificate inspection pending."}</p>
+            </div>
           </div>
         </div>
-        <div class="portal-card-footer">
-          <button class="btn-danger btn-sm decline-home-btn" data-home-id="${home.id}">
-            Decline
-          </button>
-          <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name}">
-            Approve & Verify Partner ✓
-          </button>
+        <div class="portal-card-footer admin-verify-actions">
+          <button class="btn-danger btn-sm decline-home-btn" data-home-id="${home.id}">Decline</button>
+          <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name}">Approve & Verify Partner ✓</button>
         </div>
-      `;
-
-      grid.appendChild(card);
+      `;      grid.appendChild(card);
     });
 
     container.appendChild(grid);
