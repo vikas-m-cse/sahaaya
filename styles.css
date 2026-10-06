@@ -321,3 +321,9 @@ body:after{content:"";position:fixed;left:var(--mx,50%);top:var(--my,50%);width:
  .hero-copy{min-height:620px;padding:90px 6vw 55px}.hero-art{min-height:500px}.hero h1{font-size:54px;letter-spacing:-3px}.hero-floating-a{left:18px}.hero-floating-b{right:18px}.hero-vertical,.hero-index{display:none}.scribble{right:18px}.image-caption{left:18px;bottom:20px}
  .section{padding:100px 6vw}.section-head h2{font-size:52px}.closing h2{font-size:65px;letter-spacing:-4px}
 }
+
+.reveal-section{opacity:.01;transform:translateY(45px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1)}
+.reveal-section.is-visible{opacity:1;transform:none}
+.signal-band.reveal-section{transition-delay:.08s}
+.connection.reveal-section{transition-duration:1.1s}
+.closing.reveal-section{opacity:1;transform:none}
