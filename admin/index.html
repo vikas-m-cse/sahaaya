@@ -51,64 +51,66 @@
   <!-- Portal Main Body -->
   <main class="portal-container">
 
-    <!-- Welcome Header & Quick Action -->
-    <div class="portal-welcome">
-      <div>
-        <h2>Platform Operations & Impact Overview 🛡️</h2>
-        <p>Vetting partner homes, monitoring live coordination pipelines, and ensuring community integrity.</p>
-      </div>
-      <div>
-        <button class="btn-secondary" id="exportReportBtn">
-          <span>📊</span> Export Platform Report
-        </button>
-      </div>
-    </div>
-
-    <!-- Admin KPI Cards -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-icon green">⏱</div>
-        <div class="kpi-data">
-          <strong id="kpiPlatformHours">39.5</strong>
-          <span>Total Volunteer Hours</span>
+    <!-- ADMIN COMMAND CENTER -->
+    <section class="admin-command">
+      <div class="admin-command-copy">
+        <span class="admin-eyebrow">SAHAAYA / PLATFORM OPERATIONS</span>
+        <h2>Keep the network<br><em>worthy of trust.</em></h2>
+        <p>Verify the homes, follow the people, and keep every volunteer hour accountable.</p>
+        <div class="admin-command-actions">
+          <button class="btn-primary" id="exportReportBtn"><span>↗</span> Export platform report</button>
+          <span class="admin-live"><i></i> Platform systems operational</span>
         </div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-icon peach">🏡</div>
-        <div class="kpi-data">
-          <strong id="kpiHomesCount">3</strong>
-          <span>Partner Senior Homes</span>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon blue">👤</div>
-        <div class="kpi-data">
-          <strong id="kpiVolunteersCount">3</strong>
-          <span>Registered Volunteers</span>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon purple">⏳</div>
-        <div class="kpi-data">
-          <strong id="kpiPendingVerification">1</strong>
-          <span>Homes Pending Vetting</span>
-        </div>
+      <div class="admin-command-mark" aria-hidden="true">
+        <div class="admin-ring admin-ring-a"></div>
+        <div class="admin-ring admin-ring-b"></div>
+        <div class="admin-ring admin-ring-c"></div>
+        <div class="admin-shield">S</div>
+        <span>TRUST<br>NETWORK</span>
       </div>
     </section>
 
-    <!-- Navigation Tabs -->
-    <div class="portal-tabs" role="tablist">
+    <section class="admin-pulse">
+      <div class="admin-pulse-lead">
+        <span class="admin-eyebrow">PLATFORM PULSE</span>
+        <h3>What needs<br>your attention.</h3>
+      </div>
+      <div class="admin-pulse-stat">
+        <strong id="kpiPendingVerification">1</strong>
+        <span>HOMES TO VERIFY</span>
+        <small>Protect the partner network.</small>
+      </div>
+      <div class="admin-pulse-stat">
+        <strong id="kpiPlatformHours">39.5</strong>
+        <span>VERIFIED HOURS</span>
+        <small>Community time delivered.</small>
+      </div>
+      <div class="admin-pulse-stat">
+        <strong id="kpiHomesCount">3</strong>
+        <span>PARTNER HOMES</span>
+        <small>Trusted places in Sahaaya.</small>
+      </div>
+      <div class="admin-pulse-stat">
+        <strong id="kpiVolunteersCount">3</strong>
+        <span>VOLUNTEERS</span>
+        <small>People showing up.</small>
+      </div>
+    </section>
+
+    <div class="portal-tabs admin-tabs" role="tablist">
+      <div class="admin-tabs-label"><span>CONTROL ROOM</span><b>01—04</b></div>
       <button class="portal-tab-btn active" data-tab="verification" role="tab">
-        <span>🛡️</span> Home Verification Queue <span class="portal-tab-count" id="countPendingQueue">1</span>
+        <span>01</span> Verification <span class="portal-tab-count" id="countPendingQueue">1</span>
       </button>
       <button class="portal-tab-btn" data-tab="volunteers" role="tab">
-        <span>👥</span> Volunteer Directory
+        <span>02</span> People
       </button>
       <button class="portal-tab-btn" data-tab="pipeline" role="tab">
-        <span>📋</span> Application Pipeline & Hours Log
+        <span>03</span> Pipeline
       </button>
       <button class="portal-tab-btn" data-tab="homes" role="tab">
-        <span>🏡</span> All Registered Homes
+        <span>04</span> Partner Homes
       </button>
     </div>
 
