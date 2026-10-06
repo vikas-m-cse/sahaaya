@@ -332,3 +332,31 @@ if (window.location.search.includes("login_required=1")) {
   window.addEventListener('scroll',()=>{if(progress)progress.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%';},{passive:true});
   update();
 })();
+
+
+/* Sahaaya physical-pointer interactions */
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || 'ontouchstart' in window) return;
+  const magnetic = document.querySelectorAll('.hero-primary,.nav-cta,.experience-action,.result-arrow,.final-cta,.outline-cta');
+  magnetic.forEach(el => {
+    el.addEventListener('pointermove', e => {
+      const r=el.getBoundingClientRect();
+      const x=(e.clientX-r.left-r.width/2)/r.width;
+      const y=(e.clientY-r.top-r.height/2)/r.height;
+      el.style.setProperty('--mag-x', (x*8).toFixed(2)+'px');
+      el.style.setProperty('--mag-y', (y*6).toFixed(2)+'px');
+    });
+    el.addEventListener('pointerleave',()=>{el.style.setProperty('--mag-x','0px');el.style.setProperty('--mag-y','0px');});
+  });
+
+  document.querySelectorAll('.hero-experience,.need-card').forEach(card => {
+    card.addEventListener('pointermove', e => {
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left-r.width/2)/r.width;
+      const y=(e.clientY-r.top-r.height/2)/r.height;
+      card.style.setProperty('--spot-x',(x*100+50)+'%');
+      card.style.setProperty('--spot-y',(y*100+50)+'%');
+    });
+  });
+})();
