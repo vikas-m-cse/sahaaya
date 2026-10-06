@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1050" role="img" aria-labelledby="title desc">
+<title id="title">People sharing time and stories</title>
+<desc id="desc">Warm editorial illustration of a small intergenerational group gathered around a table.</desc>
+<defs>
+ <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEE2D0"/><stop offset=".55" stop-color="#D9E2D2"/><stop offset="1" stop-color="#D3DDE2"/></linearGradient>
+ <filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="22" flood-opacity=".15"/></filter>
+</defs>
+<rect width="1600" height="1050" rx="32" fill="url(#bg2)"/>
+<circle cx="1270" cy="180" r="170" fill="#F0C56F" opacity=".7"/>
+<path d="M0 780 Q350 650 720 760 T1600 700 V1050 H0Z" fill="#B8C7AF"/>
+<rect x="170" y="115" width="380" height="380" rx="24" fill="#F7F0E4" stroke="#2D4B3A" stroke-width="16"/>
+<path d="M205 150H515V460H205Z" fill="#BDD2D6"/>
+<path d="M360 150V460M205 305H515" stroke="#F7F0E4" stroke-width="16"/>
+<g filter="url(#s)">
+ <ellipse cx="800" cy="760" rx="520" ry="110" fill="#5F4A3B" opacity=".25"/>
+ <ellipse cx="800" cy="700" rx="420" ry="110" fill="#B77C5B"/>
+ <ellipse cx="800" cy="675" rx="400" ry="96" fill="#E7D0B7"/>
+</g>
+<g>
+ <circle cx="505" cy="500" r="76" fill="#B9785C"/><path d="M430 730Q430 575 505 565Q580 575 580 730Z" fill="#46654F"/>
+ <path d="M470 730L450 900M540 730L560 900" stroke="#2D4B3A" stroke-width="28" stroke-linecap="round"/>
+</g>
+<g>
+ <circle cx="770" cy="450" r="84" fill="#D29A73"/><path d="M685 700Q685 525 770 515Q855 525 855 700Z" fill="#D4A463"/>
+ <path d="M725 700L700 900M815 700L840 900" stroke="#3E4B43" stroke-width="28" stroke-linecap="round"/>
+</g>
+<g>
+ <circle cx="1085" cy="500" r="76" fill="#8C5A48"/><path d="M1010 730Q1010 575 1085 565Q1160 575 1160 730Z" fill="#5B6F88"/>
+ <path d="M1050 730L1030 900M1120 730L1140 900" stroke="#2D4B3A" stroke-width="28" stroke-linecap="round"/>
+</g>
+<g fill="#D98B63">
+ <circle cx="735" cy="660" r="18"/><circle cx="850" cy="650" r="18"/><circle cx="930" cy="700" r="18"/>
+</g>
+<path d="M665 590 Q800 520 935 590" stroke="#2D4B3A" stroke-width="10" fill="none" stroke-linecap="round" opacity=".55"/>
+<text x="110" y="920" font-family="Georgia,serif" font-size="54" fill="#2D4B3A">a table becomes a story</text>
+<text x="113" y="970" font-family="Arial,sans-serif" font-size="19" letter-spacing="5" fill="#667168">PEOPLE · CARE · COMMUNITY</text>
+</svg>
