@@ -664,3 +664,154 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
 #volunteerOppGrid .moment-card:first-child .moment-fit{background:#e5f1e7!important;color:#1d684e!important}.moment-card:not(:first-child) .moment-fit{font-size:7px!important}.moment-card:not(:first-child) .moment-fit b{font-size:10px!important}
 #tab-discover .discover-heading p:after{content:"  •  Match strength is relative — not every moment is a perfect fit.";color:#7a8981;font-size:9px;font-style:italic}
 @media(max-width:780px){.discover-heading{min-height:0!important}.discover-count{align-items:flex-start!important;margin-top:14px!important;min-width:110px!important}.discover-heading p{max-width:620px}.discover-heading p:after{display:block;margin-top:4px}}
+
+/* =========================================================
+   MOBILE EXPERIENCE — PHONE FIRST, NOT DESKTOP SHRUNK
+   ========================================================= */
+@media (max-width: 780px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+  .portal-body{min-width:0!important}
+  .portal-body *{min-width:0}
+  .portal-body .portal-navbar{top:40px!important}
+  .portal-body .portal-nav-inner{width:100%!important;max-width:none!important;padding:10px 16px!important;gap:10px!important}
+  .portal-brand{gap:8px!important;flex:1;min-width:0}
+  .portal-brand-mark{width:38px!important;height:38px!important;flex:0 0 38px}
+  .portal-brand-text{min-width:0}
+  .portal-brand-text h1{font-size:17px!important}
+  .portal-role-tag{font-size:7px!important;letter-spacing:.9px!important}
+  .portal-user-section{gap:7px!important;flex:0 0 auto}
+  .portal-user-meta{display:none!important}
+  .portal-avatar{width:36px!important;height:36px!important;flex:0 0 36px}
+  .portal-logout-btn{padding:9px 11px!important;font-size:10px!important;white-space:nowrap}
+  .portal-logout-btn span{display:none}
+  .portal-body .portal-container{width:100%!important;box-sizing:border-box!important;max-width:none!important;padding:20px 14px 70px!important;margin:0!important}
+  
+  /* Hero becomes a phone-sized story, not a clipped desktop split */
+  .volunteer-hero{width:100%!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;gap:16px!important;margin:0 0 18px!important;padding:27px 21px 20px!important;min-height:0!important;border-radius:22px!important}
+  .volunteer-hero:before{width:420px!important;height:420px!important;right:-205px!important;top:-285px!important}
+  .volunteer-hero:after{background:radial-gradient(320px circle at 85% 18%,rgba(217,239,121,.11),transparent 70%)!important}
+  .volunteer-hero-copy{width:100%!important}
+  .portal-eyebrow{font-size:7px!important;letter-spacing:1.5px!important;margin-bottom:11px!important}
+  .volunteer-hero h2{font-size:42px!important;line-height:.92!important;letter-spacing:-.045em!important;max-width:100%!important;margin-bottom:13px!important}
+  .volunteer-hero p{font-size:11px!important;line-height:1.55!important;max-width:100%!important}
+  .hero-intent-row{flex-wrap:wrap!important;gap:6px!important;margin-top:18px!important;font-size:8px!important}
+  .volunteer-hero-action{width:100%!important}
+  .next-hour-card{width:100%!important;box-sizing:border-box!important;padding:18px!important;min-height:0!important;border-radius:16px!important}
+  .next-card-heading{gap:8px!important}
+  .next-card-heading>span{font-size:6.5px!important;letter-spacing:1.25px!important}
+  .next-card-heading em{font-size:6.5px!important;padding:4px 6px!important}
+  .next-hour-card>strong{font-size:27px!important;line-height:1.05!important;margin:12px 0 4px!important}
+  .next-hour-card>small{font-size:8px!important}
+  .next-hour-card>p{font-size:9px!important;line-height:1.5!important;margin:11px 0 0!important}
+  .next-card-meta{padding-top:11px!important;margin-top:12px!important}
+  .next-card-meta b{font-size:26px!important}
+  .next-hour-card .btn-primary{min-height:42px!important;margin-top:14px!important;width:100%!important}
+
+  /* Impact console: compact stacked composition */
+  .impact-console{width:100%!important;box-sizing:border-box!important;margin-bottom:22px!important;padding:22px 20px!important;border-radius:21px!important}
+  .impact-big-number strong{font-size:65px!important}
+  .impact-big-number span{font-size:18px!important}
+  .impact-lead p{font-size:9px!important;margin-top:9px!important}
+  .impact-trail{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important;width:100%!important;margin-top:20px!important;padding:17px 0 0!important}
+  .impact-trail-item{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto!important;gap:3px!important;min-width:0!important;padding:0 10px!important}
+  .impact-trail-item:first-child{padding-left:0}
+  .impact-trail-item:last-child{padding-right:0}
+  .impact-trail-item strong{font-size:27px!important;grid-column:auto!important}
+  .impact-trail-item div{grid-column:auto!important;margin:0!important}
+  .impact-trail-item b{font-size:6.5px!important;line-height:1.25!important;letter-spacing:.65px!important}
+  .impact-trail-item small{display:none!important}
+  .impact-trail-index{display:block!important;grid-row:auto!important;padding:0!important;font-size:6px!important;color:#81998f!important}
+  .impact-trail-line{width:1px!important;height:43px!important;align-self:center!important}
+
+  /* Workspace nav becomes a clean horizontal rail */
+  .workspace-nav{width:100%!important;box-sizing:border-box!important;margin:0 0 25px!important;height:49px!important;gap:2px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;border-bottom:1px solid rgba(23,61,50,.13)!important}
+  .workspace-nav::-webkit-scrollbar{display:none}
+  .workspace-nav-label{display:none!important}
+  .workspace-nav .portal-tab-btn{flex:0 0 auto!important;height:49px!important;padding:0 12px!important;font-size:8px!important;border-radius:9px 9px 0 0!important}
+  .workspace-nav .portal-tab-btn span{font-size:6px!important}
+  .workspace-nav .portal-tab-btn i{font-size:6px!important;padding:3px 5px!important}
+
+  /* Discovery header: no hidden right column, no giant dead zone */
+  .discover-heading{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:12px!important;align-items:end!important;min-height:0!important;margin-bottom:17px!important}
+  .discover-heading h3{font-size:38px!important;line-height:.93!important;margin:6px 0 7px!important;letter-spacing:-.045em!important}
+  .discover-heading p{font-size:9.5px!important;line-height:1.45!important;max-width:100%!important}
+  .discover-heading p:after{display:block!important;margin-top:4px!important;font-size:7.5px!important;line-height:1.35!important}
+  .discover-count{min-width:78px!important;width:78px!important;padding:11px 9px!important;border-radius:13px!important;align-items:center!important}
+  .discover-count strong{font-size:29px!important}
+  .discover-count span{font-size:5.8px!important;letter-spacing:1px!important;text-align:center!important}
+  
+  /* Filter rail: scroll, never crush */
+  #tab-discover>div[style]{display:block!important;width:100%!important;margin-bottom:17px!important}
+  #categoryFilterBar{width:100%!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;gap:7px!important;padding:2px 1px 6px!important;scrollbar-width:none!important}
+  #categoryFilterBar::-webkit-scrollbar{display:none}
+  #categoryFilterBar .filter{flex:0 0 auto!important;white-space:nowrap!important;font-size:8px!important;padding:9px 12px!important}
+  #tab-discover>div[style]>div:last-child{font-size:7px!important;margin-top:5px!important;padding-left:2px!important}
+  
+  /* Opportunity cards become one-column immersive cards */
+  #volunteerOppGrid{width:100%!important;display:grid!important;grid-template-columns:1fr!important;gap:15px!important}
+  #volunteerOppGrid .moment-card{width:100%!important;min-width:0!important;border-radius:19px!important}
+  #volunteerOppGrid .moment-visual{height:220px!important;min-height:220px!important}
+  #volunteerOppGrid .moment-body{padding:17px!important}
+  #volunteerOppGrid .moment-home{font-size:8px!important}
+  #volunteerOppGrid .moment-card h3{font-size:24px!important;line-height:1.02!important;letter-spacing:-.025em!important}
+  #volunteerOppGrid .moment-card p{font-size:10px!important;line-height:1.55!important}
+  #volunteerOppGrid .moment-details{flex-wrap:wrap!important;gap:7px!important;font-size:7px!important}
+  #volunteerOppGrid .moment-footer{padding:13px 17px!important;gap:10px!important}
+  #volunteerOppGrid .moment-footer .apply-btn{width:auto!important;min-height:38px!important;padding:9px 12px!important;font-size:8px!important}
+  #volunteerOppGrid .moment-fit{min-width:0!important;padding:6px 8px!important;font-size:6.5px!important}
+  #volunteerOppGrid .moment-fit b{font-size:9px!important}
+  
+  /* Secondary tabs / tables */
+  #tab-schedule #scheduleContainer .portal-grid{grid-template-columns:1fr!important}
+  #tab-applications .portal-table-card,#tab-hours .portal-table-card{border-radius:17px!important}
+  .portal-table-responsive{width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  .portal-table{min-width:680px!important}
+  .portal-table-header{padding:18px!important;gap:12px!important}
+  .portal-table-header h3{font-size:25px!important}
+  #tab-profile>.portal-card{border-radius:17px!important}
+  .portal-body #tab-profile .portal-card-body{padding:20px!important}
+}
+
+@media (max-width: 520px){
+  .portal-body .portal-navbar{top:39px!important}
+  .portal-body .portal-nav-inner{padding:9px 12px!important}
+  .portal-brand-text{display:none!important}
+  .portal-brand-mark{width:37px!important;height:37px!important}
+  .portal-logout-btn{font-size:8px!important;padding:8px 9px!important}
+  .portal-body .portal-container{padding:15px 11px 60px!important}
+  .volunteer-hero{padding:23px 17px 17px!important;border-radius:19px!important}
+  .volunteer-hero h2{font-size:37px!important}
+  .volunteer-hero p{font-size:10px!important}
+  .next-hour-card{padding:16px!important}
+  .next-hour-card>strong{font-size:24px!important}
+  .impact-console{padding:20px 17px!important}
+  .impact-big-number strong{font-size:58px!important}
+  .impact-trail-item{padding:0 6px!important}
+  .impact-trail-item strong{font-size:24px!important}
+  .impact-trail-item b{font-size:6px!important}
+  .workspace-nav .portal-tab-btn{padding:0 10px!important;font-size:7.5px!important}
+  .discover-heading{grid-template-columns:1fr!important;gap:10px!important}
+  .discover-heading h3{font-size:35px!important}
+  .discover-count{width:100%!important;min-width:0!important;display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-start!important;gap:7px!important;padding:9px 11px!important}
+  .discover-count span{font-size:6px!important}
+  #volunteerOppGrid .moment-visual{height:195px!important;min-height:195px!important}
+  #volunteerOppGrid .moment-card h3{font-size:22px!important}
+  #volunteerOppGrid .moment-footer{align-items:center!important}
+  #volunteerOppGrid .moment-spots{font-size:7px!important}
+  
+  /* Demo mode becomes a compact control strip instead of a multi-row desktop bar */
+  .demo-bar-inner{padding:6px 10px!important;gap:7px!important;flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none!important}
+  .demo-bar-inner::-webkit-scrollbar{display:none}
+  .demo-note{display:none!important}
+  .demo-badge{font-size:8px!important;padding:3px 6px!important}
+  .demo-pulse{width:7px!important;height:7px!important;flex:0 0 7px}
+  .demo-role-buttons{flex:0 0 auto!important}
+  .demo-role-btn{padding:5px 8px!important;font-size:8px!important}
+  .demo-role-btn .role-name{display:none!important}
+  .demo-actions{flex:0 0 auto!important;gap:5px!important}
+  .demo-link-btn,.demo-reset-btn{padding:5px 7px!important;font-size:7px!important}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .moment-card .moment-visual,.impact-console,.next-hour-card{transition:none!important}
+}
