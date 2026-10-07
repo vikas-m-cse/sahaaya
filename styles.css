@@ -365,3 +365,81 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
   .final-section footer{left:20px;right:20px}
   .final-section footer span:nth-child(2){display:none}
 }
+
+/* =========================================================
+   FINAL CTA — HUMAN STORY RECOMPOSITION
+   ========================================================= */
+.final-section{
+  min-height:720px!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(300px,.62fr)!important;
+  grid-template-rows:auto auto auto auto!important;
+  column-gap:clamp(45px,8vw,120px)!important;
+  align-content:center!important;
+  align-items:center!important;
+  justify-items:start!important;
+  text-align:left!important;
+  padding:90px 9vw 92px!important;
+}
+.final-section:before{
+  content:"";
+  grid-column:2;
+  grid-row:1 / 5;
+  justify-self:end;
+  width:min(30vw,390px);
+  height:min(58vw,560px);
+  min-height:420px;
+  border-radius:190px 190px 28px 28px;
+  background:
+    linear-gradient(180deg,rgba(23,61,50,.02),rgba(23,61,50,.28)),
+    url("https://csrbox.org/news/1695284253Visiting%20the%20elderly%20in%20retirement%20home%2C%20Delhi%20%281%29.jpg") center/cover no-repeat;
+  box-shadow:24px 30px 70px rgba(5,20,15,.24);
+  border:1px solid rgba(251,248,240,.16);
+  transform:rotate(2deg);
+  z-index:1;
+  animation:finalPhotoIn 1.1s .18s cubic-bezier(.2,.8,.2,1) both;
+}
+.final-section:after{
+  content:"REAL CONNECTION";
+  position:absolute;
+  right:calc(9vw + 18px);
+  bottom:108px;
+  z-index:4;
+  padding:9px 12px;
+  border-radius:999px;
+  background:rgba(23,61,50,.78);
+  color:var(--cream);
+  font:900 7px var(--sans);
+  letter-spacing:1.7px;
+  backdrop-filter:blur(8px);
+}
+.final-section>.eyebrow{grid-column:1;grid-row:1;align-self:end;margin-bottom:10px;color:#9cafA6!important}
+.final-section>h2{grid-column:1;grid-row:2;max-width:760px;margin:12px 0 22px!important;font-size:clamp(78px,8.7vw,132px)!important;line-height:.78!important;text-wrap:balance}
+.final-section>p{grid-column:1;grid-row:3;max-width:470px;margin:0 0 28px!important;font-size:15px!important;line-height:1.65}
+.final-section>.final-cta{grid-column:1;grid-row:4;margin:0;padding:16px 22px!important;font-size:13px;box-shadow:0 14px 0 rgba(8,25,19,.18)!important;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s!important}
+.final-section>.final-cta:hover{transform:translateY(-4px)!important;box-shadow:0 18px 0 rgba(8,25,19,.14)!important}
+.final-section .final-orbit{width:720px!important;height:720px!important;left:-290px!important;top:50%!important;transform:translateY(-50%)!important;border-color:rgba(251,248,240,.065)!important;animation:finalOrbitSpin 34s linear infinite!important;z-index:0!important;pointer-events:none}
+.final-section .final-orbit:before{width:260px!important;height:260px!important;left:32%!important;top:32%!important;border-color:rgba(217,239,121,.11)!important}
+.final-section .final-noise{position:absolute!important;inset:0!important;z-index:2!important;pointer-events:none!important;background:radial-gradient(circle at 72% 48%,rgba(217,239,121,.08),transparent 24%),linear-gradient(115deg,transparent 35%,rgba(251,248,240,.025) 50%,transparent 66%);mix-blend-mode:screen}
+.final-section footer{position:absolute!important;bottom:22px!important;left:9vw!important;right:9vw!important;z-index:6!important}
+@keyframes finalPhotoIn{from{opacity:0;transform:translate3d(40px,24px,0) rotate(5deg) scale(.97)}to{opacity:1;transform:translate3d(0,0,0) rotate(2deg) scale(1)}}
+@keyframes finalOrbitSpin{to{transform:translateY(-50%) rotate(360deg)}}
+@media(max-width:950px){
+  .final-section{min-height:720px!important;grid-template-columns:1fr!important;grid-template-rows:auto auto auto auto!important;row-gap:0!important;padding:82px 7vw 92px!important;justify-items:start!important}
+  .final-section:before{grid-column:1;grid-row:5;justify-self:center;width:min(72vw,420px);height:380px;min-height:0;margin:48px auto 0;border-radius:150px 150px 22px 22px}
+  .final-section:after{right:auto;left:calc(7vw + 18px);bottom:118px}
+  .final-section>.eyebrow,.final-section>h2,.final-section>p,.final-section>.final-cta{grid-column:1}
+  .final-section>h2{font-size:clamp(66px,11vw,108px)!important}
+  .final-section .final-orbit{width:600px!important;height:600px!important;left:-270px!important}
+  .final-section footer{left:7vw!important;right:7vw!important}
+}
+@media(max-width:620px){
+  .final-section{min-height:760px!important;padding:70px 6vw 88px!important}
+  .final-section>h2{font-size:clamp(58px,16vw,82px)!important;line-height:.82!important}
+  .final-section>p{font-size:13px!important;max-width:330px}
+  .final-section:before{width:min(82vw,360px);height:300px;margin-top:40px;border-radius:125px 125px 20px 20px}
+  .final-section:after{left:calc(6vw + 12px);bottom:120px;font-size:6px}
+  .final-section .final-orbit{width:480px!important;height:480px!important;left:-235px!important}
+  .final-section footer{left:6vw!important;right:6vw!important;font-size:6px!important}
+}
+@media(prefers-reduced-motion:reduce){.final-section:before,.final-section .final-orbit{animation:none!important}}
