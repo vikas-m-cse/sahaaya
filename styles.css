@@ -241,3 +241,127 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
 .image-conversation{background-image:url("https://static.wixstatic.com/media/44f410_976da54ecee949dbb653cb6da362fc8e~mv2.jpg/v1/fill/w_4096%2Ch_3072%2Cal_c%2Cq_90/44f410_976da54ecee949dbb653cb6da362fc8e~mv2.jpg")!important}
 .image-music{background-image:url("https://www.snehaashram.in/Art.jpeg")!important}
 .image-creative{background-image:url("https://static.wixstatic.com/media/cd09d2_abc237b499c84c34a1c6c0675b114ef6~mv2.jpg/v1/fill/w_1200%2Ch_1600%2Cal_c%2Cq_85/cd09d2_abc237b499c84c34a1c6c0675b114ef6~mv2.jpg")!important}
+
+
+/* =========================================================
+   FINAL SECTION — CINEMATIC HUMAN MOMENT PASS
+   ========================================================= */
+.final-section{
+  isolation:isolate;
+  min-height:760px;
+  padding:92px 7vw 112px;
+  justify-content:center;
+}
+.final-section:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  right:8vw;
+  top:50%;
+  width:min(27vw,430px);
+  height:min(46vw,560px);
+  transform:translateY(-50%) rotate(3deg);
+  border-radius:220px 220px 26px 26px;
+  background:
+    linear-gradient(180deg,rgba(23,61,50,.08),rgba(23,61,50,.48)),
+    url("https://csrbox.org/news/1695284253Visiting%20the%20elderly%20in%20retirement%20home%2C%20Delhi%20%281%29.jpg") center/cover no-repeat;
+  box-shadow:0 34px 90px rgba(0,0,0,.22);
+  opacity:.92;
+  filter:saturate(.82) contrast(1.03);
+  border:1px solid rgba(251,248,240,.18);
+  transition:transform .9s cubic-bezier(.2,.8,.2,1),filter .6s ease,opacity .6s ease;
+}
+.final-section:after{
+  content:"ONE HOUR · ONE PERSON · ONE REAL MOMENT";
+  position:absolute;
+  z-index:1;
+  right:calc(8vw + 20px);
+  top:calc(50% + min(46vw,560px)/2 - 42px);
+  transform:rotate(-3deg);
+  padding:9px 12px;
+  border:1px solid rgba(251,248,240,.2);
+  background:rgba(23,61,50,.78);
+  color:#d9ef79;
+  border-radius:999px;
+  font:800 7px/1 var(--sans);
+  letter-spacing:1.5px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.final-section:hover:before{
+  transform:translateY(-50%) rotate(1deg) scale(1.018);
+  filter:saturate(.96) contrast(1.05);
+}
+.final-section:hover:after{transform:rotate(-1deg) translateY(-2px)}
+.final-section .final-orbit{
+  width:min(70vw,900px);
+  height:min(70vw,900px);
+  opacity:.72;
+}
+.final-section>.eyebrow,
+.final-section>h2,
+.final-section>p,
+.final-section>.final-cta{
+  position:relative;
+  z-index:4;
+}
+.final-section>.eyebrow{
+  margin-bottom:4px;
+  color:#9bb0a7;
+}
+.final-section h2{
+  max-width:1050px;
+  margin:18px 0 24px;
+  font-size:clamp(76px,9.2vw,148px);
+  line-height:.76;
+  text-wrap:balance;
+  text-shadow:0 3px 24px rgba(0,0,0,.08);
+}
+.final-section>p{
+  max-width:470px;
+  line-height:1.7;
+  margin-bottom:29px;
+}
+.final-section .final-cta{
+  padding:16px 23px;
+  border:1px solid rgba(217,239,121,.2);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,background .3s;
+}
+.final-section .final-cta:hover{
+  transform:translateY(-4px) scale(1.025);
+  background:#e2f77f;
+  box-shadow:0 18px 40px rgba(0,0,0,.2);
+}
+.final-section footer{
+  bottom:26px;
+  z-index:5;
+}
+@media(max-width:1180px){
+  .final-section:before{right:3vw;opacity:.26;width:290px;height:430px}
+  .final-section:after{right:calc(3vw + 14px)}
+}
+@media(max-width:850px){
+  .final-section{min-height:680px;padding:80px 24px 105px}
+  .final-section:before{
+    right:50%;
+    top:31%;
+    width:230px;
+    height:300px;
+    transform:translate(50%,-50%) rotate(3deg);
+    opacity:.16;
+  }
+  .final-section:after{display:none}
+  .final-section h2{
+    font-size:clamp(62px,13vw,94px);
+    line-height:.8;
+    margin-top:14px;
+  }
+  .final-section>p{font-size:13px}
+}
+@media(max-width:520px){
+  .final-section{min-height:620px}
+  .final-section:before{width:190px;height:250px;top:27%;opacity:.12}
+  .final-section h2{font-size:clamp(54px,16vw,76px)}
+  .final-section footer{left:20px;right:20px}
+  .final-section footer span:nth-child(2){display:none}
+}
