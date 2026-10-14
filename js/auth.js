@@ -141,7 +141,11 @@ const SahaayaAuth = (() => {
     const cached = getCachedSession();
     if (cached && cached.isDemoSession) return cached;
 
-    if (!sb) return cached;
+    if (!sb) {
+      // Without a live Supabase client, only explicit demo personas may continue.
+      if (cached && !cached.isDemoSession) setCachedSession(null);
+      return cached && cached.isDemoSession ? cached : null;
+    }
 
     try {
       const { data: { session }, error } = await sb.auth.getSession();
