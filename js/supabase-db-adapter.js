@@ -163,6 +163,9 @@
       const row = must(await client().from("activities").update(patch).eq("id", id).select().single());
       return row;
     },
+    cancelOpportunity: async id => must(await client().rpc("cancel_activity", {
+      p_activity_id: id
+    })),
     getApplications: async filter => {
       let rows = await applications();
       if (filter?.volunteer_id) rows = rows.filter(a => a.volunteer_id === filter.volunteer_id);
