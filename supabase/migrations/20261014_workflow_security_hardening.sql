@@ -70,6 +70,30 @@ WITH CHECK (auth.uid() = id AND role IN ('volunteer', 'home'));
 -- Keep the existing update policy semantics for profile fields. The trigger
 -- above blocks role changes unless the caller is already an administrator.
 
+
+-- ---------------------------------------------------------------------------
+-- 1b. Force privileged workflow changes through the checked RPCs above.
+--     RLS policies are permissive when OR-combined, so the old write policies
+--     must be removed rather than merely supplemented.
+-- ---------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Homes can review applications; Volunteers can cancel" ON public.applications;
+CREATE POLICY "Volunteers can cancel own pending application"
+ON public.applications FOR UPDATE
+TO authenticated
+USING (
+  volunteer_id = public.get_user_volunteer_id()
+  AND status = 'applied'
+)
+WITH CHECK (
+  volunteer_id = public.get_user_volunteer_id()
+  AND status = 'cancelled'
+);
+
+-- Attendance writes must go through mark_activity_attendance(), which validates
+-- the host, computes hours server-side, and rejects duplicate records.
+DROP POLICY IF EXISTS "Host homes can mark attendance" ON public.attendance;
+DROP POLICY IF EXISTS "Host homes can update attendance" ON public.attendance;
+
 -- ---------------------------------------------------------------------------
 -- 2. Atomic application review with row locking and capacity enforcement.
 --    Use this RPC instead of client-side read/check/update sequences.
