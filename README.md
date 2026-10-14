@@ -173,8 +173,8 @@ To provision an administrator, create the account through a trusted Supabase Aut
 The repository keeps the existing demo personas for evaluation. Real accounts require a Supabase project and the following setup; these steps are **not applied to a hosted Supabase project automatically**.
 
 1. Copy `.env.example` to `.env.local` for local development, then set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or `VITE_SUPABASE_ANON_KEY`). Use only a publishable/anon key in browser builds; never put a service-role key in Vite variables.
-2. In the Supabase SQL Editor, run `supabase/schema.sql` on a new project.
-3. On an existing project created from that schema, run migrations in order: `supabase/migrations/20261014_secure_signup_roles.sql`, `supabase/migrations/20261014_application_notes.sql`, then `supabase/migrations/20261014_workflow_security_hardening.sql`.
+2. In the Supabase SQL Editor, run `supabase/schema.sql`, then `supabase/auth_triggers.sql` on a new project. If the tables already exist, confirm the signup trigger is installed before testing registration.
+3. Run migrations in order (also required for an existing project): `supabase/migrations/20261014_secure_signup_roles.sql`, `supabase/migrations/20261014_application_notes.sql`, then `supabase/migrations/20261014_workflow_security_hardening.sql`.
 4. Configure the same public variables in the Vercel project settings and redeploy.
 5. Test with two separate real accounts: a volunteer and a verified home. Confirm application review, capacity limits, attendance, and hours before using the system with real users.
 
