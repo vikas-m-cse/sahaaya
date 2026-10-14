@@ -102,8 +102,7 @@
     getUserById: async id => (await remote.getUsers()).find(u => u.id === id) || null,
     getUserByEmail: async email => (await remote.getUsers()).find(u => u.email.toLowerCase() === email.toLowerCase()) || null,
     getVolunteerProfileByUserId: async userId => {
-      const { data, error } = await client().from("volunteers").select("*, profiles!inner(full_name,phone,email)").eq("profile_id", userId).maybeSingle();
-      const row = must(data, error);
+      const row = must(await client().from("volunteers").select("*, profiles!inner(full_name,phone,email)").eq("profile_id", userId).maybeSingle());
       if (!row) return null;
       const attendance = must(await client().from("attendance").select("hours,status").eq("volunteer_id", row.id));
       return { id: row.id, user_id: row.profile_id, interests: row.interests || [], availability: row.availability || [],
