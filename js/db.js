@@ -780,7 +780,7 @@ const SahaayaDB = (() => {
         .filter(a => a.status === "present")
         .reduce((sum, a) => sum + (parseFloat(a.hours_credited) || 0), 0);
 
-      const completedActivities = opps.filter(o => o.status === "completed" || opps.some(op => op.id === o.id)).length;
+      const completedActivities = attendance.filter(a => a.status === "present").length;
 
       return {
         total_volunteers: volunteers.length,
