@@ -50,7 +50,8 @@ for (const [label, source, pattern] of [
   ["Home portal resolves the current account's own facility", readFileSync(new URL("./js/home-portal.js", import.meta.url), "utf8"), /getHomeByUserId\?\.\(session\.id\)/],
   ["Home requirement cancellation uses a server-checked RPC", adapter, /rpc\("cancel_activity"/],
   ["Cancellation RPC validates owner and preserves attendance history", migration, /public\.cancel_activity[\s\S]*?Only the host home or an administrator can cancel[\s\S]*?attendance history and cannot be deleted/],
-  ["Pending homes may save requirements while public visibility stays verified-only", migration, /CREATE POLICY "Homes can create own activities"[\s\S]*?home_id = public\.get_user_home_id\(\)[\s\S]*?CREATE POLICY "Activities viewable by all if home verified or if owner"/]
+  ["Pending homes may save requirements under their own home ID", migration, /CREATE POLICY "Homes can create own activities"[\s\S]*?home_id = public\.get_user_home_id\(\)/],
+  ["Public activity discovery remains limited to verified homes or owner/admin", schema, /CREATE POLICY "Activities viewable by all if home verified or if owner"[\s\S]*?verification_status = 'verified'/]
 ]) {
   const passed = pattern instanceof RegExp ? pattern.test(source) : pattern;
   assert.ok(passed, `Failed security contract: ${label}`);
