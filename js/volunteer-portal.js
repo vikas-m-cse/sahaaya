@@ -4,7 +4,7 @@
  * Depends on globals: SahaayaAuth, SahaayaDB, SahaayaMatching, SahaayaUI, SAHAAYA_CONFIG
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
+const initializePortal = async () => {
 
   // -----------------------------------------------------------------------
   // 1. Auth Guard — must await the async check
@@ -574,4 +574,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 15. Initial Load
   // -----------------------------------------------------------------------
   await loadData();
-});
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializePortal, { once: true });
+} else {
+  void initializePortal();
+}
