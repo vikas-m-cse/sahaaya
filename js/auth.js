@@ -152,8 +152,11 @@ const SahaayaAuth = (() => {
       }
       return await fetchUserProfile(session.user.id);
     } catch (err) {
+      // Never treat a cached real-account profile as an authenticated session.
+      // Only the Supabase session is authoritative; cached personas are for demo mode.
       console.warn("Auth getSession error:", err);
-      return cached;
+      if (cached && !cached.isDemoSession) setCachedSession(null);
+      return null;
     }
   }
 
@@ -183,23 +186,15 @@ const SahaayaAuth = (() => {
     if (!data.user) throw new Error("Registration failed.");
 
     if (data.session) {
-      await sb.from("profiles").upsert({
-        id: data.user.id,
-        full_name: name,
-        email,
-        phone: phone || "",
-        role: "volunteer"
-      });
-
-      await sb.from("volunteers").upsert({
-        profile_id: data.user.id,
-        interests: interests || ["companionship"],
-        availability: availability || ["sun_morning"],
-        preferred_activity_types: [],
-        preferred_area: preferred_area || "Bengaluru"
-      });
-
+      // The auth.users trigger creates the profile and volunteer row atomically.
+      // Do not repeat those writes from the browser: ignored RLS errors can leave
+      // a partially initialized account and client-side role fields are untrusted.
       const sessionUser = await fetchUserProfile(data.user.id);
+      if (!sessionUser || sessionUser.role !== "volunteer") {
+        await sb.auth.signOut();
+        setCachedSession(null);
+        throw new Error("Your account was created, but its volunteer profile could not be loaded. Please contact support.");
+      }
       return { user: data.user, sessionUser, needsConfirmation: false };
     }
 
@@ -238,25 +233,14 @@ const SahaayaAuth = (() => {
     if (!data.user) throw new Error("Registration failed.");
 
     if (data.session) {
-      await sb.from("profiles").upsert({
-        id: data.user.id,
-        full_name: contactPerson,
-        email,
-        phone: phone || "",
-        role: "home"
-      });
-
-      await sb.from("old_age_homes").upsert({
-        profile_id: data.user.id,
-        name: homeName,
-        description: description || "Senior care residence.",
-        address: address || "Bengaluru",
-        city: city || "Bengaluru",
-        contact_phone: phone || "",
-        verification_status: "pending"
-      });
-
+      // The trusted auth.users trigger creates the home record as pending.
+      // Keep account bootstrap server-side rather than duplicating writes here.
       const sessionUser = await fetchUserProfile(data.user.id);
+      if (!sessionUser || sessionUser.role !== "home" || !sessionUser.home) {
+        await sb.auth.signOut();
+        setCachedSession(null);
+        throw new Error("Your account was created, but its home profile could not be loaded. Please contact support.");
+      }
       return { user: data.user, sessionUser, needsConfirmation: false };
     }
 
