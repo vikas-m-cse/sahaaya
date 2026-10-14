@@ -18,7 +18,7 @@ const db = context.module.exports;
 const config = vm.runInContext("SAHAAYA_CONFIG", context);
 
 async function rejectsWith(promise, message) {
-  await assert.rejects(promise, error => error instanceof Error && error.message.includes(message));
+  await assert.rejects(promise, error => String(error?.message || error).includes(message));
 }
 
 await db.resetToDemoSeed();
@@ -43,7 +43,9 @@ assert.equal((await db.getApplicationById(app.id)).status, config.APPLICATION_ST
 const updatedOpp = await db.getOpportunityById(opp.id);
 assert.equal(updatedOpp.spots_filled, 1);
 assert.equal(updatedOpp.status, config.OPPORTUNITY_STATUS.FILLED);
-await rejectsWith(db.updateApplicationStatus(app.id, config.APPLICATION_STATUS.APPROVED), "Only pending applications");
+await db.updateApplicationStatus(app.id, config.APPLICATION_STATUS.APPROVED, "Repeated approval must be harmless");
+assert.equal((await db.getOpportunityById(opp.id)).spots_filled, 1, "Repeated approval must not inflate filled spots");
+await rejectsWith(db.updateApplicationStatus(app.id, config.APPLICATION_STATUS.REJECTED), "Only pending applications");
 
 const beforeProfile = await db.getVolunteerProfileByUserId(volunteerId);
 const beforeHours = Number(beforeProfile.total_hours);
