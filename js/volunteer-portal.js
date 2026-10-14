@@ -545,7 +545,7 @@ const initializePortal = async () => {
       `).join("");
     }
 
-    document.getElementById("volunteerProfileForm")?.addEventListener("submit", async e => {
+    document.getElementById("volunteerProfileForm").onsubmit = async e => {
       e.preventDefault();
       const updatedInterests    = Array.from(document.querySelectorAll("input[name='interest']:checked")).map(cb => cb.value);
       const updatedAvailability = Array.from(document.querySelectorAll("input[name='availability']:checked")).map(cb => cb.value);
@@ -559,7 +559,7 @@ const initializePortal = async () => {
 
       SahaayaUI.showToast("Profile preferences saved! Compatibility scores updated.", "success");
       renderOpportunities();
-    });
+    };
   }
 
   function setInputSafe(id, value) {
