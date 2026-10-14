@@ -583,20 +583,38 @@ const SahaayaDB = (() => {
     },
 
     submitApplication: async (appData) => {
-      const apps = load("applications");
-      // Prevent duplicate active applications
-      const existing = apps.find(
-        a => a.opportunity_id === appData.opportunity_id &&
-             a.volunteer_id === appData.volunteer_id &&
-             (a.status === "applied" || a.status === "approved")
-      );
-      if (existing) {
-        throw new Error("You have already applied for this opportunity.");
+      if (!appData?.opportunity_id || !appData?.volunteer_id) {
+        throw new Error("An opportunity and volunteer are required to apply.");
       }
 
-      const id = "app_" + Date.now();
+      const opps = load("opportunities");
+      const opp = opps.find(o => o.id === appData.opportunity_id);
+      if (!opp) throw new Error("This opportunity could not be found.");
+      if (opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN) {
+        throw new Error("This opportunity is no longer accepting applications.");
+      }
+
+      const apps = load("applications");
+      const existing = apps.find(a =>
+        a.opportunity_id === appData.opportunity_id &&
+        a.volunteer_id === appData.volunteer_id &&
+        ["applied", "approved", "attended"].includes(a.status)
+      );
+      if (existing) throw new Error("You already have an active or completed application for this opportunity.");
+
+      const approvedCount = apps.filter(a =>
+        a.opportunity_id === opp.id &&
+        ["approved", "attended"].includes(a.status)
+      ).length;
+      if (approvedCount >= Number(opp.spots_needed || 0)) {
+        opp.spots_filled = approvedCount;
+        opp.status = SAHAAYA_CONFIG.OPPORTUNITY_STATUS.FILLED;
+        save("opportunities", opps);
+        throw new Error("All volunteer spots for this opportunity are filled.");
+      }
+
       const newApp = {
-        id,
+        id: "app_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
         status: SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED,
         applied_at: new Date().toISOString(),
         reviewed_at: null,
@@ -612,24 +630,39 @@ const SahaayaDB = (() => {
       const apps = load("applications");
       const app = apps.find(a => a.id === applicationId);
       if (!app) throw new Error("Application not found");
+      if (app.status === status) return app;
+      if (app.status !== SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED) {
+        throw new Error("Only pending applications can be approved or declined. Attendance is recorded separately.");
+      }
+      if (![SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, SAHAAYA_CONFIG.APPLICATION_STATUS.REJECTED].includes(status)) {
+        throw new Error("Unsupported application status.");
+      }
+
+      const opps = load("opportunities");
+      const opp = opps.find(o => o.id === app.opportunity_id);
+      if (!opp) throw new Error("Opportunity not found");
+
+      const acceptedCount = apps.filter(a =>
+        a.id !== app.id && a.opportunity_id === opp.id &&
+        ["approved", "attended"].includes(a.status)
+      ).length;
+      if (status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED &&
+          acceptedCount >= Number(opp.spots_needed || 0)) {
+        throw new Error("No volunteer spots remain. This application cannot be approved.");
+      }
 
       app.status = status;
       app.reviewed_at = new Date().toISOString();
-      if (coordinatorNote) {
-        app.coordinator_note = coordinatorNote;
-      }
+      app.coordinator_note = coordinatorNote || app.coordinator_note || null;
 
-      // If approved, update spots_filled on the opportunity
-      const opps = load("opportunities");
-      const opp = opps.find(o => o.id === app.opportunity_id);
-      if (opp && status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED) {
-        opp.spots_filled = (opp.spots_filled || 0) + 1;
-        if (opp.spots_filled >= opp.spots_needed) {
-          opp.status = SAHAAYA_CONFIG.OPPORTUNITY_STATUS.FILLED;
-        }
-        save("opportunities", opps);
-      }
+      const acceptedAfterUpdate = acceptedCount +
+        (status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED ? 1 : 0);
+      opp.spots_filled = acceptedAfterUpdate;
+      opp.status = acceptedAfterUpdate >= Number(opp.spots_needed || 0)
+        ? SAHAAYA_CONFIG.OPPORTUNITY_STATUS.FILLED
+        : SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN;
 
+      save("opportunities", opps);
       save("applications", apps);
       return app;
     },
@@ -638,21 +671,36 @@ const SahaayaDB = (() => {
     // Attendance & Hours Crediting
     // -------------------------------------------------------------
     recordAttendance: async ({ applicationId, status, markedByUserId }) => {
+      if (!["present", "absent"].includes(status)) {
+        throw new Error("Attendance must be marked present or absent.");
+      }
+      if (!markedByUserId) throw new Error("The home coordinator must be identified.");
+
       const apps = load("applications");
       const app = apps.find(a => a.id === applicationId);
       if (!app) throw new Error("Application not found");
+      if (app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED ||
+          app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT) {
+        throw new Error("Attendance has already been recorded for this application.");
+      }
+      if (app.status !== SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED) {
+        throw new Error("Only approved volunteers can have attendance recorded.");
+      }
 
       const opps = load("opportunities");
       const opp = opps.find(o => o.id === app.opportunity_id);
       if (!opp) throw new Error("Opportunity not found");
 
       const attendanceRecords = load("attendance_records");
-      const recordId = "att_" + Date.now();
+      if (attendanceRecords.some(r => r.application_id === app.id)) {
+        throw new Error("Attendance already exists for this application.");
+      }
 
-      const hoursToCredit = status === "present" ? (opp.duration_hours || 2.0) : 0;
-
+      const hoursToCredit = status === "present"
+        ? Math.max(0, Number(opp.duration_hours) || 2)
+        : 0;
       const record = {
-        id: recordId,
+        id: "att_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
         application_id: app.id,
         opportunity_id: opp.id,
         opportunity_title: opp.title,
@@ -668,19 +716,21 @@ const SahaayaDB = (() => {
       attendanceRecords.unshift(record);
       save("attendance_records", attendanceRecords);
 
-      // Update application status
-      app.status = status === "present" ? SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED : SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT;
+      app.status = status === "present"
+        ? SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED
+        : SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT;
       save("applications", apps);
 
-      // Credit hours to volunteer profile if present
       if (status === "present") {
         const profiles = load("volunteer_profiles");
-        const profile = profiles.find(p => p.user_id === app.volunteer_id);
-        if (profile) {
-          profile.total_hours = parseFloat(((profile.total_hours || 0) + hoursToCredit).toFixed(1));
-          profile.completed_count = (profile.completed_count || 0) + 1;
-          save("volunteer_profiles", profiles);
+        let profile = profiles.find(p => p.user_id === app.volunteer_id);
+        if (!profile) {
+          profile = { id: "vp_" + Date.now(), user_id: app.volunteer_id, total_hours: 0, completed_count: 0 };
+          profiles.push(profile);
         }
+        profile.total_hours = Number(((Number(profile.total_hours) || 0) + hoursToCredit).toFixed(1));
+        profile.completed_count = (Number(profile.completed_count) || 0) + 1;
+        save("volunteer_profiles", profiles);
       }
 
       return record;
