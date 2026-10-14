@@ -141,7 +141,7 @@ The portal supports real Supabase Auth and database-backed workflows when these 
 
 Never put a Supabase **service-role** key in a browser environment variable.
 
-Before testing real accounts, make sure `supabase/schema.sql` and `supabase/auth_triggers.sql` have been applied in the Supabase SQL Editor. Then run the safe migration `supabase/migrations/20261014_application_notes.sql` to add persisted volunteer/coordinator notes to existing projects. Do not assume a GitHub commit automatically applies SQL to Supabase.
+Before testing real accounts, make sure `supabase/schema.sql` and `supabase/auth_triggers.sql` have been applied in the Supabase SQL Editor. Then run both migrations in `supabase/migrations/`: `20261014_application_notes.sql` adds persisted volunteer/coordinator notes, and `20261014_secure_signup_roles.sql` prevents public signup metadata from granting the admin role. Run them in the Supabase SQL Editor before testing real workflows. Do not assume a GitHub commit automatically applies SQL to Supabase.
 
 The repository adapter uses Supabase for authenticated, non-demo sessions and preserves LocalStorage seed data for the explicit demo role switcher. Demo users and demo data are for evaluation only; they are not real Supabase accounts and must not be treated as an authentication or authorization mechanism.
 
