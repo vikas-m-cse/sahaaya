@@ -16,6 +16,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm test
       - run: npm run build
       - name: Check JavaScript syntax
         run: find js api -name '*.js' -print0 | xargs -0 -n1 node --check
