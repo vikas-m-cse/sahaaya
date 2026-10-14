@@ -30,11 +30,12 @@ const scripts = isPortal
       "js/db.js",
       "js/matching.js",
       "js/auth.js",
+      "js/supabase-db-adapter.js",
       "js/components.js",
       window.location.pathname.includes("/volunteer/") ? "js/volunteer-portal.js" :
         window.location.pathname.includes("/home/") ? "js/home-portal.js" : "js/admin-portal.js"
     ]
-  : ["js/config.js", "js/db.js", "js/matching.js", "js/auth.js", "js/components.js", "app.js"];
+  : ["js/config.js", "js/db.js", "js/matching.js", "js/auth.js", "js/supabase-db-adapter.js", "js/components.js", "app.js"];
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
