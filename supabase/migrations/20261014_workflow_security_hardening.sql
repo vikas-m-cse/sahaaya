@@ -92,7 +92,7 @@ RETURNS public.activities
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $
+AS $cancel_activity$
 DECLARE
   v_activity public.activities%ROWTYPE;
 BEGIN
@@ -142,7 +142,7 @@ BEGIN
 
   RETURN v_activity;
 END;
-$;
+$cancel_activity$;
 
 REVOKE ALL ON FUNCTION public.cancel_activity(UUID) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.cancel_activity(UUID) TO authenticated;
