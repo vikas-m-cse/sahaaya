@@ -573,7 +573,25 @@ const initializePortal = async () => {
   // -----------------------------------------------------------------------
   // 15. Initial Load
   // -----------------------------------------------------------------------
+  // Refresh opportunities and application status when the volunteer returns
+  // to this tab, so newly published work and home decisions show up promptly.
   await loadData();
+  let refreshInProgress = false;
+  const refreshVolunteerData = async () => {
+    if (document.visibilityState === "hidden" || refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      await loadData();
+    } catch (error) {
+      console.error("Unable to refresh volunteer portal data:", error);
+    } finally {
+      refreshInProgress = false;
+    }
+  };
+  window.addEventListener("focus", refreshVolunteerData);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void refreshVolunteerData();
+  });
 };
 
 if (document.readyState === "loading") {
