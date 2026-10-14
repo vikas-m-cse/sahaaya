@@ -141,7 +141,17 @@ The portal supports real Supabase Auth and database-backed workflows when these 
 
 Never put a Supabase **service-role** key in a browser environment variable.
 
-Before testing real accounts, make sure `supabase/schema.sql` and `supabase/auth_triggers.sql` have been applied in the Supabase SQL Editor. Then run both migrations in `supabase/migrations/`: `20261014_application_notes.sql` adds persisted volunteer/coordinator notes, and `20261014_secure_signup_roles.sql` prevents public signup metadata from granting the admin role. Run them in the Supabase SQL Editor before testing real workflows. Do not assume a GitHub commit automatically applies SQL to Supabase.
+Before testing real accounts, apply the SQL in this exact order in the Supabase SQL Editor:
+
+1. `supabase/schema.sql` — tables, indexes and base row-level security policies.
+2. `supabase/auth_triggers.sql` — creates a profile and its volunteer/home detail row from a new Auth account.
+3. `supabase/migrations/20261014_application_notes.sql` — persists volunteer/coordinator notes.
+4. `supabase/migrations/20261014_secure_signup_roles.sql` — restricts public signup metadata to non-admin roles.
+5. `supabase/migrations/20261014_workflow_security_hardening.sql` — blocks role/verification tampering and routes application review and attendance through transactional, server-checked RPCs.
+
+The signup trigger is the authoritative profile bootstrap. The browser must not create duplicate profile/detail rows. A home account starts as `pending`; only an administrator should verify it. Admin accounts must be provisioned through a trusted administrative process, not public signup.
+
+After applying the SQL, configure the public Supabase URL and publishable/anon key in Vercel and run `npm test`, `npm run build`, then test with separate volunteer, home and admin accounts. Do not assume a GitHub commit automatically applies SQL to Supabase, configures Vercel, or proves a live multi-account workflow.
 
 The repository adapter uses Supabase for authenticated, non-demo sessions and preserves LocalStorage seed data for the explicit demo role switcher. Demo users and demo data are for evaluation only; they are not real Supabase accounts and must not be treated as an authentication or authorization mechanism.
 
