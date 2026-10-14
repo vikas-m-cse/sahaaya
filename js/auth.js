@@ -120,6 +120,8 @@ const SahaayaAuth = (() => {
         role: profile.role,
         phone: profile.phone,
         avatar_initials: initials,
+        // Legacy home portal expects home_id; keep it aligned with the signed-in account.
+        ...(profile.role === "home" && extra.home ? { home_id: extra.home.id } : {}),
         ...extra
       };
 
