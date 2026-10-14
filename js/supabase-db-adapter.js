@@ -181,19 +181,33 @@
         match_reasons: data.match_reasons || [], volunteer_note: data.volunteer_note || "", coordinator_note: "" };
     },
     updateApplicationStatus: async (id, status, note = "") => {
-      const row = must(await client().from("applications").update({ status, reviewed_at: new Date().toISOString(), coordinator_note: note || null }).eq("id", id).select().single());
-      return { ...row, opportunity_id: row.activity_id, coordinator_note: note };
+      if (!["approved", "rejected"].includes(status)) {
+        throw new Error("Only approval or rejection can be submitted through application review.");
+      }
+      const row = must(await client().rpc("review_application", {
+        p_application_id: id,
+        p_status: status,
+        p_coordinator_note: note || null
+      }));
+      return { ...row, opportunity_id: row.activity_id, coordinator_note: row.coordinator_note || note || "" };
     },
     recordAttendance: async ({ applicationId, status }) => {
-      const app = must(await client().from("applications").select("id,activity_id,volunteer_id,status").eq("id", applicationId).single());
-      if (!["approved", "attended"].includes(app.status)) throw new Error("Only approved volunteers can have attendance recorded.");
-      const act = must(await client().from("activities").select("start_time,end_time,title,date").eq("id", app.activity_id).single());
-      const hours = status === "present" ? Math.max(0, (new Date(`1970-01-01T${act.end_time}`) - new Date(`1970-01-01T${act.start_time}`)) / 3600000) : 0;
-      const row = must(await client().from("attendance").upsert({
-        activity_id: app.activity_id, volunteer_id: app.volunteer_id, status, hours
-      }, { onConflict: "activity_id,volunteer_id" }).select().single());
-      must(await client().from("applications").update({ status: status === "present" ? "attended" : "approved" }).eq("id", app.id));
-      return { ...row, opportunity_id: row.activity_id, hours_credited: Number(row.hours), opportunity_title: act.title, date: act.date };
+      if (!["present", "absent"].includes(status)) {
+        throw new Error("Attendance status must be present or absent.");
+      }
+      const app = must(await client().from("applications").select("id,activity_id,volunteer_id").eq("id", applicationId).single());
+      const act = must(await client().from("activities").select("title,date").eq("id", app.activity_id).single());
+      const row = must(await client().rpc("mark_activity_attendance", {
+        p_application_id: applicationId,
+        p_status: status
+      }));
+      return {
+        ...row,
+        opportunity_id: row.activity_id,
+        hours_credited: Number(row.hours || 0),
+        opportunity_title: act.title,
+        date: act.date
+      };
     },
     getAttendanceHistoryByVolunteer: async userId => {
       const volunteer = must(await client().from("volunteers").select("id").eq("profile_id", userId).single());
