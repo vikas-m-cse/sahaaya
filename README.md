@@ -146,3 +146,12 @@ Before testing real accounts, make sure `supabase/schema.sql` and `supabase/auth
 The repository adapter uses Supabase for authenticated, non-demo sessions and preserves LocalStorage seed data for the explicit demo role switcher. Demo users and demo data are for evaluation only; they are not real Supabase accounts and must not be treated as an authentication or authorization mechanism.
 
 For local development, create a local `.env` file (do not commit it) with the two variables above, then run `npm install` and `npm run dev`. Use `npm run build` to verify the Vite production build before deployment.
+
+
+## Dedicated administrator sign-in
+
+Administrators use `/admin/login.html`, which requires the access code and a real Supabase email/password account whose `profiles.role` is already `admin`. Public registration is not allowed to create administrator accounts, and demo-role switching cannot enter the protected admin portal.
+
+In Vercel, add the server-side environment variable `SAHAAYA_ADMIN_ACCESS_CODE` with the chosen six-digit code, for **Preview** and **Production** environments as appropriate, then redeploy. Keep this variable server-only: do not prefix it with `VITE_`, do not put it in client-side JavaScript, and do not commit its value to GitHub. The API endpoint returns no-store responses and checks the code on the server. The code is an additional gate, not a replacement for Supabase authentication and the database role.
+
+To provision an administrator, create the account through a trusted Supabase Auth/admin workflow and assign `admin` to that account's `public.profiles.role` through a trusted database/admin operation. Do not expose a public admin-registration form.
