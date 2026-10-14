@@ -22,9 +22,12 @@ if (supabaseUrl && supabaseKey) {
   );
 }
 
+const isAdminLogin = /\/admin\/login\.html$/.test(window.location.pathname);
 const isPortal = /\/(volunteer|home|admin)\//.test(window.location.pathname);
 const root = isPortal ? "../" : "./";
-const scripts = isPortal
+const scripts = isAdminLogin
+  ? ["js/config.js", "js/db.js", "js/auth.js", "js/admin-login.js"]
+  : isPortal
   ? [
       "js/config.js",
       "js/db.js",
