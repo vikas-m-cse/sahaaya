@@ -17,3 +17,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Check JavaScript syntax
+        run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
