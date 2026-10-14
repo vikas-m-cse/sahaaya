@@ -130,3 +130,19 @@ Or use VS Code **Live Server** extension: right-click `index.html` → *Open wit
 * **Frontend Design**: Built with Vanilla HTML5, CSS3 with Custom Properties (variables), and Vanilla Modular JavaScript without heavy external frameworks.
 * **Separation of Concerns**: Repository pattern data layer (`db.js`), transparent matching service (`matching.js`), and isolated UI controllers.
 * **Backend Readiness**: `db.js` exposes clean `async` Promise-based methods ready for direct swapping with a Node/Express REST API or Firebase Cloud Firestore backend.
+
+
+## Supabase setup for real accounts
+
+The portal supports real Supabase Auth and database-backed workflows when these **public client** environment variables are set in Vite and in Vercel:
+
+- `VITE_SUPABASE_URL` — your Supabase project URL.
+- `VITE_SUPABASE_PUBLISHABLE_KEY` — your publishable key (or `VITE_SUPABASE_ANON_KEY` for projects still using the legacy anon-key name).
+
+Never put a Supabase **service-role** key in a browser environment variable.
+
+Before testing real accounts, make sure `supabase/schema.sql` and `supabase/auth_triggers.sql` have been applied in the Supabase SQL Editor. Then run the safe migration `supabase/migrations/20261014_application_notes.sql` to add persisted volunteer/coordinator notes to existing projects. Do not assume a GitHub commit automatically applies SQL to Supabase.
+
+The repository adapter uses Supabase for authenticated, non-demo sessions and preserves LocalStorage seed data for the explicit demo role switcher. Demo users and demo data are for evaluation only; they are not real Supabase accounts and must not be treated as an authentication or authorization mechanism.
+
+For local development, create a local `.env` file (do not commit it) with the two variables above, then run `npm install` and `npm run dev`. Use `npm run build` to verify the Vite production build before deployment.
