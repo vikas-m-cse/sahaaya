@@ -312,10 +312,8 @@ const initializePortal = async () => {
           <span style="font-size: 12px; font-weight: 700; color: ${spotsLeft === 0 ? '#991b1b' : 'var(--portal-primary)'};">
             ${spotsLeft === 0 ? "All spots filled" : `${spotsLeft} spots remaining`}
           </span>
-          <button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">
-            Edit Need
-          </button>
-          ${opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.CANCELLED && opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.COMPLETED ? `<button class="btn-secondary btn-sm cancel-opp-btn" data-opp-id="${opp.id}" style="color:#b42318;border-color:#f0b8b3;">Delete Requirement</button>` : ""}
+          ${opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.CANCELLED && opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.COMPLETED ? `<button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">Edit Need</button>
+          <button class="btn-secondary btn-sm cancel-opp-btn" data-opp-id="${opp.id}" style="color:#b42318;border-color:#f0b8b3;">Delete Requirement</button>` : `<span style="font-size:12px;color:var(--portal-muted);">No actions available</span>`}
         </div>
       `;
       grid.appendChild(card);
