@@ -47,17 +47,21 @@ function loadScript(src) {
   });
 }
 
-try {
-  for (const script of scripts) await loadScript(script);
-  if (!isPortal) {
-    await loadScript("https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js");
-    await loadScript("js/sahaaya-3d.js");
-  }
-} catch (error) {
+async function bootstrap() {
+  try {
+    for (const script of scripts) await loadScript(script);
+    if (!isPortal) {
+      await loadScript("https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js");
+      await loadScript("js/sahaaya-3d.js");
+    }
+  } catch (error) {
   console.error(error);
   const notice = document.createElement("div");
   notice.setAttribute("role", "alert");
   notice.style.cssText = "position:fixed;z-index:99999;bottom:16px;left:16px;right:16px;padding:14px 18px;background:#fff4e5;color:#5b3710;border:1px solid #e6c18b;border-radius:12px;font:14px/1.5 system-ui";
   notice.textContent = "Sahaaya could not load all application scripts. Refresh the page or check the deployment build logs.";
-  document.body.appendChild(notice);
+    document.body.appendChild(notice);
+  }
 }
+
+void bootstrap();
