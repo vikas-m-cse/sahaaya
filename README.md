@@ -180,6 +180,10 @@ The repository keeps the existing demo personas for evaluation. Real accounts re
 
 The workflow-hardening migration blocks self-service admin-role escalation and client-side home verification changes. It also adds transactional RPCs for application review and attendance; the Supabase adapter calls those RPCs instead of performing vulnerable client-side multi-step updates. The attendance RPC calculates hours from the stored activity time and rejects duplicate attendance.
 
+It also lets a home save requirements while its verification is pending, but public discovery remains restricted to verified homes. The home portal resolves the facility linked to the signed-in account (rather than falling back to the first home), and both portals refresh shared data when the browser tab regains focus. This helps newly posted requirements and volunteer applications appear without a manual full-page reload. In demo mode, data is browser-local and is not shared between different devices.
+
+Homes can use **Delete Requirement** to cancel a listing. This is a safe cancellation rather than a destructive database delete: it removes the requirement from volunteer discovery and cancels pending/approved applications while preserving the record. A requirement with recorded attendance cannot be cancelled, so credited hours and attendance history are not lost.
+
 Automated checks:
 - `npm test` runs static regression checks for the security migration.
 - `npm run build` verifies the production frontend bundle.
