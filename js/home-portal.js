@@ -547,7 +547,7 @@ const initializePortal = async () => {
     const badgePlaceholder = document.getElementById("verificationBadgePlaceholder");
     badgePlaceholder.innerHTML = SahaayaUI.getStatusBadge(currentHome.verification_status);
 
-    document.getElementById("homeProfileForm").addEventListener("submit", async e => {
+    document.getElementById("homeProfileForm").onsubmit = async e => {
       e.preventDefault();
       currentHome.name = document.getElementById("profHomeName").value.trim();
       currentHome.resident_count = parseInt(document.getElementById("profResidentCount").value, 10);
@@ -565,8 +565,8 @@ const initializePortal = async () => {
       }
 
       SahaayaUI.showToast("Home profile details updated successfully.", "success");
-      loadData();
-    });
+      void loadData();
+    };
   }
 
   // Refresh shared data whenever the host returns to this tab. This keeps new
