@@ -174,13 +174,14 @@
     submitApplication: async data => {
       const volunteerId = must(await client().from("volunteers").select("id").eq("profile_id", data.volunteer_id).single()).id;
       const row = must(await client().from("applications").insert({
-        activity_id: data.opportunity_id, volunteer_id: volunteerId, status: "applied"
+        activity_id: data.opportunity_id, volunteer_id: volunteerId, status: "applied",
+        volunteer_note: data.volunteer_note || null
       }).select().single());
       return { ...row, opportunity_id: row.activity_id, volunteer_id: data.volunteer_id, match_score: data.match_score || 0,
         match_reasons: data.match_reasons || [], volunteer_note: data.volunteer_note || "", coordinator_note: "" };
     },
     updateApplicationStatus: async (id, status, note = "") => {
-      const row = must(await client().from("applications").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id).select().single());
+      const row = must(await client().from("applications").update({ status, reviewed_at: new Date().toISOString(), coordinator_note: note || null }).eq("id", id).select().single());
       return { ...row, opportunity_id: row.activity_id, coordinator_note: note };
     },
     recordAttendance: async ({ applicationId, status }) => {
