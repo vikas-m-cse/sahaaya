@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administrator Sign In — Sahaaya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    :root{--admin-ink:#202b24;--admin-muted:#68756b;--admin-paper:#f5f3ec;--admin-card:#fffefa;--admin-olive:#526747;--admin-line:#e2e4da}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 10%,#e4eadb 0,transparent 40%),var(--admin-paper);color:var(--admin-ink);font-family:"DM Sans",sans-serif;display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,480px);align-items:center;gap:clamp(32px,8vw,120px);padding:clamp(24px,7vw,100px)}
+    .story{max-width:620px}.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:inherit;font:800 20px Manrope,sans-serif;letter-spacing:-.04em}.brand-mark{width:42px;height:42px;display:grid;place-items:center;background:var(--admin-olive);color:#fff;border-radius:14px;font-size:20px}.eyebrow{text-transform:uppercase;letter-spacing:.17em;font-size:11px;font-weight:700;color:var(--admin-olive);margin:58px 0 18px}.story h1{font:700 clamp(38px,5vw,68px)/1.04 Manrope,sans-serif;letter-spacing:-.06em;margin:0 0 22px;max-width:600px}.story p{font-size:17px;line-height:1.75;color:var(--admin-muted);max-width:500px}.privacy-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--admin-line);font-size:12px;color:var(--admin-muted);line-height:1.6}
+    .panel{background:var(--admin-card);border:1px solid rgba(60,75,55,.12);border-radius:24px;padding:clamp(26px,4vw,42px);box-shadow:0 28px 90px rgba(41,52,37,.09)}.panel h2{font:700 27px Manrope,sans-serif;letter-spacing:-.04em;margin:0 0 8px}.sub{margin:0 0 28px;color:var(--admin-muted);font-size:14px;line-height:1.6}.field{display:block;margin:18px 0}.field span{display:block;font-size:12px;font-weight:700;margin-bottom:8px}.field input{width:100%;height:49px;border:1px solid #d9ddd2;border-radius:12px;padding:0 14px;background:#fff;color:var(--admin-ink);font:inherit;outline:none}.field input:focus{border-color:var(--admin-olive);box-shadow:0 0 0 3px rgba(82,103,71,.12)}.submit{width:100%;height:50px;border:0;border-radius:12px;background:var(--admin-olive);color:#fff;font:700 14px Manrope,sans-serif;cursor:pointer;margin-top:8px}.submit:disabled{opacity:.6;cursor:wait}.message{display:none;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5;margin:14px 0 0}.message.error{display:block;background:#fbebE6;color:#872e25}.message.success{display:block;background:#e8f0e3;color:#344c2e}.back{display:inline-block;margin-top:22px;color:var(--admin-olive);font-size:13px;font-weight:700;text-decoration:none}.code-hint{font-size:11px;color:var(--admin-muted);line-height:1.5;margin-top:7px}
+    @media(max-width:850px){body{grid-template-columns:1fr;gap:30px;padding:28px 18px}.story{max-width:560px}.eyebrow{margin-top:32px}.story h1{font-size:42px}.story p{font-size:15px}.privacy-note{margin-top:20px}.panel{max-width:480px;width:100%;justify-self:center}}
+  </style>
+</head>
+<body>
+  <section class="story" aria-labelledby="intro-title">
+    <a class="brand" href="../index.html"><span class="brand-mark">S</span><span>Sahaaya</span></a>
+    <p class="eyebrow">Restricted access · Platform team</p>
+    <h1 id="intro-title">Care deserves thoughtful oversight.</h1>
+    <p>Sign in to manage partner verification, review platform activity, and help keep volunteer coordination safe and accountable.</p>
+    <div class="privacy-note">Administrator access is restricted to accounts already assigned the <strong>admin</strong> role in Sahaaya's database. Public sign-up cannot grant administrator privileges.</div>
+  </section>
+  <main class="panel">
+    <h2>Administrator sign in</h2>
+    <p class="sub">Enter the access code and your authorised administrator account.</p>
+    <form id="adminLoginForm" novalidate>
+      <label class="field"><span>Admin access code</span><input id="adminCode" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" placeholder="Enter 6-digit code" required><small class="code-hint">This code is an additional gate, not a replacement for account authentication.</small></label>
+      <label class="field"><span>Administrator email</span><input id="adminEmail" type="email" autocomplete="username" placeholder="admin@your-organisation.org" required></label>
+      <label class="field"><span>Password</span><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required></label>
+      <button class="submit" id="adminSubmit" type="submit">Verify and sign in <span aria-hidden="true">→</span></button>
+      <div id="adminMessage" class="message" role="alert" aria-live="polite"></div>
+    </form>
+    <a class="back" href="../index.html">← Back to Sahaaya</a>
+  </main>
+  <script type="module" src="../js/bootstrap.js"></script>
+</body>
+</html>
