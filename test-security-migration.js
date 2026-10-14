@@ -54,7 +54,9 @@ for (const [label, source, pattern] of [
   ["Public activity discovery remains limited to verified homes or owner/admin", schema, /CREATE POLICY "Activities viewable by all if home verified or if owner"[\s\S]*?verification_status = 'verified'/],
   ["Home portal refreshes when the tab regains focus", readFileSync(new URL("./js/home-portal.js", import.meta.url), "utf8"), /window\.addEventListener\("focus", refreshHomeData\)/],
   ["Volunteer portal refreshes when the tab regains focus", readFileSync(new URL("./js/volunteer-portal.js", import.meta.url), "utf8"), /window\.addEventListener\("focus", refreshVolunteerData\)/],
-  ["Demo database supports cancellation without deleting records", readFileSync(new URL("./js/db.js", import.meta.url), "utf8"), /cancelOpportunity: async \(id\) =>[\s\S]*?opportunity\.status = SAHAAYA_CONFIG\.OPPORTUNITY_STATUS\.CANCELLED/]
+  ["Demo database supports cancellation without deleting records", readFileSync(new URL("./js/db.js", import.meta.url), "utf8"), /cancelOpportunity: async \(id\) =>[\s\S]*?opportunity\.status = SAHAAYA_CONFIG\.OPPORTUNITY_STATUS\.CANCELLED/],
+  ["Cancellation SQL function has a closed dollar-quote delimiter", migration, /AS \$cancel_activity\$[\s\S]*?\$cancel_activity\$;/],
+  ["Profile forms do not accumulate submit handlers during refresh", readFileSync(new URL("./js/home-portal.js", import.meta.url), "utf8"), /homeProfileForm"\)\.onsubmit = async e =>/]
 ]) {
   const passed = pattern instanceof RegExp ? pattern.test(source) : pattern;
   assert.ok(passed, `Failed security contract: ${label}`);
