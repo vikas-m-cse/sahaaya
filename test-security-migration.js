@@ -45,7 +45,12 @@ for (const [label, source, pattern] of [
   ["Home signup requests home role, not admin", auth, /role: "home"/],
   ["Signup leaves profile creation to the trusted auth trigger", auth, !/from\(["'](?:profiles|volunteers|old_age_homes)["']\)\.upsert\(/.test(auth)],
   ["Session lookup never trusts stale cached real accounts on error", auth, /if \(cached && !cached\.isDemoSession\) setCachedSession\(null\);\s*return null;/],
-  ["Missing Supabase client cannot authenticate a cached real account", auth, /if \(!sb\) \{[\s\S]*?return cached && cached\.isDemoSession \? cached : null;/]
+  ["Missing Supabase client cannot authenticate a cached real account", auth, /if \(!sb\) \{[\s\S]*?return cached && cached\.isDemoSession \? cached : null;/],
+  ["Real home sessions expose their linked home ID", auth, /home_id: extra\.home\.id/],
+  ["Home portal resolves the current account's own facility", readFileSync(new URL("./js/home-portal.js", import.meta.url), "utf8"), /getHomeByUserId\?\.\(session\.id\)/],
+  ["Home requirement cancellation uses a server-checked RPC", adapter, /rpc\("cancel_activity"/],
+  ["Cancellation RPC validates owner and preserves attendance history", migration, /public\.cancel_activity[\s\S]*?Only the host home or an administrator can cancel[\s\S]*?attendance history and cannot be deleted/],
+  ["Pending homes may save requirements while public visibility stays verified-only", migration, /CREATE POLICY "Homes can create own activities"[\s\S]*?home_id = public\.get_user_home_id\(\)[\s\S]*?CREATE POLICY "Activities viewable by all if home verified or if owner"/]
 ]) {
   const passed = pattern instanceof RegExp ? pattern.test(source) : pattern;
   assert.ok(passed, `Failed security contract: ${label}`);
