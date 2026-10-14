@@ -72,6 +72,82 @@ WITH CHECK (auth.uid() = id AND role IN ('volunteer', 'home'));
 
 
 -- ---------------------------------------------------------------------------
+-- Allow pending homes to save requirements as drafts/open rows. RLS keeps these
+-- rows invisible to other accounts until the home is verified.
+-- ---------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Verified homes can create activities" ON public.activities;
+CREATE POLICY "Homes can create own activities"
+ON public.activities FOR INSERT
+TO authenticated
+WITH CHECK (
+  (home_id = public.get_user_home_id())
+  OR public.is_admin()
+);
+
+-- ---------------------------------------------------------------------------
+-- 1c. Cancel a requirement safely instead of hard-deleting its history.
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.cancel_activity(p_activity_id UUID)
+RETURNS public.activities
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $
+DECLARE
+  v_activity public.activities%ROWTYPE;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Authentication required';
+  END IF;
+
+  SELECT * INTO v_activity
+  FROM public.activities
+  WHERE id = p_activity_id
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Requirement not found';
+  END IF;
+
+  IF NOT public.is_admin()
+     AND v_activity.home_id IS DISTINCT FROM public.get_user_home_id() THEN
+    RAISE EXCEPTION 'Only the host home or an administrator can cancel this requirement';
+  END IF;
+
+  IF v_activity.status IN ('cancelled', 'completed') THEN
+    RAISE EXCEPTION 'This requirement is already cancelled or completed';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM public.attendance
+    WHERE activity_id = v_activity.id
+  ) OR EXISTS (
+    SELECT 1 FROM public.applications
+    WHERE activity_id = v_activity.id AND status = 'attended'
+  ) THEN
+    RAISE EXCEPTION 'This requirement has attendance history and cannot be deleted';
+  END IF;
+
+  UPDATE public.applications
+  SET status = 'cancelled',
+      reviewed_at = now(),
+      coordinator_note = COALESCE(coordinator_note, 'Requirement cancelled by the host home.')
+  WHERE activity_id = v_activity.id
+    AND status IN ('applied', 'approved', 'rejected');
+
+  UPDATE public.activities
+  SET status = 'cancelled'
+  WHERE id = v_activity.id
+  RETURNING * INTO v_activity;
+
+  RETURN v_activity;
+END;
+$;
+
+REVOKE ALL ON FUNCTION public.cancel_activity(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.cancel_activity(UUID) TO authenticated;
+
+-- ---------------------------------------------------------------------------
 -- 1b. Force privileged workflow changes through the checked RPCs above.
 --     RLS policies are permissive when OR-combined, so the old write policies
 --     must be removed rather than merely supplemented.
