@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+const schema = readFileSync(new URL("./supabase/schema.sql", import.meta.url), "utf8");
+const adapter = readFileSync(new URL("./js/supabase-db-adapter.js", import.meta.url), "utf8");
+const auth = readFileSync(new URL("./js/auth.js", import.meta.url), "utf8");
+
 const migration = readFileSync(
   new URL("./supabase/migrations/20261014_workflow_security_hardening.sql", import.meta.url),
   "utf8"
@@ -27,4 +31,22 @@ assert.match(migration, /NEW\.role\s*=\s*'admin'/);
 assert.match(migration, /NEW\.verification_status IS DISTINCT FROM OLD\.verification_status/);
 assert.match(migration, /WHEN p_status = 'present'[\s\S]*ELSE 0/);
 
-console.log("Sahaaya security migration checks passed.");
+
+for (const [label, source, pattern] of [
+  ["Unique application per volunteer/activity", schema, /UNIQUE \(activity_id, volunteer_id\)/],
+  ["Unique attendance per volunteer/activity", schema, /unique_attendance_record UNIQUE \(activity_id, volunteer_id\)/],
+  ["Applications table RLS enabled", schema, /ALTER TABLE public\.applications ENABLE ROW LEVEL SECURITY/],
+  ["Attendance table RLS enabled", schema, /ALTER TABLE public\.attendance ENABLE ROW LEVEL SECURITY/],
+  ["Adapter uses atomic application review RPC", adapter, /rpc\("review_application"/],
+  ["Adapter uses atomic attendance RPC", adapter, /rpc\("mark_activity_attendance"/],
+  ["Adapter does not write application status directly", adapter, !/from\("applications"\)\.update\(/.test(adapter)],
+  ["Adapter does not write attendance directly", adapter, !/from\("attendance"\)\.(insert|update|upsert)\(/.test(adapter)],
+  ["Signup only requests supported self-service roles", auth, /role: "volunteer"/],
+  ["Home signup requests home role, not admin", auth, /role: "home"/]
+]) {
+  const passed = pattern instanceof RegExp ? pattern.test(source) : pattern;
+  assert.ok(passed, `Failed security contract: ${label}`);
+}
+
+console.log("Sahaaya security and database contract checks passed.");
+
