@@ -44,14 +44,18 @@ const initializePortal = async () => {
   async function loadData() {
     allUsers = await SahaayaDB.getUsers();
 
-    // Find home linked to session or fallback to home_01
-    const homeId = session.home_id || "home_01";
-    currentHome = await SahaayaDB.getHomeById(homeId);
-
+    // Resolve the facility owned by this account first. Falling back to the
+    // first home can attach a real account's work to somebody else's home.
+    currentHome = await SahaayaDB.getHomeByUserId?.(session.id);
+    if (!currentHome && session.home_id) {
+      currentHome = await SahaayaDB.getHomeById(session.home_id);
+    }
+    if (!currentHome && session.isDemoSession) {
+      currentHome = await SahaayaDB.getHomeById(session.home_id || "home_01");
+      if (!currentHome) currentHome = (await SahaayaDB.getHomes())[0] || null;
+    }
     if (!currentHome) {
-      // Fallback
-      const homes = await SahaayaDB.getHomes();
-      currentHome = homes[0];
+      throw new Error("No old-age-home profile is linked to this account. Please sign out and sign in again, or contact the Sahaaya administrator.");
     }
 
     // Populate Topbar & Greetings
@@ -311,6 +315,7 @@ const initializePortal = async () => {
           <button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">
             Edit Need
           </button>
+          ${opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.CANCELLED && opp.status !== SAHAAYA_CONFIG.OPPORTUNITY_STATUS.COMPLETED ? `<button class="btn-secondary btn-sm cancel-opp-btn" data-opp-id="${opp.id}" style="color:#b42318;border-color:#f0b8b3;">Delete Requirement</button>` : ""}
         </div>
       `;
       grid.appendChild(card);
@@ -318,7 +323,28 @@ const initializePortal = async () => {
 
     grid.querySelectorAll(".edit-opp-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        SahaayaUI.showToast("Requirement is live and receiving applications.", "info");
+        SahaayaUI.showToast("Requirement editing is not available yet. Use Delete Requirement to remove it from volunteer listings.", "info");
+      });
+    });
+
+    grid.querySelectorAll(".cancel-opp-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const opp = homeOpportunities.find(item => item.id === btn.dataset.oppId);
+        if (!opp) return;
+        const confirmed = window.confirm(
+          "Delete “" + opp.title + "” from volunteer listings? This cancels pending/approved applications. Attendance history is preserved; requirements with recorded attendance cannot be deleted."
+        );
+        if (!confirmed) return;
+        btn.disabled = true;
+        try {
+          await SahaayaDB.cancelOpportunity(opp.id);
+          SahaayaUI.showToast("Requirement deleted from volunteer listings. Its history has been preserved.", "success");
+          await loadData();
+        } catch (error) {
+          console.error("Unable to cancel requirement:", error);
+          SahaayaUI.showToast(error.message || "Could not delete this requirement. Please try again.", "error");
+          btn.disabled = false;
+        }
       });
     });
   }
@@ -409,24 +435,36 @@ const initializePortal = async () => {
       const skillsRaw = document.getElementById("newReqSkills").value;
       const required_skills = skillsRaw ? skillsRaw.split(",").map(s => s.trim()).filter(Boolean) : ["Patience", "Empathy"];
 
-      await SahaayaDB.createOpportunity({
-        home_id: currentHome.id,
-        title,
-        category,
-        slot_id,
-        description,
-        date,
-        time_start,
-        time_end,
-        duration_hours: 2.0,
-        spots_needed,
-        required_skills
-      });
+      const saveButton = document.getElementById("saveReqBtn");
+      saveButton.disabled = true;
+      try {
+        await SahaayaDB.createOpportunity({
+          home_id: currentHome.id,
+          title,
+          category,
+          slot_id,
+          description,
+          date,
+          time_start,
+          time_end,
+          duration_hours: 2.0,
+          spots_needed,
+          required_skills
+        });
 
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast("Requirement published successfully! It is now open to volunteers.", "success");
-      await loadData();
-      switchTab("requirements");
+        SahaayaUI.closeModal();
+        if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
+          SahaayaUI.showToast("Requirement published successfully and is available to volunteers.", "success");
+        } else {
+          SahaayaUI.showToast("Requirement saved. It will become visible to volunteers after your home is verified.", "info");
+        }
+        await loadData();
+        switchTab("requirements");
+      } catch (error) {
+        console.error("Unable to publish requirement:", error);
+        SahaayaUI.showToast(error.message || "Could not publish requirement. Please check your connection and try again.", "error");
+        saveButton.disabled = false;
+      }
     });
   });
 
