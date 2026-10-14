@@ -155,3 +155,23 @@ Administrators use `/admin/login.html`, which requires the access code and a rea
 In Vercel, add the server-side environment variable `SAHAAYA_ADMIN_ACCESS_CODE` with the chosen six-digit code, for **Preview** and **Production** environments as appropriate, then redeploy. Keep this variable server-only: do not prefix it with `VITE_`, do not put it in client-side JavaScript, and do not commit its value to GitHub. The API endpoint returns no-store responses and checks the code on the server. The code is an additional gate, not a replacement for Supabase authentication and the database role.
 
 To provision an administrator, create the account through a trusted Supabase Auth/admin workflow and assign `admin` to that account's `public.profiles.role` through a trusted database/admin operation. Do not expose a public admin-registration form.
+
+---
+
+## Supabase setup and security hardening
+
+The repository keeps the existing demo personas for evaluation. Real accounts require a Supabase project and the following setup; these steps are **not applied to a hosted Supabase project automatically**.
+
+1. Copy `.env.example` to `.env.local` for local development, then set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or `VITE_SUPABASE_ANON_KEY`). Use only a publishable/anon key in browser builds; never put a service-role key in Vite variables.
+2. In the Supabase SQL Editor, run `supabase/schema.sql` on a new project.
+3. On an existing project created from that schema, run migrations in order: `supabase/migrations/20261014_secure_signup_roles.sql`, `supabase/migrations/20261014_application_notes.sql`, then `supabase/migrations/20261014_workflow_security_hardening.sql`.
+4. Configure the same public variables in the Vercel project settings and redeploy.
+5. Test with two separate real accounts: a volunteer and a verified home. Confirm application review, capacity limits, attendance, and hours before using the system with real users.
+
+The workflow-hardening migration blocks self-service admin-role escalation and client-side home verification changes. It also adds transactional RPCs for application review and attendance; the Supabase adapter calls those RPCs instead of performing vulnerable client-side multi-step updates. The attendance RPC calculates hours from the stored activity time and rejects duplicate attendance.
+
+Automated checks:
+- `npm test` runs static regression checks for the security migration.
+- `npm run build` verifies the production frontend bundle.
+
+These checks do not replace applying the SQL migration or testing against your own Supabase project.
