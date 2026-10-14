@@ -306,7 +306,14 @@ const SahaayaAuth = (() => {
     const sessionUser = await getSession();
 
     if (!sessionUser) {
-      window.location.href = getBasePath() + "index.html?login_required=1";
+      window.location.href = getBasePath() + (requiredRole === "admin" ? "admin/login.html" : "index.html?login_required=1");
+      return null;
+    }
+
+    // Demo personas are never allowed to enter the protected admin portal.
+    if (requiredRole === "admin" && sessionUser.isDemoSession) {
+      setCachedSession(null);
+      window.location.href = getBasePath() + "admin/login.html";
       return null;
     }
 
