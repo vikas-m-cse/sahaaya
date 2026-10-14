@@ -2,7 +2,7 @@
  * SAHAAYA — Old Age Home Portal Controller
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
+const initializePortal = async () => {
   // 1. Authenticate Guard
   const session = await SahaayaAuth.checkAuthGuard("home");
   if (!session) return;
@@ -533,4 +533,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Initial Load
   await loadData();
-});
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializePortal, { once: true });
+} else {
+  void initializePortal();
+}
