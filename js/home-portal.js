@@ -225,10 +225,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("approveCancel")?.addEventListener("click", SahaayaUI.closeModal);
     document.getElementById("approveConfirm")?.addEventListener("click", async () => {
       const note = document.getElementById("approveNoteInput").value.trim();
-      await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, note || "Application approved! See you soon.");
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast(`Approved ${volunteerName}! Added to their schedule.`, "success");
-      await loadData();
+      const confirmBtn = document.getElementById("approveConfirm");
+      if (confirmBtn) confirmBtn.disabled = true;
+      try {
+        await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, note || "Application approved! See you soon.");
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast(`Approved ${volunteerName}! Added to their schedule.`, "success");
+        await loadData();
+      } catch (error) {
+        if (confirmBtn) confirmBtn.disabled = false;
+        SahaayaUI.showToast(error.message || "Could not approve this application.", "error");
+      }
     });
   }
 
@@ -256,10 +263,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("declineCancel")?.addEventListener("click", SahaayaUI.closeModal);
     document.getElementById("declineConfirm")?.addEventListener("click", async () => {
       const reason = document.getElementById("declineReasonSelect").value;
-      await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.REJECTED, reason);
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast("Application updated.", "info");
-      await loadData();
+      const confirmBtn = document.getElementById("declineConfirm");
+      if (confirmBtn) confirmBtn.disabled = true;
+      try {
+        await SahaayaDB.updateApplicationStatus(appId, SAHAAYA_CONFIG.APPLICATION_STATUS.REJECTED, reason);
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast("Application updated.", "info");
+        await loadData();
+      } catch (error) {
+        if (confirmBtn) confirmBtn.disabled = false;
+        SahaayaUI.showToast(error.message || "Could not update this application.", "error");
+      }
     });
   }
 
@@ -435,7 +449,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tbody = document.getElementById("attendanceRosterBody");
     tbody.innerHTML = "";
 
-    const approvedApps = homeApplications.filter(a => a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED || a.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED);
+    const approvedApps = homeApplications.filter(a =>
+      [SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED, SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED, SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT].includes(a.status)
+    );
 
     if (approvedApps.length === 0) {
       tbody.innerHTML = `
@@ -469,9 +485,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${
             app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED
               ? `<span style="color: var(--portal-primary); font-size: 12px; font-weight: 700;">✓ Hours Credited</span>`
-              : `<button class="btn-primary btn-sm mark-present-btn" data-app-id="${app.id}" data-volunteer="${volunteer.name}" data-hours="${opp?.duration_hours || 2.0}">
-                   Mark Present ✓
-                 </button>`
+              : app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT
+                ? `<span style="color: var(--portal-muted); font-size: 12px;">Attendance marked absent · 0 hours</span>`
+                : `<button class="btn-primary btn-sm mark-present-btn" data-app-id="${app.id}" data-volunteer="${volunteer.name}" data-hours="${opp?.duration_hours || 2.0}">
+                     Mark Present ✓
+                   </button>`
           }
         </td>
       `;
@@ -484,14 +502,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const volName = btn.dataset.volunteer;
         const hours = btn.dataset.hours;
 
-        await SahaayaDB.recordAttendance({
-          applicationId: appId,
-          status: "present",
-          markedByUserId: session.id
-        });
-
-        SahaayaUI.showToast(`Attendance verified! ${hours} hours credited to ${volName}.`, "success");
-        await loadData();
+        btn.disabled = true;
+        try {
+          await SahaayaDB.recordAttendance({
+            applicationId: appId,
+            status: "present",
+            markedByUserId: session.id
+          });
+          SahaayaUI.showToast(`Attendance verified! ${hours} hours credited to ${volName}.`, "success");
+          await loadData();
+        } catch (error) {
+          btn.disabled = false;
+          SahaayaUI.showToast(error.message || "Could not record attendance.", "error");
+        }
       });
     });
   }
