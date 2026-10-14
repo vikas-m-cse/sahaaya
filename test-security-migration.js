@@ -9,6 +9,9 @@ const migration = readFileSync(
 for (const required of [
   "prevent_profile_role_escalation",
   "prevent_home_verification_tampering",
+  "DROP POLICY IF EXISTS \"Homes can review applications; Volunteers can cancel\" ON public.applications",
+  "DROP POLICY IF EXISTS \"Host homes can mark attendance\" ON public.attendance",
+  "DROP POLICY IF EXISTS \"Host homes can update attendance\" ON public.attendance",
   "public.review_application",
   "public.mark_activity_attendance",
   "FOR UPDATE",
