@@ -13,7 +13,6 @@
   const passwordField = document.getElementById("adminPassword");
   const submit = document.getElementById("adminSubmit");
   const message = document.getElementById("adminMessage");
-  const ACCESS_CODE = "232758";
 
   function showMessage(text, type = "error") {
     message.textContent = text;
@@ -25,17 +24,24 @@
     message.textContent = "";
     message.className = "message";
 
-    if (codeField.value.trim() !== ACCESS_CODE) {
-      showMessage("The administrator access code is incorrect.");
-      codeField.focus();
-      return;
-    }
-
     if (!form.reportValidity()) return;
     submit.disabled = true;
     submit.textContent = "Verifying access…";
 
     try {
+      const codeResponse = await fetch("/api/admin/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ code: codeField.value.trim() })
+      });
+      if (!codeResponse.ok) {
+        const result = await codeResponse.json().catch(() => ({}));
+        showMessage(result.error || "The administrator access code could not be verified.");
+        codeField.focus();
+        return;
+      }
+
       const sessionUser = await window.SahaayaAuth.login(
         emailField.value.trim(),
         passwordField.value
