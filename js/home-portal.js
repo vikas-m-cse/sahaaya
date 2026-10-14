@@ -569,8 +569,25 @@ const initializePortal = async () => {
     });
   }
 
-  // Initial Load
+  // Refresh shared data whenever the host returns to this tab. This keeps new
+  // volunteer applications and activity changes from appearing stale.
   await loadData();
+  let refreshInProgress = false;
+  const refreshHomeData = async () => {
+    if (document.visibilityState === "hidden" || refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      await loadData();
+    } catch (error) {
+      console.error("Unable to refresh home portal data:", error);
+    } finally {
+      refreshInProgress = false;
+    }
+  };
+  window.addEventListener("focus", refreshHomeData);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void refreshHomeData();
+  });
 };
 
 if (document.readyState === "loading") {
