@@ -77,9 +77,9 @@ function openLandingModal(type, activity) {
           <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
             <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
           </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
-            <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
-          </button>
+          <a href="./admin/login.html" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px; text-decoration: none;">
+            <span>🛡️</span> <strong>Administrator sign in</strong> — Restricted access →
+          </a>
         </div>
       </div>
 
