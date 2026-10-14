@@ -44,7 +44,8 @@ for (const [label, source, pattern] of [
   ["Signup only requests supported self-service roles", auth, /role: "volunteer"/],
   ["Home signup requests home role, not admin", auth, /role: "home"/],
   ["Signup leaves profile creation to the trusted auth trigger", auth, !/from\(["'](?:profiles|volunteers|old_age_homes)["']\)\.upsert\(/.test(auth)],
-  ["Session lookup never trusts stale cached real accounts on error", auth, /if \(cached && !cached\.isDemoSession\) setCachedSession\(null\);\s*return null;/]
+  ["Session lookup never trusts stale cached real accounts on error", auth, /if \(cached && !cached\.isDemoSession\) setCachedSession\(null\);\s*return null;/],
+  ["Missing Supabase client cannot authenticate a cached real account", auth, /if \(!sb\) \{[\s\S]*?return cached && cached\.isDemoSession \? cached : null;/]
 ]) {
   const passed = pattern instanceof RegExp ? pattern.test(source) : pattern;
   assert.ok(passed, `Failed security contract: ${label}`);
