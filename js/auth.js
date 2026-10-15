@@ -281,12 +281,25 @@ const SahaayaAuth = (() => {
   // Logout
   // -----------------------------------------------------------------------
   async function logout() {
+    // Clear the app-level session immediately so a failed network request
+    // cannot leave the user appearing signed in.
     setCachedSession(null);
+
+    const destination = new URL("../index.html", window.location.href).href;
     const sb = _getSupabaseClient();
-    if (sb) {
-      try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
+
+    try {
+      if (sb) {
+        // Local scope clears this browser's Supabase session without relying
+        // on a network-wide sign-out operation.
+        await sb.auth.signOut({ scope: "local" });
+      }
+    } catch (error) {
+      console.warn("Sahaaya: Supabase sign-out failed; clearing local session anyway.", error);
+    } finally {
+      // Always leave the protected portal, even if Supabase is unreachable.
+      window.location.replace(destination);
     }
-    window.location.href = getBasePath() + "index.html";
   }
 
   // -----------------------------------------------------------------------
