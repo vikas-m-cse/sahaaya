@@ -65,23 +65,9 @@ function openLandingModal(type, activity) {
       <h2>Sign in to Sahaaya</h2>
       <p>Enter your credentials to access your verified profile and portal.</p>
 
-      <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: #f0f5f2; border: 1px solid #c6ddd3; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #174e43; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-          ⚡ 1-Click Demo Access for Evaluators
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
-            <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
-            <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
-          </button>
-          <a href="./admin/login.html" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px; text-decoration: none;">
-            <span>🛡️</span> <strong>Administrator sign in</strong> — Restricted access →
-          </a>
-        </div>
-      </div>
+      <p class="auth-note" style="font-size:12px;color:#687873;margin:0 0 18px;">
+        Use your registered Sahaaya account. New volunteers and partner homes can create an account from the registration page.
+      </p>
 
       <div style="text-align: center; color: #9eada8; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH REAL ACCOUNT —</div>
 
