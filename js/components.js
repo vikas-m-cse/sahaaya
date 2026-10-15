@@ -41,10 +41,10 @@ const SahaayaUI = (() => {
             title="Switch to Silver Springs Senior Care (Old Age Home Persona)">
             <span class="icon">🏡</span> <strong>Old Age Home</strong> <span class="role-name">(Silver Springs)</span>
           </button>
-          <button type="button" class="demo-role-btn" data-switch-role="admin" id="demoRoleAdmin"
-            title="Switch to Platform Administrator Persona">
-            <span class="icon">🛡️</span> <strong>Admin</strong> <span class="role-name">(Platform)</span>
-          </button>
+          <a class="demo-role-btn" id="demoRoleAdminLogin" href="${basePath}admin/login.html"
+            title="Open the protected administrator sign-in page" style="text-decoration:none">
+            <span class="icon">🛡️</span> <strong>Admin Login</strong>
+          </a>
         </div>
 
         <div class="demo-actions">

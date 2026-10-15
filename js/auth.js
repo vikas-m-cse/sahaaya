@@ -120,6 +120,8 @@ const SahaayaAuth = (() => {
         role: profile.role,
         phone: profile.phone,
         avatar_initials: initials,
+        // Legacy home portal expects home_id; keep it aligned with the signed-in account.
+        ...(profile.role === "home" && extra.home ? { home_id: extra.home.id } : {}),
         ...extra
       };
 
@@ -141,7 +143,11 @@ const SahaayaAuth = (() => {
     const cached = getCachedSession();
     if (cached && cached.isDemoSession) return cached;
 
-    if (!sb) return cached;
+    if (!sb) {
+      // Without a live Supabase client, only explicit demo personas may continue.
+      if (cached && !cached.isDemoSession) setCachedSession(null);
+      return cached && cached.isDemoSession ? cached : null;
+    }
 
     try {
       const { data: { session }, error } = await sb.auth.getSession();
@@ -152,8 +158,11 @@ const SahaayaAuth = (() => {
       }
       return await fetchUserProfile(session.user.id);
     } catch (err) {
+      // Never treat a cached real-account profile as an authenticated session.
+      // Only the Supabase session is authoritative; cached personas are for demo mode.
       console.warn("Auth getSession error:", err);
-      return cached;
+      if (cached && !cached.isDemoSession) setCachedSession(null);
+      return null;
     }
   }
 
@@ -183,23 +192,15 @@ const SahaayaAuth = (() => {
     if (!data.user) throw new Error("Registration failed.");
 
     if (data.session) {
-      await sb.from("profiles").upsert({
-        id: data.user.id,
-        full_name: name,
-        email,
-        phone: phone || "",
-        role: "volunteer"
-      });
-
-      await sb.from("volunteers").upsert({
-        profile_id: data.user.id,
-        interests: interests || ["companionship"],
-        availability: availability || ["sun_morning"],
-        preferred_activity_types: [],
-        preferred_area: preferred_area || "Bengaluru"
-      });
-
+      // The auth.users trigger creates the profile and volunteer row atomically.
+      // Do not repeat those writes from the browser: ignored RLS errors can leave
+      // a partially initialized account and client-side role fields are untrusted.
       const sessionUser = await fetchUserProfile(data.user.id);
+      if (!sessionUser || sessionUser.role !== "volunteer") {
+        await sb.auth.signOut();
+        setCachedSession(null);
+        throw new Error("Your account was created, but its volunteer profile could not be loaded. Please contact support.");
+      }
       return { user: data.user, sessionUser, needsConfirmation: false };
     }
 
@@ -238,25 +239,14 @@ const SahaayaAuth = (() => {
     if (!data.user) throw new Error("Registration failed.");
 
     if (data.session) {
-      await sb.from("profiles").upsert({
-        id: data.user.id,
-        full_name: contactPerson,
-        email,
-        phone: phone || "",
-        role: "home"
-      });
-
-      await sb.from("old_age_homes").upsert({
-        profile_id: data.user.id,
-        name: homeName,
-        description: description || "Senior care residence.",
-        address: address || "Bengaluru",
-        city: city || "Bengaluru",
-        contact_phone: phone || "",
-        verification_status: "pending"
-      });
-
+      // The trusted auth.users trigger creates the home record as pending.
+      // Keep account bootstrap server-side rather than duplicating writes here.
       const sessionUser = await fetchUserProfile(data.user.id);
+      if (!sessionUser || sessionUser.role !== "home" || !sessionUser.home) {
+        await sb.auth.signOut();
+        setCachedSession(null);
+        throw new Error("Your account was created, but its home profile could not be loaded. Please contact support.");
+      }
       return { user: data.user, sessionUser, needsConfirmation: false };
     }
 
@@ -291,12 +281,25 @@ const SahaayaAuth = (() => {
   // Logout
   // -----------------------------------------------------------------------
   async function logout() {
+    // Clear the app-level session immediately so a failed network request
+    // cannot leave the user appearing signed in.
     setCachedSession(null);
+
+    const destination = new URL("../index.html", window.location.href).href;
     const sb = _getSupabaseClient();
-    if (sb) {
-      try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
+
+    try {
+      if (sb) {
+        // Local scope clears this browser's Supabase session without relying
+        // on a network-wide sign-out operation.
+        await sb.auth.signOut({ scope: "local" });
+      }
+    } catch (error) {
+      console.warn("Sahaaya: Supabase sign-out failed; clearing local session anyway.", error);
+    } finally {
+      // Always leave the protected portal, even if Supabase is unreachable.
+      window.location.replace(destination);
     }
-    window.location.href = getBasePath() + "index.html";
   }
 
   // -----------------------------------------------------------------------
@@ -306,7 +309,14 @@ const SahaayaAuth = (() => {
     const sessionUser = await getSession();
 
     if (!sessionUser) {
-      window.location.href = getBasePath() + "index.html?login_required=1";
+      window.location.href = getBasePath() + (requiredRole === "admin" ? "admin/login.html" : "index.html?login_required=1");
+      return null;
+    }
+
+    // Demo personas are never allowed to enter the protected admin portal.
+    if (requiredRole === "admin" && sessionUser.isDemoSession) {
+      setCachedSession(null);
+      window.location.href = getBasePath() + "admin/login.html";
       return null;
     }
 

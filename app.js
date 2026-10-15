@@ -33,7 +33,7 @@ function openLandingModal(type, activity) {
       <h2>Let's find your fit.</h2>
       <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
       <form class="form" id="joinForm">
-        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value="Ananya Sharma"></div>
+        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value=""></div>
         <div class="field"><label for="joinEmail">Email</label><input required id="joinEmail" type="email" placeholder="you@example.com" value=""></div>
         <div class="field"><label for="joinPassword">Password</label><input required id="joinPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
         <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value="+91 98450 12345"></div>
@@ -65,23 +65,9 @@ function openLandingModal(type, activity) {
       <h2>Sign in to Sahaaya</h2>
       <p>Enter your credentials to access your verified profile and portal.</p>
 
-      <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: #f0f5f2; border: 1px solid #c6ddd3; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #174e43; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-          ⚡ 1-Click Demo Access for Evaluators
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
-            <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
-            <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
-            <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
-          </button>
-        </div>
-      </div>
+      <p class="auth-note" style="font-size:12px;color:#687873;margin:0 0 18px;">
+        Use your registered Sahaaya account. New volunteers and partner homes can create an account from the registration page.
+      </p>
 
       <div style="text-align: center; color: #9eada8; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH REAL ACCOUNT —</div>
 
@@ -99,14 +85,14 @@ function openLandingModal(type, activity) {
       <h2>Register your home.</h2>
       <p>Tell us what your residents need. You define the requirements; Sahaaya helps coordinate the right volunteers.</p>
       <form class="form" id="homeForm">
-        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value="Vandana Senior Living"></div>
-        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value="Dr. S. K. Narayan"></div>
-        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru"></div>
-        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library"></div>
+        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value=""></div>
+        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value=""></div>
+        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value=""></div>
+        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value=""></div>
         <div class="field"><label>Contact email</label><input required id="homeRegEmail" type="email" placeholder="name@home.org"></div>
         <div class="field"><label>Password</label><input required id="homeRegPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
-        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value="+91 80 2663 1122"></div>
-        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" value="35"></div>
+        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value=""></div>
+        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" min="1" max="10000" value=""></div>
         <button class="btn primary" type="submit" id="homeSubmitBtn">Register Home &amp; Create Account →</button>
       </form>
     `;
@@ -269,8 +255,36 @@ document.querySelectorAll(".filter").forEach(btn => {
   });
 });
 
-document.getElementById("menuBtn")?.addEventListener("click", () => {
-  showLandingToast("Use the portal links in the nav, or explore the sections below.", "info");
+// Accessible mobile navigation: open, close, and keep keyboard state in sync.
+const menuButton = document.getElementById("menuBtn");
+const primaryNav = document.getElementById("primaryNav");
+
+function closeMobileNav() {
+  if (!menuButton || !primaryNav) return;
+  primaryNav.classList.remove("is-open");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", "Open navigation menu");
+  menuButton.textContent = "☰";
+}
+
+menuButton?.addEventListener("click", () => {
+  if (!primaryNav) return;
+  const isOpen = primaryNav.classList.toggle("is-open");
+  menuButton.setAttribute("aria-expanded", String(isOpen));
+  menuButton.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+  menuButton.textContent = isOpen ? "×" : "☰";
+});
+
+primaryNav?.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", closeMobileNav);
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeMobileNav();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 950) closeMobileNav();
 });
 
 // Check if redirected due to login_required

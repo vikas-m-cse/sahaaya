@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/sahaaya-3d.css">
 <link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/states.css">
+<link rel="stylesheet" href="css/states.css">\n<link rel="stylesheet" href="css/sahaaya-flow-inspired.css">
 </head>
 <body>
 <div class="site-progress" id="progress"></div>
@@ -22,9 +22,9 @@
 </div>
 <header class="site-nav">
   <a class="brand" href="#home"><span class="brand-mark">sa</span><span>Sahaaya</span></a>
-  <nav class="nav-links"><a href="#moments">Find a moment</a><a href="#how">How it works</a><a href="#homes">For homes</a></nav>
+  <nav class="nav-links" id="primaryNav"><a href="#moments">Find a moment</a><a href="#how">How it works</a><a href="#homes">For homes</a></nav>
   <div class="nav-actions"><button class="nav-login" data-modal="login">Sign in</button><button class="nav-cta" data-modal="join">I want to help <span>↗</span></button></div>
-  <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primaryNav">☰</button>
 </header>
 
 <main>
@@ -193,8 +193,6 @@
 </main>
 
 <div class="modal" id="modal"><div class="modal-backdrop"></div><div class="modal-card"><button class="close" id="closeModal">×</button><div id="modalContent"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/config.js"></script><script src="js/db.js"></script><script src="js/matching.js"></script><script src="js/auth.js"></script><script src="js/components.js"></script><script src="app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script><script src="js/sahaaya-3d.js"></script>
+<script type="module" src="js/bootstrap.js"></script>
 </body>
 </html>
