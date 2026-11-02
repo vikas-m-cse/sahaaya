@@ -527,3 +527,25 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
   }
   .final-section:after { bottom: 112px !important; }
 }
+
+
+/* Mobile navigation interaction */
+@media (max-width: 950px) {
+  .site-nav { position: sticky; }
+  .site-nav .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 0;
+    right: 0;
+    padding: 18px 6vw 22px;
+    flex-direction: column;
+    gap: 18px;
+    background: rgba(251,248,240,.98);
+    border-bottom: 1px solid rgba(20,37,31,.12);
+    box-shadow: 0 18px 35px rgba(20,37,31,.10);
+    z-index: 100;
+  }
+  .site-nav.menu-open .nav-links { display: flex !important; }
+  .site-nav .menu-btn { display: block; }
+}
