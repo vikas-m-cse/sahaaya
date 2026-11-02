@@ -553,3 +553,50 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
 
 /* Keep filtered opportunity cards hidden even when card styles set display. */
 .opp-card[hidden] { display: none !important; }
+
+
+/* GLOBAL CLICKABILITY REPAIR — keep decorative layers behind controls. */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  pointer-events: auto !important;
+}
+button,
+a,
+[role="button"] {
+  position: relative;
+  z-index: 25;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.site-nav { position: sticky; }
+.site-nav .nav-actions,
+.site-nav .menu-btn,
+.site-nav .nav-links { position: relative; z-index: 30; }
+.hero-copy,
+.hero-copy button,
+.hero-copy a,
+.hero-experience .experience-action,
+.hour-dock button,
+.chapter-rail .rail-dot,
+.filter-row .filter,
+.choice-row .choice,
+.modal .close,
+.modal .modal-card button {
+  position: relative;
+  z-index: 30 !important;
+  pointer-events: auto !important;
+}
+.hero-product:before,
+.hero-product:after,
+.hero-glow,
+#sahaaya-3d,
+.hero-experience:after,
+.need-card:after,
+.final-noise,
+.final-orbit {
+  pointer-events: none !important;
+}
