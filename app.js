@@ -174,6 +174,7 @@ function openLandingModal(type, activity) {
     setOtpStatus("Use the email address or phone number registered with your Sahaaya account.");
   };
   document.querySelectorAll("[data-otp-method]").forEach(button => button.addEventListener("click", () => setOtpMethod(button.dataset.otpMethod)));
+  setOtpMethod("email");
   if (otpRequestForm) otpRequestForm.addEventListener("submit", async event => {
     event.preventDefault(); const button = document.getElementById("otpSendBtn");
     const rawIdentity = otpMethod === "email" ? otpIdentityEmail.value.trim() : otpIdentity.value.trim();
