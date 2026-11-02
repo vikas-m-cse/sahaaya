@@ -115,20 +115,16 @@
 
     const applyTrigger = target.closest(".apply");
     if (applyTrigger) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
-      // The hero's primary "I can show up" action should take the volunteer
-      // straight into the portal. Other opportunity cards retain their details modal.
+      // Let the hero anchor use its native href. This avoids depending on
+      // JavaScript navigation and still prevents the legacy modal handler
+      // from hijacking the click.
       if (applyTrigger.classList.contains("experience-action")) {
-        const activity = applyTrigger.dataset.activity || "Volunteer opportunity";
-        const portalUrl = new URL("/volunteer/index.html", window.location.origin);
-        portalUrl.searchParams.set("activity", activity);
-        console.info("Sahaaya: opening volunteer portal", portalUrl.href);
-        window.location.assign(portalUrl.href);
+        event.stopImmediatePropagation();
         return;
       }
 
+      event.preventDefault();
+      event.stopImmediatePropagation();
       openModal("activity", applyTrigger.dataset.activity || "Volunteer opportunity");
       return;
     }
