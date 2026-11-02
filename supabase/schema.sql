@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS public.old_age_homes (
     address TEXT NOT NULL,
     city TEXT NOT NULL DEFAULT 'Bengaluru',
     contact_phone TEXT NOT NULL,
+    resident_capacity INTEGER CHECK (resident_capacity IS NULL OR resident_capacity > 0),
     verification_status TEXT NOT NULL DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
