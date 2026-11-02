@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderProfileForm() {
     document.getElementById("profHomeName").value = currentHome.name;
     document.getElementById("profRegNo").value = currentHome.registration_number;
-    document.getElementById("profResidentCount").value = currentHome.resident_count;
+    document.getElementById("profResidentCount").value = currentHome.resident_count ?? currentHome.resident_capacity ?? "";
     document.getElementById("profContactPerson").value = currentHome.contact_person;
     document.getElementById("profArea").value = currentHome.area;
     document.getElementById("profAddress").value = currentHome.address;
@@ -581,16 +581,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentHome.address = document.getElementById("profAddress").value.trim();
       currentHome.description = document.getElementById("profDescription").value.trim();
 
-      // Save via update
-      const homes = await SahaayaDB.getHomes();
-      const idx = homes.findIndex(h => h.id === currentHome.id);
-      if (idx !== -1) {
-        homes[idx] = currentHome;
-        localStorage.setItem(SAHAAYA_CONFIG.STORAGE_KEY_PREFIX + "homes", JSON.stringify(homes));
+      try {
+        currentHome = await SahaayaDB.updateHomeProfile(currentHome.id, currentHome);
+        SahaayaUI.showToast("Home profile details updated successfully.", "success");
+        await loadData();
+      } catch (error) {
+        SahaayaUI.showToast(error.message || "Could not update home profile.", "error");
       }
-
-      SahaayaUI.showToast("Home profile details updated successfully.", "success");
-      loadData();
     });
   }
 
