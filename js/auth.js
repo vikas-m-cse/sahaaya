@@ -212,7 +212,7 @@ const SahaayaAuth = (() => {
   // -----------------------------------------------------------------------
   // Sign Up — Old Age Home
   // -----------------------------------------------------------------------
-  async function registerHome({ homeName, contactPerson, email, password, phone, address, city, description }) {
+  async function registerHome({ homeName, contactPerson, email, password, phone, address, city, description, residentCapacity }) {
     const sb = _getSupabaseClient();
     if (!sb) throw new Error("Supabase is not connected. Please configure .env and use Vite dev server.");
 
@@ -227,7 +227,8 @@ const SahaayaAuth = (() => {
           home_name: homeName,
           address: address || "Bengaluru",
           city: city || "Bengaluru",
-          description: description || "Senior care residence."
+          description: description || "Senior care residence.",
+          resident_capacity: Number(residentCapacity) || null
         }
       }
     });
@@ -251,6 +252,7 @@ const SahaayaAuth = (() => {
         address: address || "Bengaluru",
         city: city || "Bengaluru",
         contact_phone: phone || "",
+        resident_capacity: Number(residentCapacity) || null,
         verification_status: "pending"
       });
 
