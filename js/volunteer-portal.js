@@ -83,6 +83,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderApplicationsTable();
     renderAttendanceTable();
     renderProfileForm();
+
+    // Resume the activity selected on the landing page after authentication.
+    const requestedActivity = new URLSearchParams(window.location.search).get("activity");
+    if (requestedActivity) {
+      const requested = requestedActivity.trim().toLowerCase();
+      const match = allOpportunities.find(opp =>
+        (opp.title || "").toLowerCase().includes(requested) ||
+        requested.includes((opp.title || "").toLowerCase())
+      );
+      if (match) {
+        switchTab("discover");
+        openApplyModal(match.id);
+      } else {
+        SahaayaUI.showToast("That activity is not currently open. Browse the available opportunities below.", "info");
+        switchTab("discover");
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }
 
   // -----------------------------------------------------------------------
