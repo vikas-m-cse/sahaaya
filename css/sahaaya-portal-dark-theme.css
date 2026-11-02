@@ -959,3 +959,42 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
 @media(prefers-reduced-motion:reduce){
  .admin-ring-a,.admin-ring-b,.admin-ring-c,.admin-shield{animation:none!important}
 }
+
+
+/* Trust & compatibility review workspace */
+.admin-trust-review{margin:18px 24px 22px;padding:22px;border:1px solid #e4e9df;border-radius:16px;background:#f7f8f2;display:grid;grid-template-columns:180px minmax(260px,1fr);gap:18px 26px}
+.admin-trust-score{padding:16px;border-radius:13px;background:#173d32;color:#f8f5e9;display:flex;flex-direction:column;justify-content:center}
+.admin-trust-score>span,.admin-trust-score p{font-size:9px;letter-spacing:1.2px;color:#c3d2ca}
+.admin-trust-score>strong{font:500 42px/1.1 var(--serif);margin:8px 0}
+.admin-trust-score>strong small{font:500 14px "DM Sans",sans-serif;color:#d9ef79}
+.admin-trust-score p{letter-spacing:0;margin:0}
+.admin-trust-criteria{display:grid;gap:7px}
+.admin-trust-check{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid #e5e9e1;border-radius:9px;background:#fff}
+.admin-trust-check input{accent-color:#1d6551;width:16px;height:16px}
+.admin-trust-check span{flex:1;font-size:11px;color:#314f45}
+.admin-trust-check b{font-size:10px;color:#72877d}
+.admin-trust-evidence{grid-column:1/-1;border-top:1px solid #e0e6dc;padding-top:14px}
+.admin-trust-evidence>strong{display:block;font-size:11px;margin-bottom:8px;color:#25483c}
+.admin-evidence-link{display:flex;justify-content:space-between;gap:14px;width:100%;padding:10px 12px;margin:5px 0;border:1px solid #e0e6dc;border-radius:9px;background:#fff;color:#25483c;text-align:left;font-size:11px;cursor:pointer}
+.admin-evidence-link span{color:#28725b;font-weight:700}
+.admin-trust-rule{grid-column:1/-1;margin:0;color:#8a6822;font-size:11px;line-height:1.6}
+.admin-trust-review .save-trust-review{justify-self:start}
+.admin-trust-feedback{align-self:center;font-size:11px;color:#28725b}
+.verify-home-btn:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(.6)}
+.home-evidence-panel{margin-top:16px;border:1px solid #e2e8de;border-radius:16px}
+.home-evidence-panel .portal-card-body{padding:22px}
+.home-evidence-panel h3{margin:8px 0;color:#173d32;font:500 23px var(--serif)}
+.home-evidence-panel p{font-size:12px;color:#6f8178;line-height:1.65}
+.home-evidence-form{display:grid;grid-template-columns:1fr 1.3fr auto;gap:12px;align-items:end;margin-top:14px}
+.home-evidence-form label{display:grid;gap:7px;font-size:10px;font-weight:700;color:#456357}
+.home-evidence-form select,.home-evidence-form input{min-width:0;min-height:42px;padding:9px;border:1px solid #dce4da;border-radius:9px;background:white;font:inherit;font-size:11px}
+.home-evidence-form button{min-height:42px;white-space:nowrap}
+.home-evidence-list{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.home-evidence-item{display:flex;gap:10px;align-items:center;padding:8px 11px;border-radius:9px;background:#eef3eb;font-size:10px}
+.home-evidence-item span{color:#6c8177}
+.home-evidence-status{grid-column:1/-1;margin:0}
+@media(max-width:760px){
+ .admin-trust-review{grid-template-columns:1fr;margin:14px;padding:14px}
+ .admin-trust-evidence,.admin-trust-rule{grid-column:1}
+ .home-evidence-form{grid-template-columns:1fr}
+}
