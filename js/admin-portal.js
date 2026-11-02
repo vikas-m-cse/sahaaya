@@ -109,30 +109,70 @@ document.addEventListener("DOMContentLoaded", async () => {
         ["RESIDENT CAPACITY", home.resident_count ? String(home.resident_count) : "Not provided"],
         ["REGISTRATION ID", home.registration_number || "Not provided"]
       ];
+      const evidence = Array.isArray(home.verification_documents) ? home.verification_documents : [];
+      const checks = home.verification_checks || {};
+      const criteria = [
+        ["legal_registration", "Legal identity / registration proof", 25],
+        ["address_proof", "Physical address verified", 20],
+        ["resident_safety", "Resident safety / safeguarding evidence", 25],
+        ["coordinator_verified", "Coordinator identity and authority", 15],
+        ["operations_reviewed", "Operational readiness and consent practices", 15]
+      ];
+      const trustScore = criteria.reduce((sum, item) => sum + (checks[item[0]] === true ? item[2] : 0), 0);
       card.innerHTML = `
         <div class="admin-review-top">
-          <div>
-            <span class="admin-review-kicker">PARTNER APPLICATION</span>
+          <div><span class="admin-review-kicker">PARTNER APPLICATION · TRUST REVIEW</span>
             <h3>${home.name || "Unnamed residence"}</h3>
             <p class="admin-review-location">${location || "Location not provided"}</p>
-          </div>
-          <span class="admin-review-status"><i></i> Awaiting review</span>
+          </div><span class="admin-review-status"><i></i> Awaiting review</span>
         </div>
         <div class="admin-review-details">
           ${facts.map(([label, value]) => `<div class="admin-review-detail"><small>${label}</small><strong>${value}</strong></div>`).join("")}
         </div>
-        <div class="admin-review-description">
-          <small>ABOUT THIS RESIDENCE</small>
-          <p>${home.description || "No description provided."}</p>
-          ${home.verification_notes ? `<p class="admin-review-note">${home.verification_notes}</p>` : ""}
+        <div class="admin-trust-review">
+          <div class="admin-trust-score"><span>TRUST REVIEW SCORE</span><strong data-trust-score>${trustScore}<small>/100</small></strong><p>Evidence-based checklist · Admin assessed</p></div>
+          <div class="admin-trust-criteria">
+            ${criteria.map(([key,label,weight]) => `<label class="admin-trust-check"><input type="checkbox" data-trust-key="${key}" data-weight="${weight}" ${checks[key]===true?"checked":""}><span>${label}</span><b>${weight} pts</b></label>`).join("")}
+          </div>
+          <div class="admin-trust-evidence"><strong>Submitted evidence (${evidence.length})</strong>
+            ${evidence.length ? evidence.map((doc,index)=>`<button type="button" class="admin-evidence-link" data-doc-index="${index}">${doc.label || doc.file_name || "Uploaded document"} <span>View securely ↗</span></button>`).join("") : "<p>No documents submitted yet. Do not approve without mandatory proof.</p>"}
+          </div>
+          <p class="admin-trust-rule">Approval gate: minimum 80/100, with legal registration and address proof checked. Safety evidence is also mandatory.</p>
+          <button type="button" class="btn-primary btn-sm save-trust-review" data-home-id="${home.id}">Save review assessment</button>
+          <span class="admin-trust-feedback" aria-live="polite"></span>
         </div>
+        <div class="admin-review-description"><small>ABOUT THIS RESIDENCE</small><p>${home.description || "No description provided."}</p></div>
         <div class="admin-review-footer">
-          <span>Review the residence details before making a decision.</span>
+          <span>Approve only after inspecting original evidence and confirming all mandatory checks.</span>
           <div class="admin-verify-actions">
             <button class="btn-danger btn-sm decline-home-btn" data-home-id="${home.id}">Decline</button>
-            <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name || "this home"}">Approve home <span aria-hidden="true">→</span></button>
+            <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name || "this home"}" ${!(trustScore>=80 && checks.legal_registration && checks.address_proof && checks.resident_safety)?"disabled":""}>Approve verified partner →</button>
           </div>
         </div>`;
+      card.querySelectorAll("[data-trust-key]").forEach(input => input.addEventListener("change", () => {
+        const score = [...card.querySelectorAll("[data-trust-key]:checked")].reduce((sum,el)=>sum+Number(el.dataset.weight),0);
+        card.querySelector("[data-trust-score]").innerHTML = score + "<small>/100</small>";
+        const selected = Object.fromEntries([...card.querySelectorAll("[data-trust-key]")].map(el=>[el.dataset.trustKey,el.checked]));
+        const eligible = score>=80 && selected.legal_registration && selected.address_proof && selected.resident_safety;
+        card.querySelector(".verify-home-btn").disabled = !eligible;
+      }));
+      card.querySelector(".save-trust-review").addEventListener("click", async event => {
+        const button=event.currentTarget, feedback=card.querySelector(".admin-trust-feedback");
+        const review=Object.fromEntries([...card.querySelectorAll("[data-trust-key]")].map(el=>[el.dataset.trustKey,el.checked]));
+        const score=criteria.reduce((sum,item)=>sum+(review[item[0]]?item[2]:0),0);
+        button.disabled=true; feedback.textContent="Saving assessment…";
+        try { await SahaayaDB.updateHomeVerificationReview(home.id,review,score); feedback.textContent="Assessment saved."; }
+        catch(error){ feedback.textContent=error.message||"Could not save assessment."; }
+        button.disabled=false;
+      });
+      card.querySelectorAll(".admin-evidence-link").forEach(button => button.addEventListener("click", async () => {
+        const doc=evidence[Number(button.dataset.docIndex)];
+        try {
+          const {data,error}=await window._supabaseClient.storage.from("home-verification").createSignedUrl(doc.path,60);
+          if(error) throw error;
+          window.open(data.signedUrl,"_blank","noopener");
+        } catch(error){ SahaayaUI.showToast(error.message||"Could not open evidence.", "error"); }
+      }));
       grid.appendChild(card);
     });
 
