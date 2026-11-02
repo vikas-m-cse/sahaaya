@@ -181,7 +181,12 @@ function openLandingModal(type, activity) {
         showLandingToast(`Welcome back, ${user.name}!`, "success");
         setTimeout(() => {
           const portals = { home: "home/", admin: "admin/", volunteer: "volunteer/" };
-          window.location.href = portals[user.role] || "volunteer/";
+          const destination = new URL(portals[user.role] || "volunteer/", window.location.href);
+          const requestedActivity = new URLSearchParams(window.location.search).get("activity");
+          if (user.role === "volunteer" && requestedActivity) {
+            destination.searchParams.set("activity", requestedActivity);
+          }
+          window.location.href = destination.href;
         }, 500);
       } catch (err) {
         showLandingToast("Login failed: " + err.message, "error");
