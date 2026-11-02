@@ -878,3 +878,16 @@ a,
  .login-submit{grid-column:auto}
  .login-divider{font-size:7px;letter-spacing:.8px}
 }
+
+
+/* Passwordless OTP sign-in controls */
+.otp-method{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;margin:2px 0 16px;border:1px solid #dce5dd;border-radius:12px;background:#eef2ec}
+.otp-method-btn{height:37px;border:0!important;border-radius:9px!important;background:transparent!important;color:#75847b!important;font:700 11px var(--sans)!important;cursor:pointer!important;transition:background .18s,color .18s,box-shadow .18s!important}
+.otp-method-btn.active{background:#fff!important;color:#173d32!important;box-shadow:0 2px 8px rgba(25,57,43,.09)!important}
+.otp-form{display:grid;grid-template-columns:1fr;gap:12px}
+.otp-form[hidden]{display:none!important}
+.otp-verify-form .login-field input{text-align:center;letter-spacing:7px;font-size:19px;font-weight:800}
+.otp-resend{justify-self:center;border:0;background:transparent;color:#547b56;font:700 10px var(--sans);text-decoration:underline;cursor:pointer;padding:7px}
+.otp-status{min-height:30px;margin:13px 0 0;color:#7b8980;font-size:10px;line-height:1.6;text-align:center}
+.otp-status.error{color:#a4493c}
+.demo-evaluation-bar{display:none!important}
