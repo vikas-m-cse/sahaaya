@@ -29,36 +29,23 @@ function openLandingModal(type, activity) {
 
   if (type === "join") {
     html = `
-      <div class="eyebrow">BECOME A VOLUNTEER</div>
-      <h2>Let's find your fit.</h2>
-      <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
-      <form class="form" id="joinForm">
-        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value=""></div>
-        <div class="field"><label for="joinEmail">Email</label><input required id="joinEmail" type="email" placeholder="you@example.com" value=""></div>
-        <div class="field"><label for="joinPassword">Password</label><input required id="joinPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
-        <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value=""></div>
-        <div class="field"><label for="joinInterest">I’d like to help with</label><select id="joinInterest">
-          <option value="companionship">Companionship &amp; Storytelling</option>
-          <option value="recreation">Recreation &amp; Board Games</option>
-          <option value="music">Music &amp; Cultural</option>
-          <option value="assistive">Digital &amp; Smartphone Help</option>
-          <option value="creative">Creative &amp; Arts</option>
-          <option value="outdoors">Outdoors &amp; Gentle Walks</option>
-        </select></div>
-        <div class="field"><label for="joinAvailability">When I’m free</label><select id="joinAvailability">
-          <option value="sun_morning">Sunday Morning (9:00 AM – 1:00 PM)</option>
-          <option value="sat_evening">Saturday Evening (4:00 PM – 7:00 PM)</option>
-          <option value="sat_morning">Saturday Morning (9:00 AM – 1:00 PM)</option>
-          <option value="weekday_evening">Weekday Evenings (5:00 PM – 8:00 PM)</option>
-        </select></div>
-        <button class="btn primary" type="submit" id="joinSubmitBtn">Create Volunteer Account →</button>
-        <p style="font-size: 12px; text-align: center; margin: 4px 0 0; color: #687873;">
-          Already have an account? <a href="#" id="switchToLogin" style="color: #286c59;">Sign in →</a>
-        </p>
-      </form>
+      <div class="signup-experience">
+        <div class="eyebrow">NEW TO SAHAAYA?</div>
+        <h2>Create your volunteer account.</h2>
+        <p>Start with your name and mobile number. We will verify your number with a one-time code. Email is optional.</p>
+        <form class="form" id="joinForm">
+          <div class="field field-wide"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" autocomplete="name"></div>
+          <div class="field field-wide"><label for="joinPhone">Mobile number</label><div class="signup-phone-row"><select id="joinCountryCode" aria-label="Country calling code"><option value="+91" selected>India +91</option><option value="+1">USA +1</option><option value="+44">UK +44</option><option value="+971">UAE +971</option><option value="+61">Australia +61</option><option value="+65">Singapore +65</option></select><input required id="joinPhone" type="tel" placeholder="98765 43210" autocomplete="tel" inputmode="numeric"></div></div>
+          <div class="field field-wide"><label for="joinEmail">Email address <span class="optional-label">(optional)</span></label><input id="joinEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+          <div class="field"><label for="joinInterest">I want to help with</label><select id="joinInterest"><option value="companionship">Companionship and Storytelling</option><option value="recreation">Recreation and Board Games</option><option value="music">Music and Cultural</option><option value="assistive">Digital and Smartphone Help</option><option value="creative">Creative and Arts</option><option value="outdoors">Outdoors and Gentle Walks</option></select></div>
+          <div class="field"><label for="joinAvailability">When I am free</label><select id="joinAvailability"><option value="sun_morning">Sunday Morning</option><option value="sat_evening">Saturday Evening</option><option value="sat_morning">Saturday Morning</option><option value="weekday_evening">Weekday Evenings</option></select></div>
+          <button class="btn primary" type="submit" id="joinSubmitBtn">Send verification code</button>
+          <p class="signup-status" id="signupStatus" role="status" aria-live="polite">Your mobile number will be your login ID.</p>
+          <p class="signup-switch">Already registered? <a href="#" id="switchToLogin">Login instead</a></p>
+        </form>
+      </div>
     `;
   }
-
   if (type === "login") {
     html = `
       <div class="login-experience">
@@ -72,7 +59,7 @@ function openLandingModal(type, activity) {
           <div class="otp-method" role="group" aria-label="Choose verification method"><button type="button" class="otp-method-btn active" data-otp-method="email">Email</button><button type="button" class="otp-method-btn" data-otp-method="phone">Phone</button></div>
           <form class="otp-form" id="otpRequestForm"><div class="login-field"><label id="otpIdentityLabel" for="otpIdentity">EMAIL ADDRESS</label><div class="otp-phone-row" id="otpPhoneRow" hidden><select id="otpCountryCode" aria-label="Country calling code"><option value="+91" selected>🇮🇳 +91</option><option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option><option value="+971">🇦🇪 +971</option><option value="+61">🇦🇺 +61</option><option value="+65">🇸🇬 +65</option></select><input required type="tel" id="otpIdentity" placeholder="98765 43210" autocomplete="tel" inputmode="numeric"></div><input required type="email" id="otpIdentityEmail" placeholder="you@example.com" autocomplete="email"></div><button class="login-submit" type="submit" id="otpSendBtn"><span>Send verification code</span><span aria-hidden="true">↗</span></button></form>
           <form class="otp-form otp-verify-form" id="otpVerifyForm" hidden><div class="login-field"><label for="otpCode">6-DIGIT VERIFICATION CODE</label><input required type="text" id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code"></div><button class="login-submit" type="submit" id="otpVerifyBtn"><span>Verify and continue</span><span aria-hidden="true">↗</span></button><button class="otp-resend" type="button" id="otpResendBtn">Send a new code</button></form>
-          <p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address or phone number registered with your Sahaaya account.</p><p class="login-footnote"><span aria-hidden="true">⌁</span> One-time codes help keep your account secure.</p>
+          <p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address or phone number registered with your Sahaaya account.</p><p class="login-create-account">New to Sahaaya? <a href="#" id="switchToSignup">Create an account</a></p><p class="login-footnote"><span aria-hidden="true">⌁</span> One-time codes help keep your account secure.</p>
         </section>
       </div>
     `;
@@ -120,6 +107,7 @@ function openLandingModal(type, activity) {
     e.preventDefault();
     openLandingModal("login");
   });
+  document.getElementById("switchToSignup")?.addEventListener("click", e => { e.preventDefault(); openLandingModal("join"); });
 
   // Volunteer registration
   const joinForm = document.getElementById("joinForm");
