@@ -266,60 +266,25 @@ const SahaayaAuth = (() => {
     };
   }
 
-  // Create a volunteer account using verified phone OTP. Email is optional contact data.
-  async function requestVolunteerSignup(phone, profile) {
-    const sb = _getSupabaseClient();
-    if (!sb) throw new Error("Supabase authentication is not configured.");
-    const result = await sb.auth.signInWithOtp({
-      phone,
-      options: {
-        shouldCreateUser: true,
-        data: {
-          full_name: profile.name,
-          email: profile.email || null,
-          phone,
-          role: "volunteer",
-          interests: profile.interests || ["companionship"],
-          availability: profile.availability || ["sun_morning"],
-          preferred_area: "Bengaluru"
-        }
-      }
-    });
-    if (result.error) throw result.error;
-    return true;
-  }
-
-  // Passwordless one-time-code authentication for existing accounts only.
-  async function requestOtp(identifier, method = "email") {
-    const sb = _getSupabaseClient();
-    if (!sb) throw new Error("Supabase authentication is not configured. Connect the Sahaaya project first.");
-    const value = String(identifier || "").trim();
-    if (!value) throw new Error(method === "phone" ? "Enter your phone number with country code." : "Enter your email address.");
-    const options = { shouldCreateUser: false };
-    const result = method === "phone"
-      ? await sb.auth.signInWithOtp({ phone: value, options })
-      : await sb.auth.signInWithOtp({ email: value.toLowerCase(), options });
-    if (result.error) throw result.error;
-    return true;
-  }
-
-  async function verifyOtp(identifier, token, method = "email") {
-    const sb = _getSupabaseClient();
-    if (!sb) throw new Error("Supabase authentication is not configured.");
-    const value = String(identifier || "").trim();
-    const code = String(token || "").trim();
-    if (!/^\d{6}$/.test(code)) throw new Error("Enter the 6-digit verification code.");
-    const result = method === "phone"
-      ? await sb.auth.verifyOtp({ phone: value, token: code, type: "sms" })
-      : await sb.auth.verifyOtp({ email: value.toLowerCase(), token: code, type: "email" });
-    if (result.error) throw result.error;
-    if (!result.data.user) throw new Error("Verification did not return an account.");
-    const sessionUser = await fetchUserProfile(result.data.user.id);
-    if (!sessionUser) {
-      await sb.auth.signOut();
-      throw new Error("Your account is verified, but its Sahaaya profile is missing. Contact the Sahaaya administrator.");
-    }
+  // Email + password authentication and email-based password recovery.
+  async function loginWithPassword(email,password){
+    const sb=_getSupabaseClient();if(!sb)throw new Error("Supabase authentication is not configured.");
+    const {data,error}=await sb.auth.signInWithPassword({email:String(email||"").trim().toLowerCase(),password});
+    if(error)throw error;if(!data.user)throw new Error("Sign-in failed.");
+    const sessionUser=await fetchUserProfile(data.user.id);
+    if(!sessionUser){await sb.auth.signOut();throw new Error("Your account exists, but its Sahaaya profile is missing. Contact the administrator.");}
     return sessionUser;
+  }
+  async function sendPasswordReset(email){
+    const sb=_getSupabaseClient();if(!sb)throw new Error("Supabase authentication is not configured.");
+    const redirectTo=new URL("index.html?reset_password=1",window.location.href).href;
+    const {error}=await sb.auth.resetPasswordForEmail(String(email||"").trim().toLowerCase(),{redirectTo});
+    if(error)throw error;return true;
+  }
+  async function updatePassword(password){
+    const sb=_getSupabaseClient();if(!sb)throw new Error("Supabase authentication is not configured.");
+    if(String(password||"").length<8)throw new Error("Use at least 8 characters for your new password.");
+    const {error}=await sb.auth.updateUser({password});if(error)throw error;return true;
   }
 
   // -----------------------------------------------------------------------
@@ -369,9 +334,9 @@ const SahaayaAuth = (() => {
     getCachedSession,
     registerVolunteer,
     registerHome,
-    requestOtp,
-    requestVolunteerSignup,
-    verifyOtp,
+    loginWithPassword,
+    sendPasswordReset,
+    updatePassword,
     logout,
     checkAuthGuard,
     getBasePath
