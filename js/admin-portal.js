@@ -85,76 +85,80 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (pendingHomes.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">🛡️</div>
-          <h4>All registered senior homes are verified</h4>
-          <p>No new applications in the verification queue. Any newly registered old age homes will appear here for administrative vetting.</p>
-        </div>
-      `;
+          <div class="empty-state-icon">✓</div>
+          <h4>No homes waiting for review</h4>
+          <p>New partner applications will appear here when a residence registers.</p>
+        </div>`;
       return;
     }
 
     const grid = document.createElement("div");
-    grid.className = "portal-grid";
+    grid.className = "portal-grid admin-verification-list";
 
     pendingHomes.forEach(home => {
       const card = document.createElement("article");
       card.className = "portal-card admin-verify-card";
+      const location = [home.area, home.address].filter(Boolean).join(" · ");
+      const facts = [
+        ["COORDINATOR", home.contact_person || "Not provided"],
+        ["CONTACT", home.contact_phone || "Not provided"],
+        ["RESIDENT CAPACITY", home.resident_count ? String(home.resident_count) : "Not provided"],
+        ["REGISTRATION ID", home.registration_number || "Not provided"]
+      ];
       card.innerHTML = `
-        <div class="portal-card-header">
+        <div class="admin-review-top">
           <div>
-            <span class="badge badge-warning">VERIFICATION REQUIRED</span>
-            <div class="admin-verify-meta">REGISTRATION · ${home.registration_number || "Pending record"}</div>
+            <span class="admin-review-kicker">PARTNER APPLICATION</span>
+            <h3>${home.name || "Unnamed residence"}</h3>
+            <p class="admin-review-location">${location || "Location not provided"}</p>
           </div>
-          <span class="admin-verify-meta">NEW PARTNER REQUEST</span>
+          <span class="admin-review-status"><i></i> Awaiting review</span>
         </div>
-        <div class="portal-card-body">
-          <div class="admin-verify-body">
-            <div>
-              <span class="admin-eyebrow">PARTNER HOME</span>
-              <h3>${home.name}</h3>
-              <div style="font-size:10px;color:var(--portal-muted);line-height:1.55;">
-                <strong>${home.area || "Bengaluru"}</strong><br>
-                ${home.address || "Address on registration"}<br>
-                Superintendent · <strong>${home.contact_person || "Not provided"}</strong>
-              </div>
-              <div class="admin-verify-facts">
-                <div class="admin-verify-fact"><small>RESIDENTS</small><strong>${home.resident_count || 0}</strong></div>
-                <div class="admin-verify-fact"><small>REGISTRATION</small><strong>${home.registration_number || "—"}</strong></div>
-              </div>
-            </div>
-            <div class="admin-verify-note">
-              <small>VETTING CONTEXT</small>
-              <p><strong>About:</strong> ${home.description || "Senior living and assisted care."}</p>
-              <p style="margin-top:9px;"><strong>Verification note:</strong> ${home.verification_notes || "Certificate inspection pending."}</p>
-            </div>
+        <div class="admin-review-details">
+          ${facts.map(([label, value]) => `<div class="admin-review-detail"><small>${label}</small><strong>${value}</strong></div>`).join("")}
+        </div>
+        <div class="admin-review-description">
+          <small>ABOUT THIS RESIDENCE</small>
+          <p>${home.description || "No description provided."}</p>
+          ${home.verification_notes ? `<p class="admin-review-note">${home.verification_notes}</p>` : ""}
+        </div>
+        <div class="admin-review-footer">
+          <span>Review the residence details before making a decision.</span>
+          <div class="admin-verify-actions">
+            <button class="btn-danger btn-sm decline-home-btn" data-home-id="${home.id}">Decline</button>
+            <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name || "this home"}">Approve home <span aria-hidden="true">→</span></button>
           </div>
-        </div>
-        <div class="portal-card-footer admin-verify-actions">
-          <button class="btn-danger btn-sm decline-home-btn" data-home-id="${home.id}">Decline</button>
-          <button class="btn-primary btn-sm verify-home-btn" data-home-id="${home.id}" data-name="${home.name}">Approve & Verify Partner ✓</button>
-        </div>
-      `;      grid.appendChild(card);
+        </div>`;
+      grid.appendChild(card);
     });
 
     container.appendChild(grid);
 
     grid.querySelectorAll(".verify-home-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
-        const homeId = btn.dataset.homeId;
-        const name = btn.dataset.name;
-
-        await SahaayaDB.updateHomeStatus(homeId, SAHAAYA_CONFIG.HOME_STATUS.VERIFIED, "Verified by platform admin. Registration documents confirmed.");
-        SahaayaUI.showToast(`Verified ${name}! Home is now eligible to publish volunteer requirements.`, "success");
-        await loadData();
+        btn.disabled = true;
+        try {
+          await SahaayaDB.updateHomeStatus(btn.dataset.homeId, SAHAAYA_CONFIG.HOME_STATUS.VERIFIED, "Verified by platform admin.");
+          SahaayaUI.showToast(`${btn.dataset.name} is now verified.`, "success");
+          await loadData();
+        } catch (error) {
+          btn.disabled = false;
+          SahaayaUI.showToast(error.message || "Could not verify this home.", "error");
+        }
       });
     });
 
     grid.querySelectorAll(".decline-home-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
-        const homeId = btn.dataset.homeId;
-        await SahaayaDB.updateHomeStatus(homeId, SAHAAYA_CONFIG.HOME_STATUS.REJECTED, "Registration verification declined. Missing non-profit credentials.");
-        SahaayaUI.showToast("Home registration updated.", "info");
-        await loadData();
+        btn.disabled = true;
+        try {
+          await SahaayaDB.updateHomeStatus(btn.dataset.homeId, SAHAAYA_CONFIG.HOME_STATUS.REJECTED, "Registration verification declined by platform admin.");
+          SahaayaUI.showToast("Home application declined.", "info");
+          await loadData();
+        } catch (error) {
+          btn.disabled = false;
+          SahaayaUI.showToast(error.message || "Could not update this home.", "error");
+        }
       });
     });
   }
