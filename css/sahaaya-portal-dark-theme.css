@@ -938,3 +938,24 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
  #tab-volunteers .portal-table-header{align-items:flex-start;flex-direction:column;gap:7px;padding:19px!important}
  #tab-volunteers .portal-table-header span{text-align:left;max-width:none}
 }
+
+
+/* Living trust mark — orbiting signals around the S */
+.admin-command-mark{isolation:isolate}
+.admin-ring{transform-origin:50% 50%;will-change:transform}
+.admin-ring-a{animation:trustOrbit 18s linear infinite}
+.admin-ring-b{animation:trustOrbit 12s linear infinite reverse}
+.admin-ring-c{animation:trustPulse 3.6s ease-in-out infinite}
+.admin-ring-a:after,.admin-ring-b:after{
+  content:"";position:absolute;left:50%;top:-4px;width:7px;height:7px;
+  margin-left:-3.5px;border-radius:50%;background:#d9ef79;
+  box-shadow:0 0 10px rgba(217,239,121,.8),0 0 22px rgba(217,239,121,.35)
+}
+.admin-ring-b:after{width:5px;height:5px;top:-3px;margin-left:-2.5px;background:#f4f0d9;box-shadow:0 0 9px rgba(244,240,217,.7)}
+.admin-shield{position:relative;z-index:2;animation:trustCore 4.8s ease-in-out infinite}
+@keyframes trustOrbit{to{transform:rotate(360deg)}}
+@keyframes trustPulse{0%,100%{transform:scale(.94);opacity:.55}50%{transform:scale(1.08);opacity:1}}
+@keyframes trustCore{0%,100%{box-shadow:0 12px 35px rgba(217,239,121,.14);transform:scale(1)}50%{box-shadow:0 12px 42px rgba(217,239,121,.3);transform:scale(1.045)}}
+@media(prefers-reduced-motion:reduce){
+ .admin-ring-a,.admin-ring-b,.admin-ring-c,.admin-shield{animation:none!important}
+}
