@@ -106,9 +106,9 @@ function openLandingModal(type, activity) {
   if(joinForm) joinForm.addEventListener("submit",async event=>{
     event.preventDefault(); const button=document.getElementById("joinSubmitBtn"); button.disabled=true; button.textContent="Creating account…";
     try{
-      const digits=document.getElementById("joinPhone").value.trim().replace(/\\D/g,"");
+      const digits=document.getElementById("joinPhone").value.trim().replace(/\D/g,"");
       const phone=document.getElementById("joinCountryCode").value+digits;
-      if(!/^\\+[1-9]\\d{7,14}$/.test(phone)) throw new Error("Enter a valid phone number with the selected country code.");
+      if(!/^\+[1-9]\d{7,14}$/.test(phone)) throw new Error("Enter a valid phone number with the selected country code.");
       const result=await SahaayaAuth.registerVolunteer({
         name:document.getElementById("joinName").value.trim(),
         email:document.getElementById("joinEmail").value.trim().toLowerCase(),
