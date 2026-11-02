@@ -418,3 +418,66 @@ if (window.location.search.includes("login_required=1")) {
   card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;img.style.setProperty('--img-x',(x*5)+'px');img.style.setProperty('--img-y',(y*4)+'px');});
   card.addEventListener('pointerleave',()=>{img.style.setProperty('--img-x','0px');img.style.setProperty('--img-y','0px');});
 })();
+
+
+/* Reliable hour selector: one shared state for the picker and floating dock. */
+(() => {
+  const picker = document.querySelector('.hour-picker');
+  if (!picker) return;
+
+  const dock = document.getElementById('hourDock');
+  const summary = document.getElementById('hourSummary');
+  const match = document.getElementById('hourMatch');
+  const dockSummary = document.getElementById('dockSummary');
+  const dockCount = document.getElementById('dockCount');
+  const counts = {
+    '1|Sunday': 3, '1|Saturday': 5, '1|Weekday': 2,
+    '2|Sunday': 7, '2|Saturday': 4, '2|Weekday': 5,
+    '3|Sunday': 4, '3|Saturday': 3, '3|Weekday': 6
+  };
+  const state = { hours: '1', day: 'Sunday' };
+
+  function render() {
+    const count = counts[state.hours + '|' + state.day] ?? 3;
+    const duration = state.hours === '3' ? '3+ hours' : state.hours + (state.hours === '1' ? ' hour' : ' hours');
+    const label = duration + ' · ' + state.day;
+
+    picker.querySelectorAll('.hour-chip').forEach(button => {
+      const active = button.dataset.hours === state.hours;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    picker.querySelectorAll('.day-chip').forEach(button => {
+      const active = button.dataset.day === state.day;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    if (summary) summary.textContent = label;
+    if (match) match.textContent = count + ' moments nearby';
+    if (dockSummary) dockSummary.textContent = label;
+    if (dockCount) dockCount.textContent = count + ' nearby';
+
+    picker.classList.remove('is-updating');
+    void picker.offsetWidth;
+    picker.classList.add('is-updating');
+  }
+
+  // Capture phase makes the controls reliable even if another page interaction
+  // handler is added later; both the picker and dock always share one state.
+  document.addEventListener('click', event => {
+    const hourButton = event.target.closest('.hour-picker .hour-chip');
+    const dayButton = event.target.closest('.hour-picker .day-chip');
+    if (hourButton) {
+      event.preventDefault();
+      state.hours = hourButton.dataset.hours || '1';
+      render();
+    } else if (dayButton) {
+      event.preventDefault();
+      state.day = dayButton.dataset.day || 'Sunday';
+      render();
+    }
+  }, true);
+
+  render();
+})();
