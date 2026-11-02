@@ -306,7 +306,12 @@ const SahaayaAuth = (() => {
     const sessionUser = await getSession();
 
     if (!sessionUser) {
-      window.location.href = getBasePath() + "index.html?login_required=1";
+      // Preserve the selected landing-page activity through sign-in.
+      const requestedActivity = new URLSearchParams(window.location.search).get("activity");
+      const loginUrl = new URL(getBasePath() + "index.html", window.location.href);
+      loginUrl.searchParams.set("login_required", "1");
+      if (requestedActivity) loginUrl.searchParams.set("activity", requestedActivity);
+      window.location.href = loginUrl.href;
       return null;
     }
 
@@ -361,7 +366,10 @@ const SahaayaAuth = (() => {
 
     const base = getBasePath();
     const urlMap = { volunteer: "volunteer/", home: "home/", admin: "admin/" };
-    window.location.href = base + (urlMap[targetRole] || "volunteer/");
+    const destination = new URL(base + (urlMap[targetRole] || "volunteer/"), window.location.href);
+    const requestedActivity = new URLSearchParams(window.location.search).get("activity");
+    if (targetRole === "volunteer" && requestedActivity) destination.searchParams.set("activity", requestedActivity);
+    window.location.href = destination.href;
   }
 
   // -----------------------------------------------------------------------
