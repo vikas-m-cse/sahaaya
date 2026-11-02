@@ -64,43 +64,15 @@ function openLandingModal(type, activity) {
       <div class="login-experience">
         <aside class="login-story">
           <a class="login-brand" href="/" aria-label="Sahaaya home"><span class="login-brand-mark">sa</span><span>SAHAAYA</span></a>
-          <div class="login-story-copy">
-            <span class="login-story-kicker">A LITTLE TIME. A LOT OF HUMANITY.</span>
-            <h2>Make room for<br><em>meaningful moments.</em></h2>
-            <p>Sign in to continue showing up for conversations, shared stories and the people who make them matter.</p>
-          </div>
-          <div class="login-story-foot"><span class="login-story-dot"></span> VERIFIED HOMES <i>·</i> REAL CONNECTIONS</div>
-          <div class="login-story-orbit" aria-hidden="true"></div>
+          <div class="login-story-copy"><span class="login-story-kicker">A LITTLE TIME. A LOT OF HUMANITY.</span><h2>Make room for<br><em>meaningful moments.</em></h2><p>Sign in securely to discover opportunities, connect with care homes and keep your volunteering journey moving.</p></div>
+          <div class="login-story-foot"><span class="login-story-dot"></span> VERIFIED HOMES <i>·</i> REAL CONNECTIONS</div><div class="login-story-orbit" aria-hidden="true"></div>
         </aside>
         <section class="login-main">
-          <div class="login-heading">
-            <div class="eyebrow">PORTAL ACCESS</div>
-            <h2>Welcome <em>back.</em></h2>
-            <p>Choose a demo space or sign in with your account.</p>
-          </div>
-
-          <div class="login-demo">
-            <div class="login-section-heading"><span class="login-section-icon">✦</span><div><strong>Explore Sahaaya</strong><small>Instant access for evaluators</small></div></div>
-            <div class="login-demo-list">
-              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('volunteer')" id="demoLoginVolunteer">
-                <span class="login-demo-icon volunteer">V</span><span class="login-demo-copy"><strong>Volunteer portal</strong><small>Ananya Sharma · Discover and apply</small></span><span class="login-demo-arrow">↗</span>
-              </button>
-              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('home')" id="demoLoginHome">
-                <span class="login-demo-icon home">H</span><span class="login-demo-copy"><strong>Care home portal</strong><small>Silver Springs Care · Manage needs</small></span><span class="login-demo-arrow">↗</span>
-              </button>
-              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('admin')" id="demoLoginAdmin">
-                <span class="login-demo-icon admin">A</span><span class="login-demo-copy"><strong>Admin portal</strong><small>Platform Operations · Manage Sahaaya</small></span><span class="login-demo-arrow">↗</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="login-divider"><span>OR SIGN IN WITH YOUR ACCOUNT</span></div>
-          <form class="login-form" id="loginForm">
-            <div class="login-field"><label for="loginEmail">EMAIL ADDRESS</label><input required type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username"></div>
-            <div class="login-field"><label for="loginPassword">PASSWORD</label><input required type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"></div>
-            <button class="login-submit" type="submit" id="loginSubmitBtn"><span>Sign in securely</span><span aria-hidden="true">↗</span></button>
-          </form>
-          <p class="login-footnote"><span aria-hidden="true">⌁</span> Your account and portal data stay protected.</p>
+          <div class="login-heading"><div class="eyebrow">SECURE PORTAL ACCESS</div><h2>Welcome <em>back.</em></h2><p>Get a one-time verification code to your email or phone.</p></div>
+          <div class="otp-method" role="group" aria-label="Choose verification method"><button type="button" class="otp-method-btn active" data-otp-method="email">Email</button><button type="button" class="otp-method-btn" data-otp-method="phone">Phone</button></div>
+          <form class="otp-form" id="otpRequestForm"><div class="login-field"><label id="otpIdentityLabel" for="otpIdentity">EMAIL ADDRESS</label><input required type="email" id="otpIdentity" placeholder="you@example.com" autocomplete="email"></div><button class="login-submit" type="submit" id="otpSendBtn"><span>Send verification code</span><span aria-hidden="true">↗</span></button></form>
+          <form class="otp-form otp-verify-form" id="otpVerifyForm" hidden><div class="login-field"><label for="otpCode">6-DIGIT VERIFICATION CODE</label><input required type="text" id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code"></div><button class="login-submit" type="submit" id="otpVerifyBtn"><span>Verify and continue</span><span aria-hidden="true">↗</span></button><button class="otp-resend" type="button" id="otpResendBtn">Send a new code</button></form>
+          <p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address or phone number registered with your Sahaaya account.</p><p class="login-footnote"><span aria-hidden="true">⌁</span> One-time codes help keep your account secure.</p>
         </section>
       </div>
     `;
@@ -179,36 +151,43 @@ function openLandingModal(type, activity) {
     });
   }
 
-  // Login
-  const loginForm = document.getElementById("loginForm");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      const btn = document.getElementById("loginSubmitBtn");
-      btn.disabled = true; btn.textContent = "Authenticating...";
-      try {
-        const user = await SahaayaAuth.login(
-          document.getElementById("loginEmail").value.trim(),
-          document.getElementById("loginPassword").value
-        );
-        legacyModal.classList.remove("open");
-        showLandingToast(`Welcome back, ${user.name}!`, "success");
-        setTimeout(() => {
-          const portals = { home: "home/", admin: "admin/", volunteer: "volunteer/" };
-          const destination = new URL(portals[user.role] || "volunteer/", window.location.href);
-          const requestedActivity = new URLSearchParams(window.location.search).get("activity");
-          if (user.role === "volunteer" && requestedActivity) {
-            destination.searchParams.set("activity", requestedActivity);
-          }
-          window.location.href = destination.href;
-        }, 500);
-      } catch (err) {
-        showLandingToast("Login failed: " + err.message, "error");
-        btn.disabled = false; btn.textContent = "Sign in →";
-      }
-    });
-  }
-
+  // Passwordless email / phone OTP sign-in.
+  let otpMethod = "email";
+  let otpRequestedFor = "";
+  const otpIdentity = document.getElementById("otpIdentity");
+  const otpLabel = document.getElementById("otpIdentityLabel");
+  const otpRequestForm = document.getElementById("otpRequestForm");
+  const otpVerifyForm = document.getElementById("otpVerifyForm");
+  const otpStatus = document.getElementById("otpStatus");
+  const setOtpStatus = (message, isError = false) => { if (!otpStatus) return; otpStatus.textContent = message; otpStatus.classList.toggle("error", isError); };
+  const setOtpMethod = method => {
+    otpMethod = method;
+    document.querySelectorAll("[data-otp-method]").forEach(button => button.classList.toggle("active", button.dataset.otpMethod === method));
+    otpIdentity.value = ""; otpIdentity.type = method === "email" ? "email" : "tel";
+    otpIdentity.placeholder = method === "email" ? "you@example.com" : "+91 98765 43210";
+    otpIdentity.autocomplete = method === "email" ? "email" : "tel"; otpIdentity.inputMode = method === "email" ? "email" : "tel";
+    otpLabel.textContent = method === "email" ? "EMAIL ADDRESS" : "PHONE NUMBER WITH COUNTRY CODE";
+    otpVerifyForm.hidden = true; otpRequestForm.hidden = false; otpRequestedFor = "";
+    setOtpStatus("Use the email address or phone number registered with your Sahaaya account.");
+  };
+  document.querySelectorAll("[data-otp-method]").forEach(button => button.addEventListener("click", () => setOtpMethod(button.dataset.otpMethod)));
+  if (otpRequestForm) otpRequestForm.addEventListener("submit", async event => {
+    event.preventDefault(); const button = document.getElementById("otpSendBtn"); const identity = otpIdentity.value.trim();
+    button.disabled = true; button.querySelector("span").textContent = "Sending code…";
+    try { await SahaayaAuth.requestOtp(identity, otpMethod); otpRequestedFor = identity; otpRequestForm.hidden = true; otpVerifyForm.hidden = false; document.getElementById("otpCode").focus(); setOtpStatus("A verification code has been sent. Check your inbox or SMS messages."); }
+    catch (error) { setOtpStatus(error.message || "Could not send a verification code.", true); }
+    finally { button.disabled = false; button.querySelector("span").textContent = "Send verification code"; }
+  });
+  const verifyOtp = async () => {
+    const button = document.getElementById("otpVerifyBtn"); button.disabled = true; button.querySelector("span").textContent = "Verifying…";
+    try {
+      const user = await SahaayaAuth.verifyOtp(otpRequestedFor, document.getElementById("otpCode").value.trim(), otpMethod);
+      legacyModal.classList.remove("open"); showLandingToast("Welcome back, " + (user.name || "to Sahaaya") + "!", "success");
+      setTimeout(() => { const portals = { home: "home/", admin: "admin/", volunteer: "volunteer/" }; const destination = new URL(portals[user.role] || "volunteer/", window.location.href); const activity = new URLSearchParams(window.location.search).get("activity"); if (user.role === "volunteer" && activity) destination.searchParams.set("activity", activity); window.location.href = destination.href; }, 450);
+    } catch (error) { setOtpStatus(error.message || "That code could not be verified. Try again.", true); button.disabled = false; button.querySelector("span").textContent = "Verify and continue"; }
+  };
+  if (otpVerifyForm) otpVerifyForm.addEventListener("submit", event => { event.preventDefault(); verifyOtp(); });
+  document.getElementById("otpResendBtn")?.addEventListener("click", async () => { try { await SahaayaAuth.requestOtp(otpRequestedFor, otpMethod); setOtpStatus("A new verification code has been sent."); } catch (error) { setOtpStatus(error.message || "Could not resend the code.", true); } });
   // Home registration
   const homeForm = document.getElementById("homeForm");
   if (homeForm) {
@@ -295,7 +274,7 @@ document.getElementById("menuBtn")?.addEventListener("click", () => {
 // Check if redirected due to login_required
 if (window.location.search.includes("login_required=1")) {
   setTimeout(() => {
-    showLandingToast("Please sign in or use the Demo Role Switcher to access a portal.", "warning");
+    showLandingToast("Please sign in with your email or phone to access a portal.", "warning");
     openLandingModal("login");
   }, 400);
 }
