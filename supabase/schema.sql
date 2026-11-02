@@ -18,7 +18,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE, -- Optional for phone-first volunteer accounts
     phone TEXT,
     role TEXT NOT NULL CHECK (role IN ('volunteer', 'home', 'admin')),
     avatar_url TEXT,
