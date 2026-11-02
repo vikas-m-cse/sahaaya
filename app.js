@@ -70,7 +70,7 @@ function openLandingModal(type, activity) {
         <section class="login-main">
           <div class="login-heading"><div class="eyebrow">SECURE PORTAL ACCESS</div><h2>Welcome <em>back.</em></h2><p>Get a one-time verification code to your email or phone.</p></div>
           <div class="otp-method" role="group" aria-label="Choose verification method"><button type="button" class="otp-method-btn active" data-otp-method="email">Email</button><button type="button" class="otp-method-btn" data-otp-method="phone">Phone</button></div>
-          <form class="otp-form" id="otpRequestForm"><div class="login-field"><label id="otpIdentityLabel" for="otpIdentity">EMAIL ADDRESS</label><input required type="email" id="otpIdentity" placeholder="you@example.com" autocomplete="email"></div><button class="login-submit" type="submit" id="otpSendBtn"><span>Send verification code</span><span aria-hidden="true">↗</span></button></form>
+          <form class="otp-form" id="otpRequestForm"><div class="login-field"><label id="otpIdentityLabel" for="otpIdentity">EMAIL ADDRESS</label><div class="otp-phone-row" id="otpPhoneRow" hidden><select id="otpCountryCode" aria-label="Country calling code"><option value="+91" selected>🇮🇳 +91</option><option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option><option value="+971">🇦🇪 +971</option><option value="+61">🇦🇺 +61</option><option value="+65">🇸🇬 +65</option></select><input required type="tel" id="otpIdentity" placeholder="98765 43210" autocomplete="tel" inputmode="numeric"></div><input required type="email" id="otpIdentityEmail" placeholder="you@example.com" autocomplete="email"></div><button class="login-submit" type="submit" id="otpSendBtn"><span>Send verification code</span><span aria-hidden="true">↗</span></button></form>
           <form class="otp-form otp-verify-form" id="otpVerifyForm" hidden><div class="login-field"><label for="otpCode">6-DIGIT VERIFICATION CODE</label><input required type="text" id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code"></div><button class="login-submit" type="submit" id="otpVerifyBtn"><span>Verify and continue</span><span aria-hidden="true">↗</span></button><button class="otp-resend" type="button" id="otpResendBtn">Send a new code</button></form>
           <p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address or phone number registered with your Sahaaya account.</p><p class="login-footnote"><span aria-hidden="true">⌁</span> One-time codes help keep your account secure.</p>
         </section>
@@ -155,6 +155,9 @@ function openLandingModal(type, activity) {
   let otpMethod = "email";
   let otpRequestedFor = "";
   const otpIdentity = document.getElementById("otpIdentity");
+  const otpIdentityEmail = document.getElementById("otpIdentityEmail");
+  const otpCountryCode = document.getElementById("otpCountryCode");
+  const otpPhoneRow = document.getElementById("otpPhoneRow");
   const otpLabel = document.getElementById("otpIdentityLabel");
   const otpRequestForm = document.getElementById("otpRequestForm");
   const otpVerifyForm = document.getElementById("otpVerifyForm");
@@ -163,16 +166,19 @@ function openLandingModal(type, activity) {
   const setOtpMethod = method => {
     otpMethod = method;
     document.querySelectorAll("[data-otp-method]").forEach(button => button.classList.toggle("active", button.dataset.otpMethod === method));
-    otpIdentity.value = ""; otpIdentity.type = method === "email" ? "email" : "tel";
-    otpIdentity.placeholder = method === "email" ? "you@example.com" : "+91 98765 43210";
-    otpIdentity.autocomplete = method === "email" ? "email" : "tel"; otpIdentity.inputMode = method === "email" ? "email" : "tel";
-    otpLabel.textContent = method === "email" ? "EMAIL ADDRESS" : "PHONE NUMBER WITH COUNTRY CODE";
+    otpIdentity.value = ""; otpIdentityEmail.value = "";
+    otpIdentityEmail.hidden = method !== "email"; otpPhoneRow.hidden = method !== "phone";
+    otpIdentity.required = method === "phone"; otpIdentityEmail.required = method === "email";
+    otpLabel.textContent = method === "email" ? "EMAIL ADDRESS" : "PHONE NUMBER";
     otpVerifyForm.hidden = true; otpRequestForm.hidden = false; otpRequestedFor = "";
     setOtpStatus("Use the email address or phone number registered with your Sahaaya account.");
   };
   document.querySelectorAll("[data-otp-method]").forEach(button => button.addEventListener("click", () => setOtpMethod(button.dataset.otpMethod)));
   if (otpRequestForm) otpRequestForm.addEventListener("submit", async event => {
-    event.preventDefault(); const button = document.getElementById("otpSendBtn"); const identity = otpIdentity.value.trim();
+    event.preventDefault(); const button = document.getElementById("otpSendBtn");
+    const rawIdentity = otpMethod === "email" ? otpIdentityEmail.value.trim() : otpIdentity.value.trim();
+    const identity = otpMethod === "email" ? rawIdentity.toLowerCase() : (rawIdentity.startsWith("+") ? rawIdentity.replace(/[\\s()-]/g, "") : otpCountryCode.value + rawIdentity.replace(/\\D/g, ""));
+    if (otpMethod === "phone" && !/^\\+[1-9]\\d{7,14}$/.test(identity)) { setOtpStatus("Enter a valid phone number. Choose the country code and enter the number without it.", true); return; }
     button.disabled = true; button.querySelector("span").textContent = "Sending code…";
     try { await SahaayaAuth.requestOtp(identity, otpMethod); otpRequestedFor = identity; otpRequestForm.hidden = true; otpVerifyForm.hidden = false; document.getElementById("otpCode").focus(); setOtpStatus("A verification code has been sent. Check your inbox or SMS messages."); }
     catch (error) { setOtpStatus(error.message || "Could not send a verification code.", true); }
