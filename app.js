@@ -423,7 +423,7 @@ if (window.location.search.includes("login_required=1")) {
 
     cards.forEach(card => {
       const isMatch = matches.includes(card);
-      card.hidden = !isMatch;
+      card.classList.toggle('hour-filter-hidden', !isMatch);
       card.setAttribute('aria-hidden', String(!isMatch));
     });
 
