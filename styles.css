@@ -975,3 +975,17 @@ a,
 .home-register-foot{margin:14px 0 0;padding-top:15px;border-top:1px solid rgba(28,65,54,.1);font-size:11px;color:#78857d}
 .home-register-foot button{border:0;background:none;color:#1c5b48;text-decoration:underline;text-underline-offset:3px;font:600 11px "DM Sans",sans-serif;cursor:pointer}
 @media(max-width:640px){.modal-card:has(.home-register){width:96vw;max-height:94vh;border-radius:20px}.home-register{padding:26px 20px 20px}.home-register-intro{padding-right:28px}.home-register-intro h2{font-size:42px}.home-form-grid{grid-template-columns:1fr}.home-register-form .field-wide{grid-column:auto}.home-register-actions{align-items:stretch;flex-direction:column}.home-register-actions>p{max-width:none}.home-register-submit{width:100%}}
+
+
+/* Sahaaya signature cursors — forest green, warm ivory and a small lime leaf. */
+@media (hover:hover) and (pointer:fine) {
+  html, body, body * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='36' viewBox='0 0 32 36'%3E%3Cpath d='M4 2.5 25.5 20 16.8 21.4 21.5 30.8 16.8 33 12.2 22.8 6.5 29Z' fill='%23173d32' stroke='%23fbf8f0' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M5.8 3.8 23.1 19.6 15.7 20.8 11.6 25.8Z' fill='%23285b49'/%3E%3Cpath d='M22.7 5.5c-4.8.2-7.6 2.5-8.2 6.9 4.8.1 7.7-2.2 8.2-6.9Z' fill='%23d9ef79' stroke='%23173d32' stroke-width='1'/%3E%3Cpath d='m15.2 12.1 5.7-4.8' fill='none' stroke='%23173d32' stroke-width='.9'/%3E%3C/svg%3E") 4 3, auto !important;
+  a, button, [role="button"], input[type="submit"], input[type="button"], select, label[for], .clickable {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='38' viewBox='0 0 34 38'%3E%3Cpath d='M8 3.5c-1.6 0-2.8 1.2-2.8 2.8v14.1l-1.1-1.2c-1.1-1.2-2.8-1.2-3.8-.1-1 1-.9 2.6.1 3.8l8.2 10.2c.9 1.1 2.2 1.7 3.6 1.7h8.3c3.5 0 6.3-2.8 6.3-6.3V16.8c0-1.5-1.2-2.7-2.7-2.7-.8 0-1.5.3-2 .9-.2-1.3-1.3-2.2-2.6-2.2-.8 0-1.5.3-2 .9-.3-1.1-1.3-1.9-2.5-1.9-.6 0-1.2.2-1.7.6V6.3c0-1.6-1.2-2.8-2.8-2.8Z' fill='%23173d32' stroke='%23fbf8f0' stroke-width='1.7' stroke-linejoin='round'/%3E%3Cpath d='M24.5 3.2c-4.5.2-7.1 2.4-7.7 6.5 4.5.1 7.2-2.1 7.7-6.5Z' fill='%23d9ef79' stroke='%23173d32' stroke-width='1'/%3E%3Cpath d='m18.2 9.1 5.2-4.5' fill='none' stroke='%23173d32' stroke-width='.9'/%3E%3C/svg%3E") 8 4, pointer !important;
+  }
+  input, textarea, [contenteditable="true"] { cursor: text !important; }
+  button:disabled, [aria-disabled="true"] { cursor: not-allowed !important; }
+}
+@media (hover:none), (pointer:coarse) {
+  html, body, body * { cursor: auto; }
+}
