@@ -143,14 +143,15 @@ const SahaayaAuth = (() => {
     try {
       const { data: { session }, error } = await sb.auth.getSession();
       if (error || !session) {
-        // If Supabase has no session, clear any stale real-auth cache
-        if (cached && !cached.isDemoSession) setCachedSession(null);
+        // Clear stale cached identities. A cached client-side persona is never an authenticated session.
+        if (cached) setCachedSession(null);
         return null;
       }
       return await fetchUserProfile(session.user.id);
     } catch (err) {
       console.warn("Auth getSession error:", err);
-      return cached;
+      setCachedSession(null);
+      return null;
     }
   }
 
