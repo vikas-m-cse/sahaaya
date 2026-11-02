@@ -298,3 +298,24 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
     flex: 1;
   }
 }
+
+
+/* Real Your Hour filtering states */
+.need-card.hour-filter-hidden { display: none !important; }
+.hour-empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 34px;
+  border: 1px dashed rgba(20,37,31,.24);
+  border-radius: 18px;
+  background: rgba(255,255,255,.58);
+  color: var(--ink);
+}
+.hour-empty-state[hidden] { display: none !important; }
+.hour-empty-state strong { font: 400 27px/1.1 var(--serif); }
+.hour-empty-state span { max-width: 560px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+@media(max-width:620px) {
+  .hour-empty-state { padding: 24px; }
+}
