@@ -443,3 +443,87 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
   .final-section footer{left:6vw!important;right:6vw!important;font-size:6px!important}
 }
 @media(prefers-reduced-motion:reduce){.final-section:before,.final-section .final-orbit{animation:none!important}}
+
+
+/* Hour picker interaction hardening */
+.hero-product .hero-copy,
+.hero-product .hour-picker,
+.hero-product .hour-options,
+.hero-product .hour-chip,
+.hero-product .day-chip {
+  pointer-events: auto !important;
+}
+.hero-product .hour-picker {
+  position: relative !important;
+  z-index: 12 !important;
+}
+.hero-product .hour-options { position: relative; z-index: 2; }
+.hero-product .hour-chip,
+.hero-product .day-chip {
+  position: relative;
+  z-index: 3;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-product .hour-chip:focus-visible,
+.hero-product .day-chip:focus-visible {
+  outline: 3px solid rgba(189,109,78,.35);
+  outline-offset: 3px;
+}
+
+/* Final chapter: a quieter, more connected editorial close. */
+.final-section {
+  min-height: 690px !important;
+  grid-template-columns: minmax(0,1fr) minmax(280px,.58fr) !important;
+  column-gap: clamp(38px,7vw,100px) !important;
+  padding: 86px 8vw 96px !important;
+  background:
+    radial-gradient(circle at 12% 48%, rgba(217,239,121,.075), transparent 31%),
+    linear-gradient(115deg, #173d32 0%, #15372e 100%) !important;
+}
+.final-section:before {
+  width: min(27vw,360px) !important;
+  height: min(49vw,500px) !important;
+  min-height: 390px !important;
+  border-radius: 190px 190px 22px 22px !important;
+  background:
+    linear-gradient(180deg, rgba(23,61,50,.02), rgba(23,61,50,.12)),
+    url("https://csrbox.org/news/1695284253Visiting%20the%20elderly%20in%20retirement%20home%2C%20Delhi%20%281%29.jpg") center 42% / cover no-repeat !important;
+  box-shadow: 0 25px 65px rgba(5,20,15,.18) !important;
+}
+.final-section:after { bottom: 92px !important; }
+.final-section > .eyebrow { letter-spacing: 2px !important; }
+.final-section > h2 {
+  font-size: clamp(70px,7.5vw,112px) !important;
+  line-height: .84 !important;
+  letter-spacing: -.055em !important;
+  margin: 14px 0 22px !important;
+}
+.final-section > p {
+  max-width: 410px !important;
+  color: #c1cec8 !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+}
+.final-section > .final-cta {
+  margin-top: 2px !important;
+  box-shadow: none !important;
+}
+.final-section footer {
+  left: 8vw !important;
+  right: 8vw !important;
+  border-color: rgba(251,248,240,.2) !important;
+}
+@media (max-width:950px) {
+  .final-section {
+    grid-template-columns: 1fr !important;
+    padding: 76px 7vw 90px !important;
+  }
+  .final-section:before {
+    width: min(72vw,390px) !important;
+    height: 330px !important;
+    min-height: 0 !important;
+    margin-top: 38px !important;
+  }
+  .final-section:after { bottom: 112px !important; }
+}
