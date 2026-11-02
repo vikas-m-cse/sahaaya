@@ -599,6 +599,16 @@ const SahaayaDB = (() => {
       return newHome;
     },
 
+    updateHomeVerificationReview: async (homeId, checks, score) => {
+      const sb = window._supabaseClient;
+      if (!sb) throw new Error("Supabase is not connected.");
+      const { data, error } = await sb.from("old_age_homes")
+        .update({ verification_checks: checks, trust_score: score })
+        .eq("id", homeId).select("*").single();
+      if (error) throw new Error("Could not save trust review: " + error.message);
+      return data;
+    },
+
     updateHomeVerificationDocuments: async (homeId, documents) => {
       const sb = window._supabaseClient;
       if (!sb) throw new Error("Supabase is not connected.");
