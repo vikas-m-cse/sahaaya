@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/sahaaya-3d.css">
 <link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/states.css">
+<link rel="stylesheet" href="css/states.css">\n<link rel="stylesheet" href="css/sahaaya-flow-inspired.css">
 </head>
 <body>
 <div class="site-progress" id="progress"></div>
@@ -22,9 +22,9 @@
 </div>
 <header class="site-nav">
   <a class="brand" href="#home"><span class="brand-mark">sa</span><span>Sahaaya</span></a>
-  <nav class="nav-links"><a href="#moments">Find a moment</a><a href="#how">How it works</a><a href="#homes">For homes</a></nav>
+  <nav class="nav-links" id="primaryNav"><a href="#moments">Find a moment</a><a href="#how">How it works</a><a href="#homes">For homes</a></nav>
   <div class="nav-actions"><button class="nav-login" data-modal="login">Sign in</button><button class="nav-cta" data-modal="join">I want to help <span>↗</span></button></div>
-  <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primaryNav">☰</button>
 </header>
 
 <main>
@@ -37,7 +37,7 @@
   <button class="rail-dot" data-target="final"><b>05</b><em>Show up</em></button>
 </aside>
 <section class="hero-product" id="home">
-  <div class="hero-livebar"><span><i></i> LIVE NEEDS</span><span>3 opportunities near Bengaluru</span></div>
+  <div class="hero-livebar"><span><i></i> LIVE NEEDS</span><span id="liveOpportunityCount">3 listed opportunities near Bengaluru</span></div>
   <div id="sahaaya-3d" aria-hidden="true"></div>
   <div class="hero-glow"></div>
   <div class="hero-copy">
@@ -66,7 +66,7 @@
     </div>
   </div>
   <div class="hero-experience">
-    <div class="experience-head"><div><span class="tiny-label">NEEDED RIGHT NOW</span><strong id="needDay">Sunday · Whitefield</strong></div><span class="status-pill">3 spots</span></div>
+    <div class="experience-head"><div><span class="tiny-label">FEATURED OPPORTUNITY</span><strong id="needDay">Sunday · Whitefield</strong></div><span class="status-pill">3 spots</span></div>
     <div class="experience-photo"><img src="https://static.wixstatic.com/media/44f410_976da54ecee949dbb653cb6da362fc8e~mv2.jpg/v1/fill/w_4096%2Ch_3072%2Cal_c%2Cq_90/44f410_976da54ecee949dbb653cb6da362fc8e~mv2.jpg" alt="Two older adults talking together"><div class="photo-chip">01 / CONVERSATION</div></div>
     <div class="experience-body">
       <div class="fit-mini"><span>GOOD FIT</span><strong>87%</strong></div>
@@ -119,15 +119,15 @@
     <button class="filter" data-filter="creative">Creative</button>
   </div>
   <div class="needs-grid">
-    <article class="need-card opp-card" data-type="conversation">
+    <article class="need-card opp-card" data-type="conversation" data-day="Sunday" data-hours="2">
       <div class="need-image image-conversation"><span class="need-number">01</span><span class="need-tag">CONVERSATION</span></div>
       <div class="need-content"><div class="home-label">SILVER SPRINGS HOME <span>✓ VERIFIED</span></div><h3>Sunday Social Afternoon</h3><p>Stories, board games and an unhurried table full of conversation.</p><div class="need-meta"><span>Sun · 11—1</span><span>Whitefield</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Sunday Social Afternoon">View opportunity <b>↗</b></button></div>
     </article>
-    <article class="need-card opp-card featured" data-type="music">
+    <article class="need-card opp-card featured" data-type="music" data-day="Saturday" data-hours="2">
       <div class="need-image image-music"><span class="need-number">02</span><span class="need-tag">PLAY / MUSIC</span></div>
       <div class="need-content"><div class="home-label">BHAVANA SENIOR CARE <span>✓ VERIFIED</span></div><h3>Music & Antakshari</h3><p>Bring a favourite song. Someone may already know every word.</p><div class="need-meta"><span>Sat · 4—6</span><span>Indiranagar</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Music & Antakshari">View opportunity <b>↗</b></button></div>
     </article>
-    <article class="need-card opp-card" data-type="creative">
+    <article class="need-card opp-card" data-type="creative" data-day="Sunday" data-hours="2">
       <div class="need-image image-creative"><span class="need-number">03</span><span class="need-tag">CREATIVE</span></div>
       <div class="need-content"><div class="home-label">ANANDA PARK HOME <span>✓ VERIFIED</span></div><h3>Art & Memory Wall</h3><p>Turn old stories, drawings and small memories into one shared wall.</p><div class="need-meta"><span>Sun · 3—5</span><span>HSR Layout</span><span>2 hrs</span></div><button class="need-link apply" data-activity="Art & Memory Wall">View opportunity <b>↗</b></button></div>
     </article>
@@ -193,8 +193,6 @@
 </main>
 
 <div class="modal" id="modal"><div class="modal-backdrop"></div><div class="modal-card"><button class="close" id="closeModal">×</button><div id="modalContent"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/config.js"></script><script src="js/db.js"></script><script src="js/matching.js"></script><script src="js/auth.js"></script><script src="js/components.js"></script><script src="app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script><script src="js/sahaaya-3d.js"></script>
+<script type="module" src="js/bootstrap.js"></script>
 </body>
 </html>

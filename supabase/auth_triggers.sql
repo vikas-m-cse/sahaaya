@@ -12,7 +12,14 @@ AS $$
 DECLARE
   user_role TEXT;
 BEGIN
-  user_role := COALESCE(new.raw_user_meta_data->>'role', 'volunteer');
+  -- Never trust client-supplied metadata to grant administrator privileges.
+  -- Public registration may create volunteer or home accounts only; create admins
+  -- through a trusted Supabase dashboard/service-role operation.
+  user_role := CASE
+    WHEN new.raw_user_meta_data->>'role' IN ('volunteer', 'home')
+      THEN new.raw_user_meta_data->>'role'
+    ELSE 'volunteer'
+  END;
 
   -- 1. Insert into public.profiles
   INSERT INTO public.profiles (

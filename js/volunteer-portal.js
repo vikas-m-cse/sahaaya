@@ -4,7 +4,7 @@
  * Depends on globals: SahaayaAuth, SahaayaDB, SahaayaMatching, SahaayaUI, SAHAAYA_CONFIG
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
+const initializePortal = async () => {
 
   // -----------------------------------------------------------------------
   // 1. Auth Guard — must await the async check
@@ -545,7 +545,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `).join("");
     }
 
-    document.getElementById("volunteerProfileForm")?.addEventListener("submit", async e => {
+    document.getElementById("volunteerProfileForm").onsubmit = async e => {
       e.preventDefault();
       const updatedInterests    = Array.from(document.querySelectorAll("input[name='interest']:checked")).map(cb => cb.value);
       const updatedAvailability = Array.from(document.querySelectorAll("input[name='availability']:checked")).map(cb => cb.value);
@@ -559,7 +559,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       SahaayaUI.showToast("Profile preferences saved! Compatibility scores updated.", "success");
       renderOpportunities();
-    });
+    };
   }
 
   function setInputSafe(id, value) {
@@ -573,5 +573,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------------------------------------
   // 15. Initial Load
   // -----------------------------------------------------------------------
+  // Refresh opportunities and application status when the volunteer returns
+  // to this tab, so newly published work and home decisions show up promptly.
   await loadData();
-});
+  let refreshInProgress = false;
+  const refreshVolunteerData = async () => {
+    if (document.visibilityState === "hidden" || refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      await loadData();
+    } catch (error) {
+      console.error("Unable to refresh volunteer portal data:", error);
+    } finally {
+      refreshInProgress = false;
+    }
+  };
+  window.addEventListener("focus", refreshVolunteerData);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void refreshVolunteerData();
+  });
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializePortal, { once: true });
+} else {
+  void initializePortal();
+}

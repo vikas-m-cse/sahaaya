@@ -560,6 +560,28 @@ const SahaayaDB = (() => {
       return null;
     },
 
+    cancelOpportunity: async (id) => {
+      const opps = load("opportunities");
+      const opportunity = opps.find(o => o.id === id);
+      if (!opportunity) throw new Error("Requirement not found.");
+      const attendance = load("attendance_records");
+      if (attendance.some(record => record.opportunity_id === id)) {
+        throw new Error("This requirement has attendance history and cannot be deleted.");
+      }
+      opportunity.status = SAHAAYA_CONFIG.OPPORTUNITY_STATUS.CANCELLED;
+      const apps = load("applications");
+      for (const app of apps) {
+        if (app.opportunity_id === id && ["applied", "approved", "rejected"].includes(app.status)) {
+          app.status = "cancelled";
+          app.reviewed_at = new Date().toISOString();
+          app.coordinator_note = "Requirement cancelled by the host home.";
+        }
+      }
+      save("opportunities", opps);
+      save("applications", apps);
+      return opportunity;
+    },
+
     // -------------------------------------------------------------
     // Applications
     // -------------------------------------------------------------

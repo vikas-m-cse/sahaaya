@@ -33,7 +33,7 @@ function openLandingModal(type, activity) {
       <h2>Let's find your fit.</h2>
       <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
       <form class="form" id="joinForm">
-        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value="Ananya Sharma"></div>
+        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value=""></div>
         <div class="field"><label for="joinEmail">Email</label><input required id="joinEmail" type="email" placeholder="you@example.com" value=""></div>
         <div class="field"><label for="joinPassword">Password</label><input required id="joinPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
         <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value="+91 98450 12345"></div>
@@ -65,23 +65,9 @@ function openLandingModal(type, activity) {
       <h2>Sign in to Sahaaya</h2>
       <p>Enter your credentials to access your verified profile and portal.</p>
 
-      <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: #f0f5f2; border: 1px solid #c6ddd3; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #174e43; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-          ⚡ 1-Click Demo Access for Evaluators
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
-            <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
-            <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
-            <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
-          </button>
-        </div>
-      </div>
+      <p class="auth-note" style="font-size:12px;color:#687873;margin:0 0 18px;">
+        Use your registered Sahaaya account. New volunteers and partner homes can create an account from the registration page.
+      </p>
 
       <div style="text-align: center; color: #9eada8; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH REAL ACCOUNT —</div>
 
@@ -99,14 +85,14 @@ function openLandingModal(type, activity) {
       <h2>Register your home.</h2>
       <p>Tell us what your residents need. You define the requirements; Sahaaya helps coordinate the right volunteers.</p>
       <form class="form" id="homeForm">
-        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value="Vandana Senior Living"></div>
-        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value="Dr. S. K. Narayan"></div>
-        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru"></div>
-        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library"></div>
+        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value=""></div>
+        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value=""></div>
+        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value=""></div>
+        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value=""></div>
         <div class="field"><label>Contact email</label><input required id="homeRegEmail" type="email" placeholder="name@home.org"></div>
         <div class="field"><label>Password</label><input required id="homeRegPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
-        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value="+91 80 2663 1122"></div>
-        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" value="35"></div>
+        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value=""></div>
+        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" min="1" max="10000" value=""></div>
         <button class="btn primary" type="submit" id="homeSubmitBtn">Register Home &amp; Create Account →</button>
       </form>
     `;
@@ -269,8 +255,36 @@ document.querySelectorAll(".filter").forEach(btn => {
   });
 });
 
-document.getElementById("menuBtn")?.addEventListener("click", () => {
-  showLandingToast("Use the portal links in the nav, or explore the sections below.", "info");
+// Accessible mobile navigation: open, close, and keep keyboard state in sync.
+const menuButton = document.getElementById("menuBtn");
+const primaryNav = document.getElementById("primaryNav");
+
+function closeMobileNav() {
+  if (!menuButton || !primaryNav) return;
+  primaryNav.classList.remove("is-open");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", "Open navigation menu");
+  menuButton.textContent = "☰";
+}
+
+menuButton?.addEventListener("click", () => {
+  if (!primaryNav) return;
+  const isOpen = primaryNav.classList.toggle("is-open");
+  menuButton.setAttribute("aria-expanded", String(isOpen));
+  menuButton.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+  menuButton.textContent = isOpen ? "×" : "☰";
+});
+
+primaryNav?.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", closeMobileNav);
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeMobileNav();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 950) closeMobileNav();
 });
 
 // Check if redirected due to login_required
@@ -362,36 +376,119 @@ if (window.location.search.includes("login_required=1")) {
 })();
 
 
-/* Signature Sahaaya hour selector */
+/* Unified Your Hour matcher — one source of truth for the picker and floating dock */
 (() => {
-  const hours=document.querySelectorAll('.hour-chip'), days=document.querySelectorAll('.day-chip');
-  const summary=document.getElementById('hourSummary'), match=document.getElementById('hourMatch'), box=document.querySelector('.hour-picker'), explore=document.getElementById('hourExplore');
-  if(!summary||!match) return;
-  let h='1', d='Sunday';
-  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
-  const update=()=>{summary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;match.textContent=(counts[h+'|'+d]||3)+' moments nearby';box.classList.remove('is-updating');void box.offsetWidth;box.classList.add('is-updating');};
-  hours.forEach(x=>x.addEventListener('click',()=>{hours.forEach(y=>y.classList.remove('active'));x.classList.add('active');h=x.dataset.hours;update();}));
-  days.forEach(x=>x.addEventListener('click',()=>{days.forEach(y=>y.classList.remove('active'));x.classList.add('active');d=x.dataset.day;update();}));
-  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  const picker = document.querySelector('.hour-picker');
+  const dock = document.getElementById('hourDock');
+  const hero = document.querySelector('.hero-product');
+  if (!picker || !hero) return;
+
+  const hourButtons = [...picker.querySelectorAll('.hour-chip')];
+  const dayButtons = [...picker.querySelectorAll('.day-chip')];
+  const summary = document.getElementById('hourSummary');
+  const match = document.getElementById('hourMatch');
+  const dockSummary = document.getElementById('dockSummary');
+  const dockCount = document.getElementById('dockCount');
+  const cards = [...document.querySelectorAll('.needs-grid .opp-card')];
+  const liveCount = document.getElementById('liveOpportunityCount');
+  const exploreButtons = [
+    document.getElementById('hourExplore'),
+    document.getElementById('dockExplore')
+  ].filter(Boolean);
+
+  let selectedHours = 1;
+  let selectedDay = 'Sunday';
+
+  const labelForHours = value => value === 3 ? '3+ hours' : value + (value === 1 ? ' hour' : ' hours');
+  const matchingCards = () => cards.filter(card => {
+    const cardDay = card.dataset.day;
+    const duration = Number(card.dataset.hours || 0);
+    const dayMatches = selectedDay === 'Weekday'
+      ? cardDay === 'Weekday'
+      : cardDay === selectedDay;
+    return dayMatches && duration > 0 && duration <= selectedHours;
+  });
+
+  function render() {
+    const matches = matchingCards();
+    const count = matches.length;
+    const timeLabel = labelForHours(selectedHours) + ' · ' + selectedDay;
+    const countLabel = count + (count === 1 ? ' matching moment' : ' matching moments');
+
+    if (summary) summary.textContent = timeLabel;
+    if (match) match.textContent = countLabel;
+    if (dockSummary) dockSummary.textContent = timeLabel;
+    if (dockCount) dockCount.textContent = count + ' nearby';
+    if (liveCount) liveCount.textContent = cards.length + ' listed opportunities near Bengaluru';
+
+    cards.forEach(card => {
+      const isMatch = matches.includes(card);
+      card.classList.toggle('hour-filter-hidden', !isMatch);
+      card.setAttribute('aria-hidden', String(!isMatch));
+    });
+
+    const grid = document.querySelector('.needs-grid');
+    let empty = document.getElementById('hourEmptyState');
+    if (count === 0 && grid) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.id = 'hourEmptyState';
+        empty.className = 'hour-empty-state';
+        empty.setAttribute('role', 'status');
+        empty.innerHTML = '<strong>No exact matches for this time yet.</strong><span>Try another day or choose more hours. We will only show opportunities that fit the time you selected.</span>';
+        grid.appendChild(empty);
+      }
+      empty.hidden = false;
+    } else if (empty) {
+      empty.hidden = true;
+    }
+
+    picker.classList.remove('is-updating');
+    void picker.offsetWidth;
+    picker.classList.add('is-updating');
+  }
+
+  hourButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedHours = Number(button.dataset.hours);
+      hourButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      render();
+    });
+  });
+
+  dayButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedDay = button.dataset.day;
+      dayButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      render();
+    });
+  });
+
+  exploreButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      document.getElementById('moments')?.scrollIntoView({
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start'
+      });
+    });
+  });
+
+  const onScroll = () => {
+    if (dock) dock.classList.toggle('visible', scrollY > hero.offsetHeight * 0.72);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  render();
 })();
-
-
-/* Living hour dock — keeps the chosen intention present while exploring */
-(() => {
-  const dock=document.getElementById('hourDock'), dockSummary=document.getElementById('dockSummary'), dockCount=document.getElementById('dockCount'), explore=document.getElementById('dockExplore');
-  const hero=document.querySelector('.hero-product');
-  if(!dock||!hero) return;
-  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
-  let h='1',d='Sunday';
-  const refresh=()=>{dockSummary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;dockCount.textContent=(counts[h+'|'+d]||3)+' nearby';};
-  document.querySelectorAll('.hour-chip').forEach(x=>x.addEventListener('click',()=>{h=x.dataset.hours;refresh();}));
-  document.querySelectorAll('.day-chip').forEach(x=>x.addEventListener('click',()=>{d=x.dataset.day;refresh();}));
-  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth'}));
-  const onScroll=()=>dock.classList.toggle('visible',scrollY>hero.offsetHeight*.72);
-  addEventListener('scroll',onScroll,{passive:true});onScroll();refresh();
-})();
-
-
+ 
 /* Signature page choreography */
 (() => {
   const nav=document.querySelector('.site-nav'), rail=document.querySelector('.chapter-rail'), fill=document.getElementById('railFill');

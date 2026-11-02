@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS public.applications (
     activity_id UUID NOT NULL REFERENCES public.activities(id) ON DELETE CASCADE,
     volunteer_id UUID NOT NULL REFERENCES public.volunteers(id) ON DELETE CASCADE,
     status TEXT NOT NULL DEFAULT 'applied' CHECK (status IN ('applied', 'approved', 'rejected', 'attended', 'cancelled')),
+    volunteer_note TEXT,
+    coordinator_note TEXT,
     applied_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     reviewed_at TIMESTAMPTZ,
     CONSTRAINT unique_volunteer_activity_application UNIQUE (activity_id, volunteer_id)
