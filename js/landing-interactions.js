@@ -117,6 +117,15 @@
     if (applyTrigger) {
       event.preventDefault();
       event.stopImmediatePropagation();
+
+      // The hero's primary "I can show up" action should take the volunteer
+      // straight into the portal. Other opportunity cards retain their details modal.
+      if (applyTrigger.classList.contains("experience-action")) {
+        const activity = applyTrigger.dataset.activity || "Volunteer opportunity";
+        window.location.href = "volunteer/?activity=" + encodeURIComponent(activity);
+        return;
+      }
+
       openModal("activity", applyTrigger.dataset.activity || "Volunteer opportunity");
       return;
     }
