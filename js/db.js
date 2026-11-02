@@ -568,7 +568,7 @@ const SahaayaDB = (() => {
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
         const { data, error } = await sb.from("old_age_homes").select("*").eq("id", id).maybeSingle();
         if (error) throw new Error("Could not load home: " + error.message);
-        return data || null;
+        return data ? { ...data, user_id: data.profile_id, area: data.city || "", resident_count: data.resident_capacity ?? data.resident_count ?? null, verification_documents: data.verification_documents || [], verification_checks: data.verification_checks || {}, trust_score: data.trust_score ?? 0 } : null;
       }
       const homes = load("homes");
       return homes.find(h => h.id === id) || null;
@@ -579,7 +579,7 @@ const SahaayaDB = (() => {
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) {
         const { data, error } = await sb.from("old_age_homes").select("*").eq("profile_id", userId).maybeSingle();
         if (error) throw new Error("Could not load your home: " + error.message);
-        return data || null;
+        return data ? { ...data, user_id: data.profile_id, area: data.city || "", resident_count: data.resident_capacity ?? data.resident_count ?? null, verification_documents: data.verification_documents || [], verification_checks: data.verification_checks || {}, trust_score: data.trust_score ?? 0 } : null;
       }
       const homes = load("homes");
       return homes.find(h => h.user_id === userId) || null;
