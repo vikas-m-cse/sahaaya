@@ -873,3 +873,32 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
 #verificationQueueContainer .admin-verify-actions button:disabled{opacity:.55;cursor:wait}
 @media(max-width:760px){#verificationQueueContainer .admin-review-top{padding:20px;flex-direction:column}#verificationQueueContainer .admin-review-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding:17px 20px}#verificationQueueContainer .admin-review-detail{padding:0 10px;border-left:1px solid #edf0e9}#verificationQueueContainer .admin-review-detail:nth-child(odd){padding-left:0;border-left:0}#verificationQueueContainer .admin-review-description{padding:17px 20px}#verificationQueueContainer .admin-review-footer{padding:15px 20px;align-items:stretch;flex-direction:column}#verificationQueueContainer .admin-verify-actions{width:100%}#verificationQueueContainer .admin-verify-actions button{flex:1}}
 @media(max-width:420px){#verificationQueueContainer .admin-review-details{grid-template-columns:1fr 1fr}#verificationQueueContainer .admin-review-top h3{font-size:23px}}
+
+
+/* Verification queue refinement — tighter editorial layout, less empty space */
+#tab-verification:after{content:none!important}
+#verificationQueueContainer{max-width:1120px}
+#verificationQueueContainer:before{content:"Homes waiting for a decision.";display:block;margin:0 0 20px;color:#173d32;font:400 clamp(30px,3.2vw,42px)/1.02 var(--serif);letter-spacing:-.045em}
+#verificationQueueContainer .portal-grid{display:block!important}
+#verificationQueueContainer .admin-verify-card{width:100%;max-width:1120px;margin:0 0 18px!important;border-radius:18px!important;overflow:hidden!important}
+#verificationQueueContainer .admin-verify-card .portal-card-header{min-height:62px;padding:14px 22px!important;display:flex;align-items:center;justify-content:space-between}
+#verificationQueueContainer .admin-verify-card .portal-card-body{padding:22px 24px!important}
+#verificationQueueContainer .admin-verify-body{grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr)!important;align-items:start!important;gap:28px!important}
+#verificationQueueContainer .admin-verify-body h3{font:600 24px/1.15 "Manrope",sans-serif!important;letter-spacing:-.8px;margin:5px 0 10px!important;color:#173d32!important}
+#verificationQueueContainer .admin-verify-body>div:first-child>div:not(.admin-verify-facts){font-size:12px!important;line-height:1.8!important}
+#verificationQueueContainer .admin-verify-facts{margin-top:18px!important}
+#verificationQueueContainer .admin-verify-fact{min-height:68px;padding:12px 14px!important}
+#verificationQueueContainer .admin-verify-fact small{font-size:8px!important;letter-spacing:1.2px!important}
+#verificationQueueContainer .admin-verify-fact strong{font-size:13px!important}
+#verificationQueueContainer .admin-verify-note{min-height:0!important;padding:18px 19px!important;border-radius:13px!important}
+#verificationQueueContainer .admin-verify-note small{font-size:8px!important;letter-spacing:1.3px!important}
+#verificationQueueContainer .admin-verify-note p{font-size:12px!important;line-height:1.7!important}
+#verificationQueueContainer .admin-verify-actions{padding:14px 22px!important;min-height:68px;align-items:center}
+#verificationQueueContainer .admin-verify-actions button{min-height:40px;padding:0 17px!important;border-radius:10px!important;font-size:11px!important}
+@media(max-width:760px){
+  #verificationQueueContainer{max-width:none}
+  #verificationQueueContainer .admin-verify-body{grid-template-columns:1fr!important;gap:16px!important}
+  #verificationQueueContainer .admin-verify-card .portal-card-body{padding:18px!important}
+  #verificationQueueContainer .admin-verify-card .portal-card-header{padding:13px 16px!important}
+  #verificationQueueContainer .admin-verify-actions{padding:12px 16px!important;flex-wrap:wrap}
+}
