@@ -622,6 +622,15 @@ const SahaayaDB = (() => {
     updateHomeStatus: async (homeId, status, notes = "") => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(homeId))) {
+        if (status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
+          const { data: review, error: reviewError } = await sb.from("old_age_homes").select("trust_score, verification_checks, verification_documents").eq("id", homeId).single();
+          if (reviewError) throw new Error("Could not validate trust assessment: " + reviewError.message);
+          const checks = review.verification_checks || {}, docs = review.verification_documents || [];
+          const has = kind => docs.some(doc => doc.kind === kind);
+          if (Number(review.trust_score || 0) < 80 || !checks.legal_registration || !checks.address_proof || !checks.resident_safety || !has("legal_registration") || !has("address_proof") || !has("safety_policy")) {
+            throw new Error("Approval blocked: score at least 80, all mandatory checks, and legal, address and safety documents are required.");
+          }
+        }
         const update = { verification_status: status };
         const { data, error } = await sb
           .from("old_age_homes")
