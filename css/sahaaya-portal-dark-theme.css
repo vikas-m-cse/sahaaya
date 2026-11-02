@@ -902,3 +902,19 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
   #verificationQueueContainer .admin-verify-card .portal-card-header{padding:13px 16px!important}
   #verificationQueueContainer .admin-verify-actions{padding:12px 16px!important;flex-wrap:wrap}
 }
+
+/* Final queue polish: use the in-flow heading and keep the review card focused */
+#verificationQueueContainer:before{content:none!important;display:none!important}
+#verificationQueueContainer{max-width:1120px;margin:0 auto 34px}
+#verificationQueueContainer .verification-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 18px;padding:0 2px 18px;border-bottom:1px solid rgba(23,61,50,.13)}
+#verificationQueueContainer .verification-section-heading>div:first-child>span{font-size:7px;letter-spacing:1.8px;font-weight:900;color:#82928b}
+#verificationQueueContainer .verification-section-heading h2{margin:7px 0 6px;font:400 clamp(30px,3vw,40px)/1 var(--serif);letter-spacing:-.045em;color:#173d32}
+#verificationQueueContainer .verification-section-heading p{margin:0;color:#718078;font-size:10px;line-height:1.5}
+#verificationQueueContainer .verification-total{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(23,61,50,.13);border-radius:12px;background:rgba(255,253,248,.72);white-space:nowrap}
+#verificationQueueContainer .verification-total strong{font:400 27px/1 var(--serif);color:#246b57}
+#verificationQueueContainer .verification-total span{font-size:7px;letter-spacing:1px;font-weight:900;color:#718078}
+#verificationQueueContainer .admin-review-top{padding:22px 24px 16px!important}
+#verificationQueueContainer .admin-review-details{padding:0 24px 17px!important}
+#verificationQueueContainer .admin-review-description{padding:17px 24px!important}
+#verificationQueueContainer .admin-review-footer{padding:14px 24px!important;flex-direction:row!important;align-items:center!important}
+@media(max-width:640px){#verificationQueueContainer .verification-section-heading{align-items:flex-start;flex-direction:column}#verificationQueueContainer .admin-review-footer{flex-direction:column!important;align-items:stretch!important}}
