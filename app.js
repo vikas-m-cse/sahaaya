@@ -57,20 +57,40 @@ function openLandingModal(type, activity) {
   }
   if (type === "home") {
     html = `
-      <div class="eyebrow">PARTNER WITH US</div>
-      <h2>Register your home.</h2>
-      <p>Tell us what your residents need. You define the requirements; Sahaaya helps coordinate the right volunteers.</p>
-      <form class="form" id="homeForm">
-        <div class="field"><label>Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" value="Vandana Senior Living"></div>
-        <div class="field"><label>Coordinator</label><input required id="homeRegContact" placeholder="Chief coordinator / superintendent" value="Dr. S. K. Narayan"></div>
-        <div class="field"><label>Area</label><input required id="homeRegArea" placeholder="Area / neighbourhood" value="Jayanagar, Bengaluru"></div>
-        <div class="field field-wide"><label>Address</label><input required id="homeRegAddress" placeholder="Full street address" value="34, 4th Block, Near Central Library"></div>
-        <div class="field"><label>Contact email</label><input required id="homeRegEmail" type="email" placeholder="name@home.org"></div>
-        <div class="field"><label>Password</label><input required id="homeRegPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
-        <div class="field"><label>Phone</label><input required id="homeRegPhone" placeholder="+91" value="+91 80 2663 1122"></div>
-        <div class="field"><label>Resident capacity</label><input required id="homeRegResidents" type="number" placeholder="Number of residents" value="35"></div>
-        <button class="btn primary" type="submit" id="homeSubmitBtn">Register Home &amp; Create Account →</button>
-      </form>
+      <div class="home-register">
+        <div class="home-register-intro">
+          <span class="home-register-mark" aria-hidden="true">sa</span>
+          <div class="eyebrow">A PARTNERSHIP BUILT AROUND CARE</div>
+          <h2>Bring your home<br><em>into the circle.</em></h2>
+          <p>Tell us a little about your residence. Once your details are reviewed, you can post the activities your residents would love to share with volunteers.</p>
+        </div>
+        <form class="form home-register-form" id="homeForm">
+          <div class="home-form-section">
+            <div class="home-form-section-head"><span>01</span><div><strong>Your residence</strong><small>Help volunteers recognise your home.</small></div></div>
+            <div class="home-form-grid">
+              <div class="field"><label for="homeRegName">Home name</label><input required id="homeRegName" placeholder="e.g. Vandana Senior Living" autocomplete="organization"></div>
+              <div class="field"><label for="homeRegContact">Coordinator name</label><input required id="homeRegContact" placeholder="Person coordinating volunteers" autocomplete="name"></div>
+              <div class="field"><label for="homeRegArea">Area / city</label><input required id="homeRegArea" placeholder="e.g. Jayanagar, Bengaluru" autocomplete="address-level2"></div>
+              <div class="field"><label for="homeRegResidents">Resident capacity</label><input required id="homeRegResidents" type="number" min="1" max="10000" placeholder="Number of residents" inputmode="numeric"></div>
+              <div class="field field-wide"><label for="homeRegAddress">Full address</label><input required id="homeRegAddress" placeholder="Street, landmark, area and PIN code" autocomplete="street-address"></div>
+            </div>
+          </div>
+          <div class="home-form-section">
+            <div class="home-form-section-head"><span>02</span><div><strong>Account & contact</strong><small>Used for secure sign-in and coordination.</small></div></div>
+            <div class="home-form-grid">
+              <div class="field"><label for="homeRegEmail">Official contact email</label><input required id="homeRegEmail" type="email" placeholder="name@yourhome.org" autocomplete="email"></div>
+              <div class="field"><label for="homeRegPhone">Contact phone</label><input required id="homeRegPhone" type="tel" placeholder="+91 98765 43210" autocomplete="tel"></div>
+              <div class="field field-wide"><label for="homeRegPassword">Create password</label><input required id="homeRegPassword" type="password" placeholder="At least 8 characters" minlength="8" autocomplete="new-password"><small class="home-field-hint">Use at least 8 characters. Keep this password private.</small></div>
+            </div>
+          </div>
+          <div class="home-register-actions">
+            <p>Registration is reviewed before your home is listed publicly.</p>
+            <button class="home-register-submit" type="submit" id="homeSubmitBtn"><span>Register your home</span><b aria-hidden="true">↗</b></button>
+          </div>
+          <p class="home-register-status" id="homeRegisterStatus" role="status" aria-live="polite"></p>
+        </form>
+        <p class="home-register-foot">Already partnered with Sahaaya? <button type="button" id="homeLoginSwitch">Sign in to your home account</button></p>
+      </div>
     `;
   }
 
@@ -121,6 +141,8 @@ function openLandingModal(type, activity) {
     }catch(error){setSignupStatus(error.message||"Could not create your account. Please try again.",true);button.disabled=false;button.textContent="Create account";}
   });
 
+  document.getElementById("homeLoginSwitch")?.addEventListener("click", () => openLandingModal("login"));
+
   // Email/password login and password recovery.
   const loginForm=document.getElementById("passwordLoginForm"), otpStatus=document.getElementById("otpStatus");
   const setLoginStatus=(message,isError=false)=>{if(otpStatus){otpStatus.textContent=message;otpStatus.classList.toggle("error",isError);}};
@@ -153,7 +175,9 @@ function openLandingModal(type, activity) {
     homeForm.addEventListener("submit", async e => {
       e.preventDefault();
       const btn = document.getElementById("homeSubmitBtn");
-      btn.disabled = true; btn.textContent = "Registering home...";
+      const status = document.getElementById("homeRegisterStatus");
+      btn.disabled = true; btn.querySelector("span").textContent = "Creating your account…";
+      if (status) status.textContent = "Please wait while we securely register your home.";
       try {
         const res = await SahaayaAuth.registerHome({
           homeName:      document.getElementById("homeRegName").value.trim(),
@@ -173,8 +197,8 @@ function openLandingModal(type, activity) {
           setTimeout(() => window.location.href = "home/", 600);
         }
       } catch (err) {
-        showLandingToast("Error: " + err.message, "error");
-        btn.disabled = false; btn.textContent = "Register Home & Create Account →";
+        if (status) { status.textContent = err.message || "We could not complete registration. Please try again."; status.classList.add("error"); }
+        btn.disabled = false; btn.querySelector("span").textContent = "Register your home";
       }
     });
   }
