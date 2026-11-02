@@ -544,6 +544,9 @@ const SahaayaDB = (() => {
           area: home.city || "",
           contact_person: profileMap[home.profile_id] || "Home coordinator",
           resident_count: home.resident_capacity ?? home.resident_count ?? null,
+          verification_documents: home.verification_documents || [],
+          verification_checks: home.verification_checks || {},
+          trust_score: home.trust_score ?? null,
           registration_number: home.registration_number || "",
           verification_notes: home.verification_notes || ""
         }));
@@ -594,6 +597,16 @@ const SahaayaDB = (() => {
       homes.push(newHome);
       save("homes", homes);
       return newHome;
+    },
+
+    updateHomeVerificationDocuments: async (homeId, documents) => {
+      const sb = window._supabaseClient;
+      if (!sb) throw new Error("Supabase is not connected.");
+      const { data, error } = await sb.from("old_age_homes")
+        .update({ verification_documents: documents })
+        .eq("id", homeId).select("*").single();
+      if (error) throw new Error("Could not save verification documents: " + error.message);
+      return data;
     },
 
     updateHomeStatus: async (homeId, status, notes = "") => {
