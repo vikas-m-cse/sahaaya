@@ -69,6 +69,7 @@ BEGIN
       address,
       city,
       contact_phone,
+      resident_capacity,
       verification_status
     )
     VALUES (
@@ -78,6 +79,7 @@ BEGIN
       COALESCE(new.raw_user_meta_data->>'address', 'Bengaluru'),
       COALESCE(new.raw_user_meta_data->>'city', 'Bengaluru'),
       COALESCE(new.raw_user_meta_data->>'phone', ''),
+      NULLIF(new.raw_user_meta_data->>'resident_capacity', '')::INTEGER,
       'pending'
     )
     ON CONFLICT (profile_id) DO NOTHING;
