@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${
             applied
               ? `<span class="badge ${applied.status === "approved" ? "badge-success" : "badge-warning"}">${applied.status === "approved" ? "Approved & Scheduled" : "Application in Review"}</span>`
-              : `<button class="btn-primary apply-btn" data-opp-id="${opp.id}">I can show up <span>↗</span></button>`
+              : match.eligible ? `<button class="btn-primary apply-btn" data-opp-id="${opp.id}">I can show up <span>↗</span></button>` : `<span class="badge badge-warning" title="${match.hardStops.join(" ")}">Needs review · ${match.hardStops.length ? "Eligibility check" : "Low compatibility"}</span>`
           }
         </div>
       `;
@@ -250,6 +250,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!opp) return;
     const home  = allHomes.find(h => h.id === opp.home_id) || { name: "Partner Senior Home", address: "Bengaluru" };
     const match = SahaayaMatching.calculateMatch(currentProfile, opp);
+    if (!match.eligible) {
+      SahaayaUI.showToast(match.hardStops[0] || "This activity needs a stronger compatibility fit before applying.", "warning");
+      return;
+    }
 
     SahaayaUI.openModal({
       title: "Confirm Volunteer Application",
