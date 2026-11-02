@@ -469,50 +469,56 @@ const SahaayaDB = (() => {
     },
 
     getVolunteerProfileByUserId: async (userId) => {
-      const localProfiles = load("volunteer_profiles");
-      const localProfile = localProfiles.find(p => p.user_id === userId) || null;
       const sb = window._supabaseClient;
-      if (!sb || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) return localProfile;
-      const { data, error } = await sb
-        .from("volunteers")
-        .select("profile_id, interests, availability, preferred_activity_types, preferred_area")
-        .eq("profile_id", userId)
-        .maybeSingle();
-      if (error) {
-        console.warn("Could not load live volunteer profile:", error.message);
-        return localProfile;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) {
+        const { data, error } = await sb.from("volunteers")
+          .select("id, profile_id, interests, availability, preferred_activity_types, preferred_area")
+          .eq("profile_id", userId).maybeSingle();
+        if (error) throw new Error("Could not load volunteer profile: " + error.message);
+        if (!data) return null;
+        const localProfile = load("volunteer_profiles").find(p => p.user_id === userId) || {};
+        return {
+          id: data.id, user_id: data.profile_id,
+          interests: data.interests || [],
+          availability: data.availability || [],
+          preferred_activity_types: data.preferred_activity_types || [],
+          preferred_area: data.preferred_area || "",
+          total_hours: localProfile.total_hours || 0,
+          completed_count: localProfile.completed_count || 0
+        };
       }
-      if (!data) return localProfile;
-      return {
-        user_id: data.profile_id,
-        interests: data.interests || [],
-        availability: data.availability || [],
-        preferred_activity_types: data.preferred_activity_types || [],
-        preferred_area: data.preferred_area || "",
-        total_hours: localProfile?.total_hours || 0,
-        completed_count: localProfile?.completed_count || 0
-      };
+      const localProfiles = load("volunteer_profiles");
+      return localProfiles.find(p => p.user_id === userId) || null;
     },
 
     updateVolunteerProfile: async (userId, updateData) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) {
+        const payload = {
+          profile_id: userId,
+          interests: updateData.interests || [],
+          availability: updateData.availability || [],
+          preferred_activity_types: updateData.preferred_activity_types || updateData.interests || [],
+          preferred_area: updateData.preferred_area || null
+        };
+        const { data, error } = await sb.from("volunteers")
+          .upsert(payload, { onConflict: "profile_id" })
+          .select("id, profile_id, interests, availability, preferred_activity_types, preferred_area")
+          .single();
+        if (error) throw new Error("Could not save volunteer profile: " + error.message);
+        return {
+          id: data.id, user_id: data.profile_id,
+          interests: data.interests || [], availability: data.availability || [],
+          preferred_activity_types: data.preferred_activity_types || [],
+          preferred_area: data.preferred_area || "",
+          total_hours: 0, completed_count: 0, ...updateData
+        };
+      }
       const profiles = load("volunteer_profiles");
       const index = profiles.findIndex(p => p.user_id === userId);
-      if (index !== -1) {
-        profiles[index] = { ...profiles[index], ...updateData };
-        save("volunteer_profiles", profiles);
-        return profiles[index];
-      }
-      // Create if doesn't exist
-      const newProfile = {
-        id: "vp_" + Date.now(),
-        user_id: userId,
-        total_hours: 0,
-        completed_count: 0,
-        ...updateData
-      };
-      profiles.push(newProfile);
-      save("volunteer_profiles", profiles);
-      return newProfile;
+      if (index !== -1) { profiles[index] = { ...profiles[index], ...updateData }; save("volunteer_profiles", profiles); return profiles[index]; }
+      const newProfile = { id: "vp_" + Date.now(), user_id: userId, total_hours: 0, completed_count: 0, ...updateData };
+      profiles.push(newProfile); save("volunteer_profiles", profiles); return newProfile;
     },
 
     // -------------------------------------------------------------
