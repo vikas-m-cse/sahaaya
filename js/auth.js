@@ -292,6 +292,15 @@ const SahaayaAuth = (() => {
   // -----------------------------------------------------------------------
   // Logout
   // -----------------------------------------------------------------------
+  async function signOutCurrentSession() {
+    setCachedSession(null);
+    const sb = _getSupabaseClient();
+    if (sb) {
+      const { error } = await sb.auth.signOut();
+      if (error) throw error;
+    }
+  }
+
   async function logout() {
     setCachedSession(null);
     const sb = _getSupabaseClient();
@@ -337,6 +346,7 @@ const SahaayaAuth = (() => {
     registerVolunteer,
     registerHome,
     loginWithPassword,
+    signOutCurrentSession,
     sendPasswordReset,
     updatePassword,
     logout,
