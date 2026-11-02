@@ -918,3 +918,23 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
 #verificationQueueContainer .admin-review-description{padding:17px 24px!important}
 #verificationQueueContainer .admin-review-footer{padding:14px 24px!important;flex-direction:row!important;align-items:center!important}
 @media(max-width:640px){#verificationQueueContainer .verification-section-heading{align-items:flex-start;flex-direction:column}#verificationQueueContainer .admin-review-footer{flex-direction:column!important;align-items:stretch!important}}
+
+
+/* People directory — remove misplaced decorative heading and restore hierarchy */
+#tab-volunteers:before,#tab-volunteers:after{content:none!important;display:none!important}
+#tab-volunteers .portal-table-card{overflow:hidden;border-radius:20px!important}
+#tab-volunteers .portal-table-header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 25px!important;background:#173d32!important;border:0!important}
+#tab-volunteers .portal-table-header h3{margin:0!important;color:#fffdf7!important;font:400 clamp(22px,2.4vw,29px)/1.1 var(--serif)!important;letter-spacing:-.8px}
+#tab-volunteers .portal-table-header span{max-width:310px;text-align:right;color:#c3d2ca!important;font-size:10px!important;line-height:1.5}
+#tab-volunteers .portal-table-responsive{overflow-x:auto}
+#tab-volunteers .portal-table{min-width:900px}
+#tab-volunteers .portal-table th{height:42px;padding:12px 18px!important;font-size:8px!important;letter-spacing:1px!important;white-space:nowrap}
+#tab-volunteers .portal-table td{height:66px;padding:13px 18px!important;font-size:11px!important;line-height:1.5;vertical-align:middle}
+#tab-volunteers .portal-table td strong{font-size:11px!important;font-weight:750}
+#tab-volunteers .portal-table td small{font-size:9px!important;line-height:1.45}
+#tab-volunteers .portal-table td:nth-child(5) strong{font-size:16px!important;letter-spacing:-.3px}
+#tab-volunteers .portal-table .cat-pill{display:inline-flex;align-items:center;margin:2px 4px 2px 0;padding:5px 9px!important;border-radius:999px!important;background:#edf2eb!important;color:#426357!important;font-size:9px!important;font-weight:700}
+@media(max-width:760px){
+ #tab-volunteers .portal-table-header{align-items:flex-start;flex-direction:column;gap:7px;padding:19px!important}
+ #tab-volunteers .portal-table-header span{text-align:left;max-width:none}
+}
