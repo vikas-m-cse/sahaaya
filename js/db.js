@@ -543,7 +543,7 @@ const SahaayaDB = (() => {
           user_id: home.profile_id,
           area: home.city || "",
           contact_person: profileMap[home.profile_id] || "Home coordinator",
-          resident_count: home.resident_count ?? null,
+          resident_count: home.resident_capacity ?? home.resident_count ?? null,
           registration_number: home.registration_number || "",
           verification_notes: home.verification_notes || ""
         }));
