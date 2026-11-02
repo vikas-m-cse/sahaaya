@@ -720,3 +720,53 @@ a,
   .footer-column{gap:13px}
   .footer-bottom{align-items:flex-start;flex-direction:column;gap:13px;font-size:9px}
 }
+
+
+/* Final CTA photo alignment: anchor the portrait to the section, not the implicit grid row. */
+.final-section:before{
+  position:absolute!important;
+  top:50%!important;
+  right:9vw!important;
+  bottom:auto!important;
+  left:auto!important;
+  width:clamp(300px,27vw,390px)!important;
+  height:clamp(420px,38vw,540px)!important;
+  min-height:0!important;
+  margin:0!important;
+  transform:translateY(-50%) rotate(2deg)!important;
+  z-index:1!important;
+}
+.final-section:after{
+  top:auto!important;
+  right:calc(9vw + 18px)!important;
+  bottom:calc((100% - clamp(420px,38vw,540px))/2 + 18px)!important;
+  transform:rotate(-2deg)!important;
+}
+@media(max-width:950px){
+  .final-section:before{
+    top:auto!important;
+    right:50%!important;
+    bottom:28px!important;
+    left:auto!important;
+    width:min(72vw,420px)!important;
+    height:clamp(300px,55vw,380px)!important;
+    min-height:0!important;
+    margin:0!important;
+    transform:translateX(50%) rotate(2deg)!important;
+  }
+  .final-section:after{
+    right:auto!important;
+    left:calc(50% + min(36vw,210px) - 12px)!important;
+    bottom:42px!important;
+  }
+  .final-section{padding-bottom:440px!important}
+}
+@media(max-width:520px){
+  .final-section:before{
+    bottom:24px!important;
+    width:min(78vw,340px)!important;
+    height:290px!important;
+  }
+  .final-section:after{display:none!important}
+  .final-section{padding-bottom:350px!important}
+}
