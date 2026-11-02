@@ -60,9 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     homeNameTag.textContent = `${currentHome.name} · ${currentHome.area}`;
     homeWelcomeTitle.textContent = `${currentHome.name} 🏡`;
 
-    // Render Verification Notice Banner
-    renderVerificationBanner();
+    // Evidence submission/review comes before the verification status banner.
     renderVerificationEvidence();
+    renderVerificationBanner();
 
     // Fetch requirements & applications for this home
     const allOpps = await SahaayaDB.getOpportunities();
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <span class="notice-icon">✓</span>
             <div>
               <strong>Verified Partner Home:</strong>
-              Registered NGO/Trust (${currentHome.registration_number}). Your volunteer requirements are actively recommended to verified volunteers.
+              Registered partner${currentHome.registration_number ? ` · Registration ID: ${currentHome.registration_number}` : ""}. Your volunteer requirements are actively recommended to verified volunteers.
             </div>
           </div>
           <span class="badge badge-success">✓ Verified Partner</span>
@@ -110,47 +110,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Upload evidence for platform trust review. Files stay in a private Supabase bucket.
+  // Evidence submission is the first step in partner verification.
+  // Pending/rejected homes can upload documents; verified homes no longer see an upload form.
   function renderVerificationEvidence() {
     if (!verificationNoticeArea || !currentHome) return;
-    const existing = Array.isArray(currentHome.verification_documents) ? currentHome.verification_documents : [];
     document.getElementById("homeEvidencePanel")?.remove();
+    if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) return;
+    const existing = Array.isArray(currentHome.verification_documents) ? currentHome.verification_documents : [];
     const panel = document.createElement("section");
     panel.id = "homeEvidencePanel";
     panel.className = "portal-card home-evidence-panel";
     panel.innerHTML = `
       <div class="portal-card-body">
-        <span class="admin-review-kicker">TRUST & SAFETY REVIEW</span>
+        <span class="admin-review-kicker">STEP 1 · TRUST & SAFETY</span>
         <h3>Submit your verification evidence</h3>
-        <p>Upload clear, current documents. Sahaaya administrators review these before approving your home.</p>
-        <div class="home-evidence-list">${existing.map(doc => `<div class="home-evidence-item"><strong>${doc.label}</strong><span>Uploaded · ${new Date(doc.uploaded_at).toLocaleDateString()}</span></div>`).join("") || "<p>No evidence uploaded yet.</p>"}</div>
+        <p>Upload clear, current documents first. An administrator will review the evidence and complete the home verification decision afterwards.</p>
+        <div class="home-evidence-list">${existing.map(doc => `<div class="home-evidence-item"><strong>${doc.label || doc.file_name || "Verification document"}</strong><span>Uploaded · ${doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "Date unavailable"}</span></div>`).join("") || "<p>No evidence uploaded yet. Submit the required documents to begin review.</p>"}</div>
         <form id="homeEvidenceForm" class="home-evidence-form">
-          <label>Document type
-            <select name="kind" required>
-              <option value="">Choose evidence</option>
-              <option value="legal_registration">Legal registration / trust / society certificate</option>
-              <option value="address_proof">Address proof for the residence</option>
-              <option value="safety_policy">Resident safety / safeguarding policy</option>
-              <option value="care_operations">Care operations / facility evidence</option>
-              <option value="coordinator_authority">Coordinator authorization</option>
-            </select>
-          </label>
-          <label>Upload document (PDF, JPG or PNG; max 10 MB)
-            <input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
-          </label>
-          <button class="btn-primary btn-sm" type="submit">Upload evidence securely</button>
-          <p class="home-evidence-status" role="status" aria-live="polite"></p>
+          <label>Document type<select name="kind" required><option value="">Choose evidence</option><option value="legal_registration">Legal registration / trust / society certificate</option><option value="address_proof">Address proof for the residence</option><option value="safety_policy">Resident safety / safeguarding policy</option><option value="care_operations">Care operations / facility evidence</option><option value="coordinator_authority">Coordinator authorization</option></select></label>
+          <label>Upload document (PDF, JPG or PNG; max 10 MB)<input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required></label>
+          <button class="btn-primary btn-sm" type="submit">Upload evidence securely</button><p class="home-evidence-status" role="status" aria-live="polite"></p>
         </form>
       </div>`;
-    verificationNoticeArea.appendChild(panel);
+    verificationNoticeArea.parentNode.insertBefore(panel, verificationNoticeArea);
     const form = panel.querySelector("#homeEvidenceForm");
     form.addEventListener("submit", async event => {
       event.preventDefault();
       const file = form.elements.file.files[0], kind = form.elements.kind.value, status = form.querySelector(".home-evidence-status");
       if (!file || !kind) return;
       if (file.size > 10 * 1024 * 1024) { status.textContent = "File exceeds the 10 MB limit."; return; }
-      const allowed = ["application/pdf","image/jpeg","image/png"];
-      if (!allowed.includes(file.type)) { status.textContent = "Use a PDF, JPG or PNG file."; return; }
+      if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type)) { status.textContent = "Use a PDF, JPG or PNG file."; return; }
       const sb = window._supabaseClient;
       if (!sb) { status.textContent = "Secure upload is unavailable. Please try again later."; return; }
       const button = form.querySelector("button"); button.disabled = true; status.textContent = "Uploading privately…";
@@ -159,16 +148,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const path = session.id + "/" + crypto.randomUUID() + "." + ext;
         const { error } = await sb.storage.from("home-verification").upload(path, file, { upsert: false, contentType: file.type });
         if (error) throw error;
-        const labels = {legal_registration:"Legal registration proof",address_proof:"Residence address proof",safety_policy:"Resident safety policy",care_operations:"Care operations evidence",coordinator_authority:"Coordinator authorization"};
+        const labels = { legal_registration: "Legal registration proof", address_proof: "Residence address proof", safety_policy: "Resident safety policy", care_operations: "Care operations evidence", coordinator_authority: "Coordinator authorization" };
         const docs = [...existing, { kind, label: labels[kind], path, uploaded_at: new Date().toISOString(), file_name: file.name, content_type: file.type }];
         await SahaayaDB.updateHomeVerificationDocuments(currentHome.id, docs);
-        currentHome.verification_documents = docs;
-        status.textContent = "Evidence uploaded securely. It is now available for admin review.";
-        renderVerificationEvidence();
-      } catch (error) {
-        status.textContent = error.message || "Upload failed. Please try again.";
-        button.disabled = false;
-      }
+        currentHome.verification_documents = docs; status.textContent = "Evidence uploaded securely. It is now available for admin review."; renderVerificationEvidence();
+      } catch (error) { status.textContent = error.message || "Upload failed. Please try again."; button.disabled = false; }
     });
   }
 
