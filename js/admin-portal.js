@@ -155,7 +155,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const score = [...card.querySelectorAll("[data-trust-key]:checked")].reduce((sum,el)=>sum+Number(el.dataset.weight),0);
         card.querySelector("[data-trust-score]").innerHTML = score + "<small>/100</small>";
         const selected = Object.fromEntries([...card.querySelectorAll("[data-trust-key]")].map(el=>[el.dataset.trustKey,el.checked]));
-        const eligible = score>=80 && selected.legal_registration && selected.address_proof && selected.resident_safety;
+        const hasRequiredProof = ["legal_registration", "address_proof", "safety_policy"].every(kind => evidence.some(doc => doc.kind === kind));
+        const eligible = hasRequiredProof && score>=80 && selected.legal_registration && selected.address_proof && selected.resident_safety;
         card.querySelector(".verify-home-btn").disabled = !eligible || card.dataset.reviewSaved !== "true";
       }));
       card.querySelector(".save-trust-review").addEventListener("click", async event => {
@@ -163,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const review=Object.fromEntries([...card.querySelectorAll("[data-trust-key]")].map(el=>[el.dataset.trustKey,el.checked]));
         const score=criteria.reduce((sum,item)=>sum+(review[item[0]]?item[2]:0),0);
         button.disabled=true; feedback.textContent="Saving assessment…";
-        try { await SahaayaDB.updateHomeVerificationReview(home.id,review,score); feedback.textContent="Assessment saved."; card.dataset.reviewSaved="true"; const eligible=score>=80 && review.legal_registration && review.address_proof && review.resident_safety; card.querySelector(".verify-home-btn").disabled=!eligible; }
+        try { await SahaayaDB.updateHomeVerificationReview(home.id,review,score); feedback.textContent="Assessment saved."; card.dataset.reviewSaved="true"; const hasRequiredProof=["legal_registration","address_proof","safety_policy"].every(kind=>evidence.some(doc=>doc.kind===kind)); const eligible=hasRequiredProof && score>=80 && review.legal_registration && review.address_proof && review.resident_safety; card.querySelector(".verify-home-btn").disabled=!eligible; }
         catch(error){ feedback.textContent=error.message||"Could not save assessment."; }
         button.disabled=false;
       });
