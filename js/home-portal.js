@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     allUsers = await SahaayaDB.getUsers();
 
     // Find home linked to session or fallback to home_01
-    const homeId = session.home_id || "home_01";
-    currentHome = await SahaayaDB.getHomeById(homeId);
+    currentHome = await SahaayaDB.getHomeByUserId(session.id);
+    if (!currentHome && session.home_id) currentHome = await SahaayaDB.getHomeById(session.home_id);
 
     if (!currentHome) {
       // Fallback
