@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Render Verification Notice Banner
     renderVerificationBanner();
+    renderVerificationEvidence();
 
     // Fetch requirements & applications for this home
     const allOpps = await SahaayaDB.getOpportunities();
@@ -107,6 +108,66 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       `;
     }
+  }
+
+  // Upload evidence for platform trust review. Files stay in a private Supabase bucket.
+  function renderVerificationEvidence() {
+    if (!verificationNoticeArea || !currentHome) return;
+    const existing = Array.isArray(currentHome.verification_documents) ? currentHome.verification_documents : [];
+    const panel = document.createElement("section");
+    panel.className = "portal-card home-evidence-panel";
+    panel.innerHTML = `
+      <div class="portal-card-body">
+        <span class="admin-review-kicker">TRUST & SAFETY REVIEW</span>
+        <h3>Submit your verification evidence</h3>
+        <p>Upload clear, current documents. Sahaaya administrators review these before approving your home.</p>
+        <div class="home-evidence-list">${existing.map(doc => `<div class="home-evidence-item"><strong>${doc.label}</strong><span>Uploaded · ${new Date(doc.uploaded_at).toLocaleDateString()}</span></div>`).join("") || "<p>No evidence uploaded yet.</p>"}</div>
+        <form id="homeEvidenceForm" class="home-evidence-form">
+          <label>Document type
+            <select name="kind" required>
+              <option value="">Choose evidence</option>
+              <option value="legal_registration">Legal registration / trust / society certificate</option>
+              <option value="address_proof">Address proof for the residence</option>
+              <option value="safety_policy">Resident safety / safeguarding policy</option>
+              <option value="care_operations">Care operations / facility evidence</option>
+              <option value="coordinator_authority">Coordinator authorization</option>
+            </select>
+          </label>
+          <label>Upload document (PDF, JPG or PNG; max 10 MB)
+            <input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
+          </label>
+          <button class="btn-primary btn-sm" type="submit">Upload evidence securely</button>
+          <p class="home-evidence-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>`;
+    verificationNoticeArea.appendChild(panel);
+    const form = panel.querySelector("#homeEvidenceForm");
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const file = form.elements.file.files[0], kind = form.elements.kind.value, status = form.querySelector(".home-evidence-status");
+      if (!file || !kind) return;
+      if (file.size > 10 * 1024 * 1024) { status.textContent = "File exceeds the 10 MB limit."; return; }
+      const allowed = ["application/pdf","image/jpeg","image/png"];
+      if (!allowed.includes(file.type)) { status.textContent = "Use a PDF, JPG or PNG file."; return; }
+      const sb = window._supabaseClient;
+      if (!sb) { status.textContent = "Secure upload is unavailable. Please try again later."; return; }
+      const button = form.querySelector("button"); button.disabled = true; status.textContent = "Uploading privately…";
+      try {
+        const ext = file.name.split(".").pop().toLowerCase();
+        const path = session.id + "/" + crypto.randomUUID() + "." + ext;
+        const { error } = await sb.storage.from("home-verification").upload(path, file, { upsert: false, contentType: file.type });
+        if (error) throw error;
+        const labels = {legal_registration:"Legal registration proof",address_proof:"Residence address proof",safety_policy:"Resident safety policy",care_operations:"Care operations evidence",coordinator_authority:"Coordinator authorization"};
+        const docs = [...existing, { kind, label: labels[kind], path, uploaded_at: new Date().toISOString(), file_name: file.name, content_type: file.type }];
+        await SahaayaDB.updateHomeVerificationDocuments(currentHome.id, docs);
+        currentHome.verification_documents = docs;
+        status.textContent = "Evidence uploaded securely. It is now available for admin review.";
+        renderVerificationEvidence();
+      } catch (error) {
+        status.textContent = error.message || "Upload failed. Please try again.";
+        button.disabled = false;
+      }
+    });
   }
 
   // 4. Render KPIs
