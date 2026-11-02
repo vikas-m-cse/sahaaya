@@ -137,11 +137,8 @@ const SahaayaAuth = (() => {
   async function getSession() {
     const sb = _getSupabaseClient();
 
-    // Demo mode always takes priority if no real Supabase session is active
     const cached = getCachedSession();
-    if (cached && cached.isDemoSession) return cached;
-
-    if (!sb) return cached;
+    if (!sb) return null;
 
     try {
       const { data: { session }, error } = await sb.auth.getSession();
@@ -268,22 +265,36 @@ const SahaayaAuth = (() => {
     };
   }
 
-  // -----------------------------------------------------------------------
-  // Login
-  // -----------------------------------------------------------------------
-  async function login(email, password) {
+  // Passwordless one-time-code authentication for existing accounts only.
+  async function requestOtp(identifier, method = "email") {
     const sb = _getSupabaseClient();
-    if (!sb) throw new Error("Supabase is not connected.");
+    if (!sb) throw new Error("Supabase authentication is not configured. Connect the Sahaaya project first.");
+    const value = String(identifier || "").trim();
+    if (!value) throw new Error(method === "phone" ? "Enter your phone number with country code." : "Enter your email address.");
+    const options = { shouldCreateUser: false };
+    const result = method === "phone"
+      ? await sb.auth.signInWithOtp({ phone: value, options })
+      : await sb.auth.signInWithOtp({ email: value.toLowerCase(), options });
+    if (result.error) throw result.error;
+    return true;
+  }
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    if (!data.user) throw new Error("Authentication failed.");
-
-    const sessionUser = await fetchUserProfile(data.user.id);
+  async function verifyOtp(identifier, token, method = "email") {
+    const sb = _getSupabaseClient();
+    if (!sb) throw new Error("Supabase authentication is not configured.");
+    const value = String(identifier || "").trim();
+    const code = String(token || "").trim();
+    if (!/^\d{6}$/.test(code)) throw new Error("Enter the 6-digit verification code.");
+    const result = method === "phone"
+      ? await sb.auth.verifyOtp({ phone: value, token: code, type: "sms" })
+      : await sb.auth.verifyOtp({ email: value.toLowerCase(), token: code, type: "email" });
+    if (result.error) throw result.error;
+    if (!result.data.user) throw new Error("Verification did not return an account.");
+    const sessionUser = await fetchUserProfile(result.data.user.id);
     if (!sessionUser) {
-      throw new Error("User profile not found in database. Contact administrator.");
+      await sb.auth.signOut();
+      throw new Error("Your account is verified, but its Sahaaya profile is missing. Contact the Sahaaya administrator.");
     }
-
     return sessionUser;
   }
 
@@ -327,52 +338,6 @@ const SahaayaAuth = (() => {
   }
 
   // -----------------------------------------------------------------------
-  // Demo Role Switcher (evaluation only — not a security mechanism)
-  // -----------------------------------------------------------------------
-  async function switchDemoRole(targetRole) {
-    const personas = {
-      volunteer: {
-        id: "usr_vol_01",
-        name: "Ananya Sharma",
-        email: "demo.volunteer@sahaaya.org",
-        role: "volunteer",
-        phone: "+91 98450 12345",
-        avatar_initials: "AS",
-        isDemoSession: true
-      },
-      home: {
-        id: "usr_home_01",
-        name: "Rajesh Sen",
-        email: "demo.home@sahaaya.org",
-        role: "home",
-        phone: "+91 80 2845 0911",
-        avatar_initials: "SS",
-        home_id: "home_01",
-        isDemoSession: true
-      },
-      admin: {
-        id: "usr_admin_01",
-        name: "Sahana K",
-        email: "demo.admin@sahaaya.org",
-        role: "admin",
-        phone: "+91 99000 11223",
-        avatar_initials: "SK",
-        isDemoSession: true
-      }
-    };
-
-    const demoSession = personas[targetRole] || personas.volunteer;
-    setCachedSession(demoSession);
-
-    const base = getBasePath();
-    const urlMap = { volunteer: "volunteer/", home: "home/", admin: "admin/" };
-    const destination = new URL(base + (urlMap[targetRole] || "volunteer/"), window.location.href);
-    const requestedActivity = new URLSearchParams(window.location.search).get("activity");
-    if (targetRole === "volunteer" && requestedActivity) destination.searchParams.set("activity", requestedActivity);
-    window.location.href = destination.href;
-  }
-
-  // -----------------------------------------------------------------------
   // Public API
   // -----------------------------------------------------------------------
   return {
@@ -380,10 +345,10 @@ const SahaayaAuth = (() => {
     getCachedSession,
     registerVolunteer,
     registerHome,
-    login,
+    requestOtp,
+    verifyOtp,
     logout,
     checkAuthGuard,
-    switchDemoRole,
     getBasePath
   };
 })();
