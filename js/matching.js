@@ -41,19 +41,25 @@ const SahaayaMatching = (() => {
     if (opportunity.required_training && !overlap(profile.completed_training, [opportunity.required_training])) hardStops.push("Required training has not been completed.");
     if (opportunity.consent_required && profile.consent_to_safeguarding !== true) hardStops.push("Required safeguarding agreement is not confirmed.");
 
-    let score = 0;
-    score += scoreDimension(interestMatch, WEIGHTS.interest, "Activity interest aligns", reasons, gaps);
-    score += scoreDimension(slotMatch || !requiredSlot, WEIGHTS.schedule, slotMatch ? "Available for the scheduled time" : "No fixed time slot was specified", reasons, gaps);
-    score += scoreDimension(skillMatch, WEIGHTS.skills, skillMatch ? "Required skills or experience align" : "Required skills are not demonstrated", reasons, gaps);
-    score += scoreDimension(languageMatch, WEIGHTS.language, languageMatch ? "Language requirements align" : "Language requirement not confirmed", reasons, gaps);
-    score += scoreDimension(areaMatch, WEIGHTS.location, areaMatch ? "Location appears feasible based on stated areas" : "Location may be difficult; confirm travel feasibility", reasons, gaps);
-    score += scoreDimension(taskFit, WEIGHTS.taskFit, taskFit ? "Task preferences are compatible" : "Task requirements conflict with stated preferences", reasons, gaps);
-    score += scoreDimension(environmentMatch, WEIGHTS.environment, environmentMatch ? "Activity environment aligns with preferences" : "Environment preference needs review", reasons, gaps);
+    let points = 0, applicableWeight = 0;
+    const add = (applicable, matched, weight, yes, no) => {
+      if (!applicable) return;
+      applicableWeight += weight;
+      points += scoreDimension(matched, weight, matched ? yes : no, reasons, gaps);
+    };
+    add(true, interestMatch, WEIGHTS.interest, "Activity interest aligns", "Activity is outside your stated interests");
+    add(!!requiredSlot, slotMatch, WEIGHTS.schedule, "Available for the scheduled time", "Schedule conflict: this time is not in your stated availability");
+    add(requiredSkills.length > 0, skillMatch, WEIGHTS.skills, "Required skills or experience align", "Required skills are not demonstrated");
+    add(requiredLanguages.length > 0, languageMatch, WEIGHTS.language, "Language requirements align", "Required language is not confirmed");
+    add(!!(opportunity.area && profile.preferred_area), areaMatch, WEIGHTS.location, "Location appears feasible based on stated areas", "Location may be difficult; confirm travel feasibility");
+    add(taskNeeds.length > 0, taskFit, WEIGHTS.taskFit, "Task requirements align with stated preferences", "Task requirements conflict with stated preferences");
+    add(!!opportunity.environment, environmentMatch, WEIGHTS.environment, "Activity environment aligns with preferences", "Environment preference needs review");
     const hours = Number(profile.total_hours || 0), sessions = Number(profile.completed_count || 0);
-    const reliability = hours >= 10 ? 5 : sessions >= 1 ? 3 : 0;
-    score += reliability;
-    reasons.push(reliability ? "Has verified participation history" : "New volunteer; no reliability penalty applied");
-    const matchLevel = hardStops.length || score < 55 ? "low" : score >= 85 ? "high" : score >= 70 ? "good" : "conditional";
+    const reliability = hours >= 10 ? 5 : sessions >= 1 ? 3 : 2.5;
+    applicableWeight += WEIGHTS.reliability; points += reliability;
+    reasons.push(hours >= 10 || sessions >= 1 ? "Has verified participation history" : "New volunteer; reliability remains neutral until history exists");
+    const score = applicableWeight ? Math.round(points / applicableWeight * 100) : 0;
+    const matchLevel = hardStops.length || score < 55 ? "low" : score >= 85 ? "high" : score >= 70 ? "medium" : "general";
     return {
       score: Math.round(score), reasons, gaps, hardStops, weights: WEIGHTS,
       matchLevel, eligible: hardStops.length === 0 && score >= 55,
