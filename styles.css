@@ -600,3 +600,26 @@ a,
 .final-orbit {
   pointer-events: none !important;
 }
+
+
+/* Hero application control: keep the interactive content above decorative card layers. */
+.hero-product .hero-experience::after{
+  content:none!important;
+  display:none!important;
+  pointer-events:none!important;
+}
+.hero-product .hero-experience .experience-body{
+  position:relative!important;
+  z-index:20!important;
+  isolation:isolate!important;
+}
+.hero-product .hero-experience .experience-action{
+  position:relative!important;
+  z-index:30!important;
+  display:flex!important;
+  width:100%!important;
+  min-height:48px!important;
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+}
