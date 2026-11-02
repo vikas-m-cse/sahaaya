@@ -673,122 +673,204 @@ const SahaayaDB = (() => {
     // Requirements / Opportunities
     // -------------------------------------------------------------
     getOpportunities: async (filters = {}) => {
+      const sb = window._supabaseClient;
+      if (sb) {
+        let query = sb.from("activities")
+          .select("*, old_age_homes(id, name, address, city, verification_status)")
+          .order("created_at", { ascending: false });
+        if (filters.home_id) query = query.eq("home_id", filters.home_id);
+        if (filters.status) query = query.eq("status", filters.status);
+        if (filters.category && filters.category !== "all") query = query.eq("activity_type", filters.category);
+        const { data, error } = await query;
+        if (error) throw new Error("Could not load shared activities: " + error.message);
+        const activities = data || [];
+        const activityIds = activities.map(item => item.id);
+        let counts = {};
+        if (activityIds.length) {
+          const { data: apps, error: appError } = await sb.from("applications")
+            .select("activity_id, status").in("activity_id", activityIds)
+            .in("status", ["applied", "approved", "attended"]);
+          if (appError) console.warn("Could not load activity application counts:", appError.message);
+          (apps || []).forEach(app => { counts[app.activity_id] = (counts[app.activity_id] || 0) + (app.status === "approved" || app.status === "attended" ? 1 : 0); });
+        }
+        return activities.map(item => ({
+          ...item,
+          home_id: item.home_id,
+          category: item.activity_type,
+          slot_id: item.slot_id || "",
+          date: item.date,
+          time_start: item.start_time,
+          time_end: item.end_time,
+          duration_hours: Number(item.duration_hours || 2),
+          spots_needed: item.volunteers_required,
+          spots_filled: counts[item.id] || 0,
+          required_skills: item.required_skills || [],
+          home: item.old_age_homes ? {
+            id: item.old_age_homes.id, name: item.old_age_homes.name,
+            address: item.old_age_homes.address, area: item.old_age_homes.city
+          } : null
+        }));
+      }
       let opps = load("opportunities");
-      if (filters.home_id) {
-        opps = opps.filter(o => o.home_id === filters.home_id);
-      }
-      if (filters.category && filters.category !== "all") {
-        opps = opps.filter(o => o.category === filters.category);
-      }
-      if (filters.status) {
-        opps = opps.filter(o => o.status === filters.status);
-      }
+      if (filters.home_id) opps = opps.filter(o => o.home_id === filters.home_id);
+      if (filters.category && filters.category !== "all") opps = opps.filter(o => o.category === filters.category);
+      if (filters.status) opps = opps.filter(o => o.status === filters.status);
       return opps;
     },
 
     getOpportunityById: async (id) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
+        const { data, error } = await sb.from("activities").select("*").eq("id", id).maybeSingle();
+        if (error) throw new Error("Could not load activity: " + error.message);
+        return data ? { ...data, category: data.activity_type, time_start: data.start_time, time_end: data.end_time, spots_needed: data.volunteers_required, duration_hours: Number(data.duration_hours || 2), required_skills: data.required_skills || [] } : null;
+      }
       const opps = load("opportunities");
       return opps.find(o => o.id === id) || null;
     },
 
     createOpportunity: async (oppData) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(oppData.home_id))) {
+        const payload = {
+          home_id: oppData.home_id,
+          title: oppData.title,
+          description: oppData.description,
+          activity_type: oppData.category,
+          date: oppData.date,
+          start_time: oppData.time_start,
+          end_time: oppData.time_end,
+          volunteers_required: Number(oppData.spots_needed) || 1,
+          slot_id: oppData.slot_id || null,
+          duration_hours: Number(oppData.duration_hours) || 2,
+          required_skills: oppData.required_skills || [],
+          status: "open"
+        };
+        const { data, error } = await sb.from("activities").insert(payload).select("*").single();
+        if (error) {
+          if (error.code === "42501") throw new Error("This home is not yet verified or is not permitted to publish activities. A platform admin must verify it first.");
+          throw new Error("Could not publish requirement to the shared database: " + error.message);
+        }
+        return { ...data, category: data.activity_type, time_start: data.start_time, time_end: data.end_time, spots_needed: data.volunteers_required, duration_hours: Number(data.duration_hours || 2), required_skills: data.required_skills || [], spots_filled: 0 };
+      }
       const opps = load("opportunities");
       const id = "opp_" + Date.now();
-      const newOpp = {
-        id,
-        spots_filled: 0,
-        status: SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN,
-        created_at: new Date().toISOString(),
-        ...oppData
-      };
-      opps.unshift(newOpp); // Newest first
-      save("opportunities", opps);
-      return newOpp;
+      const newOpp = { id, spots_filled: 0, status: SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN, created_at: new Date().toISOString(), ...oppData };
+      opps.unshift(newOpp); save("opportunities", opps); return newOpp;
     },
 
     updateOpportunity: async (id, data) => {
-      const opps = load("opportunities");
-      const index = opps.findIndex(o => o.id === id);
-      if (index !== -1) {
-        opps[index] = { ...opps[index], ...data };
-        save("opportunities", opps);
-        return opps[index];
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
+        const payload = {};
+        if (data.title !== undefined) payload.title = data.title;
+        if (data.description !== undefined) payload.description = data.description;
+        if (data.category !== undefined) payload.activity_type = data.category;
+        if (data.date !== undefined) payload.date = data.date;
+        if (data.time_start !== undefined) payload.start_time = data.time_start;
+        if (data.time_end !== undefined) payload.end_time = data.time_end;
+        if (data.spots_needed !== undefined) payload.volunteers_required = data.spots_needed;
+        if (data.status !== undefined) payload.status = data.status;
+        const { data: row, error } = await sb.from("activities").update(payload).eq("id", id).select("*").single();
+        if (error) throw new Error("Could not update activity: " + error.message);
+        return { ...row, category: row.activity_type, time_start: row.start_time, time_end: row.end_time, spots_needed: row.volunteers_required };
       }
+      const opps = load("opportunities"); const index = opps.findIndex(o => o.id === id);
+      if (index !== -1) { opps[index] = { ...opps[index], ...data }; save("opportunities", opps); return opps[index]; }
       return null;
     },
 
-    // -------------------------------------------------------------
-    // Applications
-    // -------------------------------------------------------------
     getApplications: async (filter = {}) => {
+      const sb = window._supabaseClient;
+      if (sb) {
+        let volunteerRecordId = null;
+        if (filter.volunteer_id) {
+          const { data: volunteer, error: volunteerError } = await sb.from("volunteers")
+            .select("id, profile_id").eq("profile_id", filter.volunteer_id).maybeSingle();
+          if (volunteerError) throw new Error("Could not resolve volunteer account: " + volunteerError.message);
+          volunteerRecordId = volunteer?.id || null;
+          if (!volunteerRecordId) return [];
+        }
+        let query = sb.from("applications").select("*").order("applied_at", { ascending: false });
+        if (volunteerRecordId) query = query.eq("volunteer_id", volunteerRecordId);
+        if (filter.opportunity_id) query = query.eq("activity_id", filter.opportunity_id);
+        if (filter.status) query = query.eq("status", filter.status);
+        const { data, error } = await query;
+        if (error) throw new Error("Could not load applications: " + error.message);
+        const rows = data || [];
+        const volunteerIds = [...new Set(rows.map(row => row.volunteer_id))];
+        let volunteerMap = {};
+        if (volunteerIds.length) {
+          const { data: volunteers, error: vError } = await sb.from("volunteers").select("id, profile_id").in("id", volunteerIds);
+          if (vError) console.warn("Could not resolve application volunteers:", vError.message);
+          const profileIds = (volunteers || []).map(v => v.profile_id);
+          const { data: profiles } = profileIds.length ? await sb.from("profiles").select("id, full_name, phone").in("id", profileIds) : { data: [] };
+          const pMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+          (volunteers || []).forEach(v => { volunteerMap[v.id] = { ...v, ...(pMap[v.profile_id] || {}) }; });
+        }
+        return rows.map(row => ({
+          ...row,
+          opportunity_id: row.activity_id,
+          volunteer_record_id: row.volunteer_id,
+          volunteer_id: volunteerMap[row.volunteer_id]?.profile_id || row.volunteer_id,
+          volunteer_name: volunteerMap[row.volunteer_id]?.full_name || "Volunteer",
+          volunteer_phone: volunteerMap[row.volunteer_id]?.phone || ""
+        }));
+      }
       let apps = load("applications");
-      if (filter.volunteer_id) {
-        apps = apps.filter(a => a.volunteer_id === filter.volunteer_id);
-      }
-      if (filter.opportunity_id) {
-        apps = apps.filter(a => a.opportunity_id === filter.opportunity_id);
-      }
-      if (filter.status) {
-        apps = apps.filter(a => a.status === filter.status);
-      }
+      if (filter.volunteer_id) apps = apps.filter(a => a.volunteer_id === filter.volunteer_id);
+      if (filter.opportunity_id) apps = apps.filter(a => a.opportunity_id === filter.opportunity_id);
+      if (filter.status) apps = apps.filter(a => a.status === filter.status);
       return apps;
     },
 
     getApplicationById: async (id) => {
-      const apps = load("applications");
-      return apps.find(a => a.id === id) || null;
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
+        const { data, error } = await sb.from("applications").select("*").eq("id", id).maybeSingle();
+        if (error) throw new Error("Could not load application: " + error.message);
+        return data ? { ...data, opportunity_id: data.activity_id, volunteer_record_id: data.volunteer_id } : null;
+      }
+      const apps = load("applications"); return apps.find(a => a.id === id) || null;
     },
 
     submitApplication: async (appData) => {
-      const apps = load("applications");
-      // Prevent duplicate active applications
-      const existing = apps.find(
-        a => a.opportunity_id === appData.opportunity_id &&
-             a.volunteer_id === appData.volunteer_id &&
-             (a.status === "applied" || a.status === "approved")
-      );
-      if (existing) {
-        throw new Error("You have already applied for this opportunity.");
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(appData.volunteer_id))) {
+        const { data: volunteer, error: vError } = await sb.from("volunteers").select("id").eq("profile_id", appData.volunteer_id).single();
+        if (vError || !volunteer) throw new Error("Your volunteer profile is not set up in the shared database yet. Please complete your profile and try again.");
+        const { data, error } = await sb.from("applications").insert({
+          activity_id: appData.opportunity_id,
+          volunteer_id: volunteer.id,
+          status: "applied"
+        }).select("*").single();
+        if (error) {
+          if (error.code === "23505") throw new Error("You have already applied for this activity.");
+          throw new Error("Could not submit application: " + error.message);
+        }
+        return { ...data, opportunity_id: data.activity_id, volunteer_id: appData.volunteer_id, volunteer_record_id: data.volunteer_id };
       }
-
+      const apps = load("applications");
+      const existing = apps.find(a => a.opportunity_id === appData.opportunity_id && a.volunteer_id === appData.volunteer_id && (a.status === "applied" || a.status === "approved"));
+      if (existing) throw new Error("You have already applied for this opportunity.");
       const id = "app_" + Date.now();
-      const newApp = {
-        id,
-        status: SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED,
-        applied_at: new Date().toISOString(),
-        reviewed_at: null,
-        coordinator_note: null,
-        ...appData
-      };
-      apps.push(newApp);
-      save("applications", apps);
-      return newApp;
+      const newApp = { id, status: SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED, applied_at: new Date().toISOString(), reviewed_at: null, coordinator_note: null, ...appData };
+      apps.push(newApp); save("applications", apps); return newApp;
     },
 
     updateApplicationStatus: async (applicationId, status, coordinatorNote = "") => {
-      const apps = load("applications");
-      const app = apps.find(a => a.id === applicationId);
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
+        const { data, error } = await sb.from("applications").update({ status, reviewed_at: new Date().toISOString() }).eq("id", applicationId).select("*").single();
+        if (error) throw new Error("Could not update application: " + error.message);
+        return { ...data, opportunity_id: data.activity_id, volunteer_record_id: data.volunteer_id };
+      }
+      const apps = load("applications"); const app = apps.find(a => a.id === applicationId);
       if (!app) throw new Error("Application not found");
-
-      app.status = status;
-      app.reviewed_at = new Date().toISOString();
-      if (coordinatorNote) {
-        app.coordinator_note = coordinatorNote;
-      }
-
-      // If approved, update spots_filled on the opportunity
-      const opps = load("opportunities");
-      const opp = opps.find(o => o.id === app.opportunity_id);
-      if (opp && status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED) {
-        opp.spots_filled = (opp.spots_filled || 0) + 1;
-        if (opp.spots_filled >= opp.spots_needed) {
-          opp.status = SAHAAYA_CONFIG.OPPORTUNITY_STATUS.FILLED;
-        }
-        save("opportunities", opps);
-      }
-
-      save("applications", apps);
-      return app;
+      app.status = status; app.reviewed_at = new Date().toISOString(); if (coordinatorNote) app.coordinator_note = coordinatorNote;
+      const opps = load("opportunities"); const opp = opps.find(o => o.id === app.opportunity_id);
+      if (opp && status === SAHAAYA_CONFIG.APPLICATION_STATUS.APPROVED) { opp.spots_filled = (opp.spots_filled || 0) + 1; if (opp.spots_filled >= opp.spots_needed) opp.status = SAHAAYA_CONFIG.OPPORTUNITY_STATUS.FILLED; save("opportunities", opps); }
+      save("applications", apps); return app;
     },
 
     // -------------------------------------------------------------
