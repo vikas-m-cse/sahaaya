@@ -178,8 +178,8 @@ function openLandingModal(type, activity) {
   if (otpRequestForm) otpRequestForm.addEventListener("submit", async event => {
     event.preventDefault(); const button = document.getElementById("otpSendBtn");
     const rawIdentity = otpMethod === "email" ? otpIdentityEmail.value.trim() : otpIdentity.value.trim();
-    const identity = otpMethod === "email" ? rawIdentity.toLowerCase() : (rawIdentity.startsWith("+") ? rawIdentity.replace(/[\\s()-]/g, "") : otpCountryCode.value + rawIdentity.replace(/\\D/g, ""));
-    if (otpMethod === "phone" && !/^\\+[1-9]\\d{7,14}$/.test(identity)) { setOtpStatus("Enter a valid phone number. Choose the country code and enter the number without it.", true); return; }
+    const identity = otpMethod === "email" ? rawIdentity.toLowerCase() : (rawIdentity.startsWith("+") ? rawIdentity.replace(/[\s()-]/g, "") : otpCountryCode.value + rawIdentity.replace(/\D/g, ""));
+    if (otpMethod === "phone" && !/^\+[1-9]\d{7,14}$/.test(identity)) { setOtpStatus("Enter a valid phone number. Choose the country code and enter the number without it.", true); return; }
     button.disabled = true; button.querySelector("span").textContent = "Sending code…";
     try { await SahaayaAuth.requestOtp(identity, otpMethod); otpRequestedFor = identity; otpRequestForm.hidden = true; otpVerifyForm.hidden = false; document.getElementById("otpCode").focus(); setOtpStatus("A verification code has been sent. Check your inbox or SMS messages."); }
     catch (error) { setOtpStatus(error.message || "Could not send a verification code.", true); }
