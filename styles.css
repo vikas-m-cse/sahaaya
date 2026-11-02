@@ -926,3 +926,41 @@ a,
 .signup-status.error{color:#a4493c}
 .signup-resend{grid-column:1/-1;border:0;background:transparent;color:#547b56;font:700 11px var(--sans);text-decoration:underline;cursor:pointer;padding:8px}
 @media(max-width:620px){.signup-experience h2{font-size:40px}.signup-phone-row{grid-template-columns:105px minmax(0,1fr);gap:7px}}
+
+
+/* Home partner registration — calm, structured and responsive */
+.modal-card:has(.home-register){width:min(880px,94vw);max-height:min(92vh,900px);padding:0;border-radius:26px;background:#f7f5ed;overflow:auto}
+.modal-card:has(.home-register)>.close{z-index:5;right:18px;top:18px;background:rgba(255,255,255,.88);border-color:rgba(28,65,54,.12)}
+.home-register{padding:34px 44px 26px;color:#183d33}
+.home-register-intro{max-width:620px;margin-bottom:26px}
+.home-register-mark{display:grid;place-items:center;width:42px;height:42px;margin-bottom:18px;border-radius:50%;background:#1c4338;color:#f7f5ed;font:italic 22px Georgia,serif}
+.home-register .eyebrow{font-size:9px;letter-spacing:2px;font-weight:800;color:#8a7553}
+.home-register-intro h2{font:400 clamp(38px,5vw,58px)/.98 var(--serif);letter-spacing:-1.8px;margin:10px 0 12px;color:#183d33}
+.home-register-intro h2 em{color:#9a7952}
+.home-register-intro>p{max-width:570px;margin:0;color:#68766e;font-size:13px;line-height:1.7}
+.home-register-form{display:block!important;margin:0!important}
+.home-form-section{padding:20px 0;border-top:1px solid rgba(28,65,54,.13)}
+.home-form-section-head{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.home-form-section-head>span{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(28,65,54,.2);border-radius:50%;font-size:10px;font-weight:800;color:#9a7952}
+.home-form-section-head div{display:grid;gap:3px}
+.home-form-section-head strong{font-size:13px;color:#183d33}
+.home-form-section-head small{font-size:11px;color:#7b877f}
+.home-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px}
+.home-register-form .field{min-width:0;display:flex;flex-direction:column;gap:6px}
+.home-register-form .field label{font-size:9px;letter-spacing:1.35px;font-weight:800;color:#52645b;text-transform:uppercase}
+.home-register-form .field input{width:100%;min-width:0;height:48px;padding:0 14px;border:1px solid #d8ddd5;border-radius:12px;background:#fff;color:#1d332b;font:500 13px "DM Sans",sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
+.home-register-form .field input::placeholder{color:#a2aaa3}
+.home-register-form .field input:focus{border-color:#557d6c;box-shadow:0 0 0 3px rgba(85,125,108,.12)}
+.home-register-form .field-wide{grid-column:1/-1}
+.home-field-hint{font-size:10px;color:#849087}
+.home-register-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:18px;border-top:1px solid rgba(28,65,54,.13)}
+.home-register-actions>p{max-width:260px;margin:0;color:#7b877f;font-size:10px;line-height:1.55}
+.home-register-submit{display:flex;align-items:center;justify-content:space-between;gap:28px;min-width:220px;padding:14px 17px;border:0;border-radius:12px;background:#1c4338;color:#fff;font:600 12px "DM Sans",sans-serif;cursor:pointer;transition:transform .2s,background .2s}
+.home-register-submit:hover{background:#285848;transform:translateY(-1px)}
+.home-register-submit:disabled{opacity:.65;cursor:wait;transform:none}
+.home-register-submit b{font-size:18px;font-weight:400}
+.home-register-status{min-height:16px;margin:10px 0 0;color:#537363;font-size:11px}
+.home-register-status.error{color:#a43d35}
+.home-register-foot{margin:14px 0 0;padding-top:15px;border-top:1px solid rgba(28,65,54,.1);font-size:11px;color:#78857d}
+.home-register-foot button{border:0;background:none;color:#1c5b48;text-decoration:underline;text-underline-offset:3px;font:600 11px "DM Sans",sans-serif;cursor:pointer}
+@media(max-width:640px){.modal-card:has(.home-register){width:96vw;max-height:94vh;border-radius:20px}.home-register{padding:26px 20px 20px}.home-register-intro{padding-right:28px}.home-register-intro h2{font-size:42px}.home-form-grid{grid-template-columns:1fr}.home-register-form .field-wide{grid-column:auto}.home-register-actions{align-items:stretch;flex-direction:column}.home-register-actions>p{max-width:none}.home-register-submit{width:100%}}
