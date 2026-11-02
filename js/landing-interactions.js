@@ -122,7 +122,10 @@
       // straight into the portal. Other opportunity cards retain their details modal.
       if (applyTrigger.classList.contains("experience-action")) {
         const activity = applyTrigger.dataset.activity || "Volunteer opportunity";
-        window.location.href = "volunteer/?activity=" + encodeURIComponent(activity);
+        const portalUrl = new URL("/volunteer/index.html", window.location.origin);
+        portalUrl.searchParams.set("activity", activity);
+        console.info("Sahaaya: opening volunteer portal", portalUrl.href);
+        window.location.assign(portalUrl.href);
         return;
       }
 
