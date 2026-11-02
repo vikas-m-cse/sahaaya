@@ -266,6 +266,29 @@ const SahaayaAuth = (() => {
     };
   }
 
+  // Create a volunteer account using verified phone OTP. Email is optional contact data.
+  async function requestVolunteerSignup(phone, profile) {
+    const sb = _getSupabaseClient();
+    if (!sb) throw new Error("Supabase authentication is not configured.");
+    const result = await sb.auth.signInWithOtp({
+      phone,
+      options: {
+        shouldCreateUser: true,
+        data: {
+          full_name: profile.name,
+          email: profile.email || null,
+          phone,
+          role: "volunteer",
+          interests: profile.interests || ["companionship"],
+          availability: profile.availability || ["sun_morning"],
+          preferred_area: "Bengaluru"
+        }
+      }
+    });
+    if (result.error) throw result.error;
+    return true;
+  }
+
   // Passwordless one-time-code authentication for existing accounts only.
   async function requestOtp(identifier, method = "email") {
     const sb = _getSupabaseClient();
@@ -347,6 +370,7 @@ const SahaayaAuth = (() => {
     registerVolunteer,
     registerHome,
     requestOtp,
+    requestVolunteerSignup,
     verifyOtp,
     logout,
     checkAuthGuard,
