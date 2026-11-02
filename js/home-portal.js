@@ -114,7 +114,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderVerificationEvidence() {
     if (!verificationNoticeArea || !currentHome) return;
     const existing = Array.isArray(currentHome.verification_documents) ? currentHome.verification_documents : [];
+    document.getElementById("homeEvidencePanel")?.remove();
     const panel = document.createElement("section");
+    panel.id = "homeEvidencePanel";
     panel.className = "portal-card home-evidence-panel";
     panel.innerHTML = `
       <div class="portal-card-body">
