@@ -61,38 +61,50 @@ function openLandingModal(type, activity) {
 
   if (type === "login") {
     html = `
-      <div class="eyebrow">PORTAL ACCESS</div>
-      <h2>Sign in to Sahaaya</h2>
-      <p>Enter your credentials to access your verified profile and portal.</p>
+      <div class="login-experience">
+        <aside class="login-story">
+          <a class="login-brand" href="/" aria-label="Sahaaya home"><span class="login-brand-mark">sa</span><span>SAHAAYA</span></a>
+          <div class="login-story-copy">
+            <span class="login-story-kicker">A LITTLE TIME. A LOT OF HUMANITY.</span>
+            <h2>Make room for<br><em>meaningful moments.</em></h2>
+            <p>Sign in to continue showing up for conversations, shared stories and the people who make them matter.</p>
+          </div>
+          <div class="login-story-foot"><span class="login-story-dot"></span> VERIFIED HOMES <i>·</i> REAL CONNECTIONS</div>
+          <div class="login-story-orbit" aria-hidden="true"></div>
+        </aside>
+        <section class="login-main">
+          <div class="login-heading">
+            <div class="eyebrow">PORTAL ACCESS</div>
+            <h2>Welcome <em>back.</em></h2>
+            <p>Choose a demo space or sign in with your account.</p>
+          </div>
 
-      <!-- 1-Click Demo Evaluation Access -->
-      <div style="background: #f0f5f2; border: 1px solid #c6ddd3; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
-        <span style="font-size: 10px; font-weight: 800; color: #174e43; letter-spacing: 0.8px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-          ⚡ 1-Click Demo Access for Evaluators
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('volunteer')">
-            <span>👤</span> <strong>Volunteer Portal</strong> — Ananya Sharma →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('home')">
-            <span>🏡</span> <strong>Old Age Home Portal</strong> — Silver Springs Care →
-          </button>
-          <button type="button" class="btn secondary" style="justify-content: flex-start; padding: 8px 12px; font-size: 13px;" onclick="SahaayaAuth.switchDemoRole('admin')">
-            <span>🛡️</span> <strong>Admin Portal</strong> — Platform Operations →
-          </button>
-        </div>
+          <div class="login-demo">
+            <div class="login-section-heading"><span class="login-section-icon">✦</span><div><strong>Explore Sahaaya</strong><small>Instant access for evaluators</small></div></div>
+            <div class="login-demo-list">
+              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('volunteer')" id="demoLoginVolunteer">
+                <span class="login-demo-icon volunteer">V</span><span class="login-demo-copy"><strong>Volunteer portal</strong><small>Ananya Sharma · Discover and apply</small></span><span class="login-demo-arrow">↗</span>
+              </button>
+              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('home')" id="demoLoginHome">
+                <span class="login-demo-icon home">H</span><span class="login-demo-copy"><strong>Care home portal</strong><small>Silver Springs Care · Manage needs</small></span><span class="login-demo-arrow">↗</span>
+              </button>
+              <button type="button" class="login-demo-option" onclick="SahaayaAuth.switchDemoRole('admin')" id="demoLoginAdmin">
+                <span class="login-demo-icon admin">A</span><span class="login-demo-copy"><strong>Admin portal</strong><small>Platform Operations · Manage Sahaaya</small></span><span class="login-demo-arrow">↗</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-divider"><span>OR SIGN IN WITH YOUR ACCOUNT</span></div>
+          <form class="login-form" id="loginForm">
+            <div class="login-field"><label for="loginEmail">EMAIL ADDRESS</label><input required type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username"></div>
+            <div class="login-field"><label for="loginPassword">PASSWORD</label><input required type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"></div>
+            <button class="login-submit" type="submit" id="loginSubmitBtn"><span>Sign in securely</span><span aria-hidden="true">↗</span></button>
+          </form>
+          <p class="login-footnote"><span aria-hidden="true">⌁</span> Your account and portal data stay protected.</p>
+        </section>
       </div>
-
-      <div style="text-align: center; color: #9eada8; font-size: 11px; margin: 12px 0; font-weight: 700; letter-spacing: 0.5px;">— OR SIGN IN WITH REAL ACCOUNT —</div>
-
-      <form class="form" id="loginForm">
-        <input required type="email" id="loginEmail" placeholder="Email address">
-        <input required type="password" id="loginPassword" placeholder="Password">
-        <button class="btn primary" type="submit" id="loginSubmitBtn">Sign in →</button>
-      </form>
     `;
   }
-
   if (type === "home") {
     html = `
       <div class="eyebrow">PARTNER WITH US</div>
@@ -127,7 +139,9 @@ function openLandingModal(type, activity) {
   }
 
   if (legacyContent) legacyContent.innerHTML = html;
-  if (legacyModal)   legacyModal.classList.add("open");
+  const modalCard = legacyModal?.querySelector(".modal-card");
+  modalCard?.classList.toggle("login-layout", type === "login");
+  if (legacyModal) legacyModal.classList.add("open");
 
   // Switch to login link inside join form
   document.getElementById("switchToLogin")?.addEventListener("click", e => {
