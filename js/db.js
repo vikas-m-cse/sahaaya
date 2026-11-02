@@ -519,6 +519,40 @@ const SahaayaDB = (() => {
     // Old Age Homes
     // -------------------------------------------------------------
     getHomes: async (filter = {}) => {
+      const sb = window._supabaseClient;
+      if (sb) {
+        const { data, error } = await sb
+          .from("old_age_homes")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw new Error("Could not load registered homes from Supabase: " + error.message);
+
+        const profileIds = [...new Set((data || []).map(home => home.profile_id).filter(Boolean))];
+        let profileMap = {};
+        if (profileIds.length) {
+          const { data: profiles, error: profileError } = await sb
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", profileIds);
+          if (profileError) console.warn("Could not load home coordinator names:", profileError.message);
+          (profiles || []).forEach(profile => { profileMap[profile.id] = profile.full_name; });
+        }
+
+        let homes = (data || []).map(home => ({
+          ...home,
+          user_id: home.profile_id,
+          area: home.city || "",
+          contact_person: profileMap[home.profile_id] || "Home coordinator",
+          resident_count: home.resident_count ?? null,
+          registration_number: home.registration_number || "",
+          verification_notes: home.verification_notes || ""
+        }));
+        if (filter.verification_status) {
+          homes = homes.filter(home => home.verification_status === filter.verification_status);
+        }
+        return homes;
+      }
+
       let homes = load("homes");
       if (filter.verification_status) {
         homes = homes.filter(h => h.verification_status === filter.verification_status);
@@ -527,11 +561,23 @@ const SahaayaDB = (() => {
     },
 
     getHomeById: async (id) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
+        const { data, error } = await sb.from("old_age_homes").select("*").eq("id", id).maybeSingle();
+        if (error) throw new Error("Could not load home: " + error.message);
+        return data || null;
+      }
       const homes = load("homes");
       return homes.find(h => h.id === id) || null;
     },
 
     getHomeByUserId: async (userId) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) {
+        const { data, error } = await sb.from("old_age_homes").select("*").eq("profile_id", userId).maybeSingle();
+        if (error) throw new Error("Could not load your home: " + error.message);
+        return data || null;
+      }
       const homes = load("homes");
       return homes.find(h => h.user_id === userId) || null;
     },
@@ -551,6 +597,19 @@ const SahaayaDB = (() => {
     },
 
     updateHomeStatus: async (homeId, status, notes = "") => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(homeId))) {
+        const update = { verification_status: status };
+        const { data, error } = await sb
+          .from("old_age_homes")
+          .update(update)
+          .eq("id", homeId)
+          .select("*")
+          .single();
+        if (error) throw new Error("Could not update home verification: " + error.message);
+        return data;
+      }
+
       const homes = load("homes");
       const home = homes.find(h => h.id === homeId);
       if (!home) throw new Error("Home not found");
