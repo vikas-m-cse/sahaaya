@@ -25,8 +25,8 @@ BEGIN
   )
   VALUES (
     new.id,
-    COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
-    new.email,
+    COALESCE(new.raw_user_meta_data->>'full_name', split_part(COALESCE(new.email, new.phone, 'Volunteer'), '@', 1)),
+    COALESCE(new.email, NULLIF(new.raw_user_meta_data->>'email', '')),
     new.raw_user_meta_data->>'phone',
     user_role,
     new.raw_user_meta_data->>'avatar_url'
