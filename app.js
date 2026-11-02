@@ -42,6 +42,7 @@ function openLandingModal(type, activity) {
           <button class="btn primary" type="submit" id="joinSubmitBtn">Create account</button>
           <p class="signup-status" id="signupStatus" role="status" aria-live="polite">We'll send an email confirmation link before your first sign-in.</p>
           <p class="signup-switch">Already registered? <a href="#" id="switchToLogin">Login instead</a></p>
+           <p class="signup-switch home-signup-switch">Registering a care home? <a href="#" id="switchToHomeRegister">Apply as a home</a></p>
         </form>
       </div>`;
   }
@@ -119,6 +120,10 @@ function openLandingModal(type, activity) {
     openLandingModal("login");
   });
   document.getElementById("switchToSignup")?.addEventListener("click", e => { e.preventDefault(); openLandingModal("join"); });
+  document.getElementById("switchToHomeRegister")?.addEventListener("click", e => {
+    e.preventDefault();
+    openLandingModal("home");
+  });
 
   // Volunteer registration with email + password.
   const joinForm = document.getElementById("joinForm");
