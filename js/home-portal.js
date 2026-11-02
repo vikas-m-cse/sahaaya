@@ -472,24 +472,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       const skillsRaw = document.getElementById("newReqSkills").value;
       const required_skills = skillsRaw ? skillsRaw.split(",").map(s => s.trim()).filter(Boolean) : ["Patience", "Empathy"];
 
-      await SahaayaDB.createOpportunity({
-        home_id: currentHome.id,
-        title,
-        category,
-        slot_id,
-        description,
-        date,
-        time_start,
-        time_end,
-        duration_hours: 2.0,
-        spots_needed,
-        required_skills
-      });
-
-      SahaayaUI.closeModal();
-      SahaayaUI.showToast("Requirement published successfully! It is now open to volunteers.", "success");
-      await loadData();
-      switchTab("requirements");
+      if (currentHome.verification_status !== SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
+        SahaayaUI.showToast("Your home must be verified before requirements can be published to volunteers.", "warning");
+        return;
+      }
+      const publishButton = document.getElementById("saveReqBtn");
+      if (publishButton) { publishButton.disabled = true; publishButton.textContent = "Publishing…"; }
+      try {
+        await SahaayaDB.createOpportunity({
+          home_id: currentHome.id,
+          title,
+          category,
+          slot_id,
+          description,
+          date,
+          time_start,
+          time_end,
+          duration_hours: 2.0,
+          spots_needed,
+          required_skills
+        });
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast("Requirement published to the shared volunteer network.", "success");
+        await loadData();
+        switchTab("requirements");
+      } catch (error) {
+        if (publishButton) { publishButton.disabled = false; publishButton.textContent = "Publish Volunteer Requirement →"; }
+        SahaayaUI.showToast(error.message || "Could not publish this requirement. Please try again.", "error");
+      }
     });
   });
 
