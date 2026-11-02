@@ -416,10 +416,37 @@ const SahaayaDB = (() => {
     // -------------------------------------------------------------
     // Users & Profiles
     // -------------------------------------------------------------
-    getUsers: async () => load("users"),
+    // Merge real Supabase identities with legacy demo users. Live profile IDs
+    // are the same UUIDs stored on applications.volunteer_id, so portal joins
+    // resolve the real person's name instead of falling back to "Volunteer".
+    getUsers: async () => {
+      const localUsers = load("users");
+      const sb = window._supabaseClient;
+      if (!sb) return localUsers;
+      const { data, error } = await sb
+        .from("profiles")
+        .select("id, full_name, email, phone, role, created_at");
+      if (error) {
+        console.warn("Could not load live Sahaaya profiles:", error.message);
+        return localUsers;
+      }
+      const liveUsers = (data || []).map(profile => ({
+        id: profile.id,
+        name: profile.full_name || "Sahaaya user",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        role: profile.role,
+        created_at: profile.created_at,
+        avatar_initials: (profile.full_name || "SU").split(/\\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase(),
+        is_live: true
+      }));
+      const byId = new Map(localUsers.map(user => [user.id, user]));
+      liveUsers.forEach(user => byId.set(user.id, user));
+      return [...byId.values()];
+    },
 
     getUserById: async (id) => {
-      const users = load("users");
+      const users = await SahaayaDB.getUsers();
       return users.find(u => u.id === id) || null;
     },
 
@@ -442,8 +469,29 @@ const SahaayaDB = (() => {
     },
 
     getVolunteerProfileByUserId: async (userId) => {
-      const profiles = load("volunteer_profiles");
-      return profiles.find(p => p.user_id === userId) || null;
+      const localProfiles = load("volunteer_profiles");
+      const localProfile = localProfiles.find(p => p.user_id === userId) || null;
+      const sb = window._supabaseClient;
+      if (!sb || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) return localProfile;
+      const { data, error } = await sb
+        .from("volunteers")
+        .select("profile_id, interests, availability, preferred_activity_types, preferred_area")
+        .eq("profile_id", userId)
+        .maybeSingle();
+      if (error) {
+        console.warn("Could not load live volunteer profile:", error.message);
+        return localProfile;
+      }
+      if (!data) return localProfile;
+      return {
+        user_id: data.profile_id,
+        interests: data.interests || [],
+        availability: data.availability || [],
+        preferred_activity_types: data.preferred_activity_types || [],
+        preferred_area: data.preferred_area || "",
+        total_hours: localProfile?.total_hours || 0,
+        completed_count: localProfile?.completed_count || 0
+      };
     },
 
     updateVolunteerProfile: async (userId, updateData) => {
