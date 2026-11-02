@@ -549,3 +549,7 @@ button,a{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit
   .site-nav.menu-open .nav-links { display: flex !important; }
   .site-nav .menu-btn { display: block; }
 }
+
+
+/* Keep filtered opportunity cards hidden even when card styles set display. */
+.opp-card[hidden] { display: none !important; }
