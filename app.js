@@ -109,36 +109,53 @@ function openLandingModal(type, activity) {
   });
   document.getElementById("switchToSignup")?.addEventListener("click", e => { e.preventDefault(); openLandingModal("join"); });
 
-  // Volunteer registration
+  // Volunteer registration: create a new account with a verified phone number.
   const joinForm = document.getElementById("joinForm");
-  if (joinForm) {
-    joinForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      const btn = document.getElementById("joinSubmitBtn");
-      btn.disabled = true; btn.textContent = "Creating account...";
-      try {
-        const res = await SahaayaAuth.registerVolunteer({
-          name:         document.getElementById("joinName").value.trim(),
-          email:        document.getElementById("joinEmail").value.trim(),
-          password:     document.getElementById("joinPassword").value,
-          phone:        document.getElementById("joinPhone").value.trim(),
-          interests:    [document.getElementById("joinInterest").value],
+  let signupStage = "request";
+  let signupPhone = "";
+  let signupProfile = null;
+  const setSignupStatus = (message, error = false) => {
+    const status = document.getElementById("signupStatus");
+    if (status) { status.textContent = message; status.classList.toggle("error", error); }
+  };
+  if (joinForm) joinForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = document.getElementById(signupStage === "request" ? "joinSubmitBtn" : "joinVerifyBtn");
+    button.disabled = true;
+    try {
+      if (signupStage === "request") {
+        const digits = document.getElementById("joinPhone").value.trim().replace(/\D/g, "");
+        signupPhone = document.getElementById("joinCountryCode").value + digits;
+        if (!/^\+[1-9]\d{7,14}$/.test(signupPhone)) throw new Error("Enter a valid phone number with the selected country code.");
+        signupProfile = {
+          name: document.getElementById("joinName").value.trim(),
+          email: document.getElementById("joinEmail").value.trim().toLowerCase() || null,
+          interests: [document.getElementById("joinInterest").value],
           availability: [document.getElementById("joinAvailability").value]
+        };
+        button.textContent = "Sending OTP…";
+        await SahaayaAuth.requestVolunteerSignup(signupPhone, signupProfile);
+        signupStage = "verify";
+        joinForm.innerHTML = '<div class="field field-wide"><label for="joinOtpCode">SMS VERIFICATION CODE</label><input required id="joinOtpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter 6-digit code"></div><button class="btn primary" type="submit" id="joinVerifyBtn">Verify number and create account</button><button class="signup-resend" type="button" id="joinResendBtn">Send a new code</button><p class="signup-status" id="signupStatus" role="status" aria-live="polite">Code sent to ' + signupPhone + '</p>';
+        document.getElementById("joinOtpCode").focus();
+        document.getElementById("joinResendBtn").addEventListener("click", async () => {
+          try { await SahaayaAuth.requestVolunteerSignup(signupPhone, signupProfile); setSignupStatus("A new verification code has been sent."); }
+          catch (error) { setSignupStatus(error.message, true); }
         });
+      } else {
+        button.textContent = "Verifying…";
+        const user = await SahaayaAuth.verifyOtp(signupPhone, document.getElementById("joinOtpCode").value.trim(), "phone");
+        if (user.role !== "volunteer") throw new Error("This phone number is already linked to another Sahaaya account. Please log in instead.");
         legacyModal.classList.remove("open");
-        if (res.needsConfirmation) {
-          showLandingToast("Account created! Check your email to confirm before signing in.", "success");
-        } else {
-          showLandingToast("Volunteer account created! Opening portal...", "success");
-          setTimeout(() => window.location.href = "volunteer/", 600);
-        }
-      } catch (err) {
-        showLandingToast("Error: " + err.message, "error");
-        btn.disabled = false; btn.textContent = "Create Volunteer Account →";
+        showLandingToast("Your volunteer account is ready. Welcome to Sahaaya!", "success");
+        setTimeout(() => window.location.href = "volunteer/", 500);
       }
-    });
-  }
-
+    } catch (error) {
+      setSignupStatus(error.message || "Something went wrong. Please try again.", true);
+      button.disabled = false;
+      button.textContent = signupStage === "request" ? "Send verification code" : "Verify number and create account";
+    }
+  });
   // Passwordless email / phone OTP sign-in.
   let otpMethod = "email";
   let otpRequestedFor = "";
