@@ -81,6 +81,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = "";
 
     const pendingHomes = allHomes.filter(h => h.verification_status === SAHAAYA_CONFIG.HOME_STATUS.PENDING);
+    const sectionHeading = document.createElement("div");
+    sectionHeading.className = "verification-section-heading";
+    sectionHeading.innerHTML = `<div><span>PARTNER APPLICATIONS</span><h2>Homes awaiting review</h2><p>Review each residence before welcoming it into the Sahaaya network.</p></div><div class="verification-total"><strong>${pendingHomes.length}</strong><span>AWAITING REVIEW</span></div>`;
+    container.appendChild(sectionHeading);
 
     if (pendingHomes.length === 0) {
       container.innerHTML = `
