@@ -33,10 +33,10 @@ function openLandingModal(type, activity) {
       <h2>Let's find your fit.</h2>
       <p>Create your verified volunteer profile to start discovering opportunities at partner senior homes.</p>
       <form class="form" id="joinForm">
-        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value="Ananya Sharma"></div>
+        <div class="field"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" value=""></div>
         <div class="field"><label for="joinEmail">Email</label><input required id="joinEmail" type="email" placeholder="you@example.com" value=""></div>
         <div class="field"><label for="joinPassword">Password</label><input required id="joinPassword" type="password" placeholder="Minimum 6 characters" minlength="6"></div>
-        <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value="+91 98450 12345"></div>
+        <div class="field"><label for="joinPhone">Phone</label><input id="joinPhone" placeholder="+91 98765 43210" value=""></div>
         <div class="field"><label for="joinInterest">I’d like to help with</label><select id="joinInterest">
           <option value="companionship">Companionship &amp; Storytelling</option>
           <option value="recreation">Recreation &amp; Board Games</option>
@@ -50,7 +50,7 @@ function openLandingModal(type, activity) {
           <option value="sat_evening">Saturday Evening (4:00 PM – 7:00 PM)</option>
           <option value="sat_morning">Saturday Morning (9:00 AM – 1:00 PM)</option>
           <option value="weekday_evening">Weekday Evenings (5:00 PM – 8:00 PM)</option>
-        </select>
+        </select></div>
         <button class="btn primary" type="submit" id="joinSubmitBtn">Create Volunteer Account →</button>
         <p style="font-size: 12px; text-align: center; margin: 4px 0 0; color: #687873;">
           Already have an account? <a href="#" id="switchToLogin" style="color: #286c59;">Sign in →</a>
