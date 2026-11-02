@@ -599,6 +599,24 @@ const SahaayaDB = (() => {
       return newHome;
     },
 
+    updateHomeProfile: async (homeId, profile) => {
+      const sb = window._supabaseClient;
+      if (!sb) throw new Error("Supabase is not connected.");
+      const { data, error } = await sb.from("old_age_homes").update({
+        name: profile.name,
+        address: profile.address,
+        city: profile.area,
+        description: profile.description,
+        resident_capacity: Number(profile.resident_count) || null
+      }).eq("id", homeId).select("*").single();
+      if (error) throw new Error("Could not update home profile: " + error.message);
+      if (profile.contact_person) {
+        const { error: profileError } = await sb.from("profiles").update({ full_name: profile.contact_person }).eq("id", data.profile_id);
+        if (profileError) throw new Error("Home saved, but coordinator name could not be updated: " + profileError.message);
+      }
+      return { ...data, user_id: data.profile_id, area: data.city || "", resident_count: data.resident_capacity ?? null };
+    },
+
     updateHomeVerificationReview: async (homeId, checks, score) => {
       const sb = window._supabaseClient;
       if (!sb) throw new Error("Supabase is not connected.");
