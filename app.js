@@ -30,39 +30,30 @@ function openLandingModal(type, activity) {
   if (type === "join") {
     html = `
       <div class="signup-experience">
-        <div class="eyebrow">NEW TO SAHAAYA?</div>
-        <h2>Create your volunteer account.</h2>
-        <p>Start with your name and mobile number. We will verify your number with a one-time code. Email is optional.</p>
+        <div class="eyebrow">NEW TO SAHAAYA?</div><h2>Create your volunteer account.</h2>
+        <p>Register with your email and password. Your phone number helps care homes contact you.</p>
         <form class="form" id="joinForm">
           <div class="field field-wide"><label for="joinName">Full name</label><input required id="joinName" placeholder="Your full name" autocomplete="name"></div>
+          <div class="field field-wide"><label for="joinEmail">Email address</label><input required id="joinEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+          <div class="field field-wide"><label for="joinPassword">Create password</label><input required id="joinPassword" type="password" placeholder="At least 8 characters" minlength="8" autocomplete="new-password"></div>
           <div class="field field-wide"><label for="joinPhone">Mobile number</label><div class="signup-phone-row"><select id="joinCountryCode" aria-label="Country calling code"><option value="+91" selected>India +91</option><option value="+1">USA +1</option><option value="+44">UK +44</option><option value="+971">UAE +971</option><option value="+61">Australia +61</option><option value="+65">Singapore +65</option></select><input required id="joinPhone" type="tel" placeholder="98765 43210" autocomplete="tel" inputmode="numeric"></div></div>
-          <div class="field field-wide"><label for="joinEmail">Email address <span class="optional-label">(optional)</span></label><input id="joinEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
           <div class="field"><label for="joinInterest">I want to help with</label><select id="joinInterest"><option value="companionship">Companionship and Storytelling</option><option value="recreation">Recreation and Board Games</option><option value="music">Music and Cultural</option><option value="assistive">Digital and Smartphone Help</option><option value="creative">Creative and Arts</option><option value="outdoors">Outdoors and Gentle Walks</option></select></div>
           <div class="field"><label for="joinAvailability">When I am free</label><select id="joinAvailability"><option value="sun_morning">Sunday Morning</option><option value="sat_evening">Saturday Evening</option><option value="sat_morning">Saturday Morning</option><option value="weekday_evening">Weekday Evenings</option></select></div>
-          <button class="btn primary" type="submit" id="joinSubmitBtn">Send verification code</button>
-          <p class="signup-status" id="signupStatus" role="status" aria-live="polite">Your mobile number will be your login ID.</p>
+          <button class="btn primary" type="submit" id="joinSubmitBtn">Create account</button>
+          <p class="signup-status" id="signupStatus" role="status" aria-live="polite">We'll send an email confirmation link before your first sign-in.</p>
           <p class="signup-switch">Already registered? <a href="#" id="switchToLogin">Login instead</a></p>
         </form>
-      </div>
-    `;
+      </div>`;
   }
   if (type === "login") {
     html = `
       <div class="login-experience">
-        <aside class="login-story">
-          <a class="login-brand" href="/" aria-label="Sahaaya home"><span class="login-brand-mark">sa</span><span>SAHAAYA</span></a>
-          <div class="login-story-copy"><span class="login-story-kicker">A LITTLE TIME. A LOT OF HUMANITY.</span><h2>Make room for<br><em>meaningful moments.</em></h2><p>Sign in securely to discover opportunities, connect with care homes and keep your volunteering journey moving.</p></div>
-          <div class="login-story-foot"><span class="login-story-dot"></span> VERIFIED HOMES <i>·</i> REAL CONNECTIONS</div><div class="login-story-orbit" aria-hidden="true"></div>
-        </aside>
-        <section class="login-main">
-          <div class="login-heading"><div class="eyebrow">SECURE PORTAL ACCESS</div><h2>Welcome <em>back.</em></h2><p>Get a one-time verification code to your email or phone.</p></div>
-          <div class="otp-method" role="group" aria-label="Choose verification method"><button type="button" class="otp-method-btn active" data-otp-method="email">Email</button><button type="button" class="otp-method-btn" data-otp-method="phone">Phone</button></div>
-          <form class="otp-form" id="otpRequestForm"><div class="login-field"><label id="otpIdentityLabel" for="otpIdentity">EMAIL ADDRESS</label><div class="otp-phone-row" id="otpPhoneRow" hidden><select id="otpCountryCode" aria-label="Country calling code"><option value="+91" selected>🇮🇳 +91</option><option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option><option value="+971">🇦🇪 +971</option><option value="+61">🇦🇺 +61</option><option value="+65">🇸🇬 +65</option></select><input required type="tel" id="otpIdentity" placeholder="98765 43210" autocomplete="tel" inputmode="numeric"></div><input required type="email" id="otpIdentityEmail" placeholder="you@example.com" autocomplete="email"></div><button class="login-submit" type="submit" id="otpSendBtn"><span>Send verification code</span><span aria-hidden="true">↗</span></button></form>
-          <form class="otp-form otp-verify-form" id="otpVerifyForm" hidden><div class="login-field"><label for="otpCode">6-DIGIT VERIFICATION CODE</label><input required type="text" id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code"></div><button class="login-submit" type="submit" id="otpVerifyBtn"><span>Verify and continue</span><span aria-hidden="true">↗</span></button><button class="otp-resend" type="button" id="otpResendBtn">Send a new code</button></form>
-          <p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address or phone number registered with your Sahaaya account.</p><p class="login-create-account">New to Sahaaya? <a href="#" id="switchToSignup">Create an account</a></p><p class="login-footnote"><span aria-hidden="true">⌁</span> One-time codes help keep your account secure.</p>
+        <aside class="login-story"><a class="login-brand" href="/" aria-label="Sahaaya home"><span class="login-brand-mark">sa</span><span>SAHAAYA</span></a><div class="login-story-copy"><span class="login-story-kicker">A LITTLE TIME. A LOT OF HUMANITY.</span><h2>Make room for<br><em>meaningful moments.</em></h2><p>Sign in securely to discover opportunities, connect with care homes and keep your volunteering journey moving.</p></div><div class="login-story-foot"><span class="login-story-dot"></span> VERIFIED HOMES <i>·</i> REAL CONNECTIONS</div><div class="login-story-orbit" aria-hidden="true"></div></aside>
+        <section class="login-main"><div class="login-heading"><div class="eyebrow">SECURE PORTAL ACCESS</div><h2>Welcome <em>back.</em></h2><p>Sign in with your registered email and password.</p></div>
+          <form class="otp-form" id="passwordLoginForm"><div class="login-field"><label for="loginEmail">EMAIL ADDRESS</label><input required type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"></div><div class="login-field"><label for="loginPassword">PASSWORD</label><input required type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"></div><button class="login-submit" type="submit" id="passwordLoginBtn"><span>Sign in</span><span aria-hidden="true">↗</span></button></form>
+          <button class="otp-resend" type="button" id="forgotPasswordBtn">Forgot password?</button><p class="otp-status" id="otpStatus" role="status" aria-live="polite">Use the email address linked to your Sahaaya account.</p><p class="login-create-account">New to Sahaaya? <a href="#" id="switchToSignup">Create an account</a></p><p class="login-footnote"><span aria-hidden="true">⌁</span> Secure email and password authentication.</p>
         </section>
-      </div>
-    `;
+      </div>`;
   }
   if (type === "home") {
     html = `
@@ -109,97 +100,53 @@ function openLandingModal(type, activity) {
   });
   document.getElementById("switchToSignup")?.addEventListener("click", e => { e.preventDefault(); openLandingModal("join"); });
 
-  // Volunteer registration: create a new account with a verified phone number.
+  // Volunteer registration with email + password.
   const joinForm = document.getElementById("joinForm");
-  let signupStage = "request";
-  let signupPhone = "";
-  let signupProfile = null;
-  const setSignupStatus = (message, error = false) => {
-    const status = document.getElementById("signupStatus");
-    if (status) { status.textContent = message; status.classList.toggle("error", error); }
-  };
-  if (joinForm) joinForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    const button = document.getElementById(signupStage === "request" ? "joinSubmitBtn" : "joinVerifyBtn");
-    button.disabled = true;
-    try {
-      if (signupStage === "request") {
-        const digits = document.getElementById("joinPhone").value.trim().replace(/\D/g, "");
-        signupPhone = document.getElementById("joinCountryCode").value + digits;
-        if (!/^\+[1-9]\d{7,14}$/.test(signupPhone)) throw new Error("Enter a valid phone number with the selected country code.");
-        signupProfile = {
-          name: document.getElementById("joinName").value.trim(),
-          email: document.getElementById("joinEmail").value.trim().toLowerCase() || null,
-          interests: [document.getElementById("joinInterest").value],
-          availability: [document.getElementById("joinAvailability").value]
-        };
-        button.textContent = "Sending OTP…";
-        await SahaayaAuth.requestVolunteerSignup(signupPhone, signupProfile);
-        signupStage = "verify";
-        joinForm.innerHTML = '<div class="field field-wide"><label for="joinOtpCode">SMS VERIFICATION CODE</label><input required id="joinOtpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter 6-digit code"></div><button class="btn primary" type="submit" id="joinVerifyBtn">Verify number and create account</button><button class="signup-resend" type="button" id="joinResendBtn">Send a new code</button><p class="signup-status" id="signupStatus" role="status" aria-live="polite">Code sent to ' + signupPhone + '</p>';
-        document.getElementById("joinOtpCode").focus();
-        document.getElementById("joinResendBtn").addEventListener("click", async () => {
-          try { await SahaayaAuth.requestVolunteerSignup(signupPhone, signupProfile); setSignupStatus("A new verification code has been sent."); }
-          catch (error) { setSignupStatus(error.message, true); }
-        });
-      } else {
-        button.textContent = "Verifying…";
-        const user = await SahaayaAuth.verifyOtp(signupPhone, document.getElementById("joinOtpCode").value.trim(), "phone");
-        if (user.role !== "volunteer") throw new Error("This phone number is already linked to another Sahaaya account. Please log in instead.");
-        legacyModal.classList.remove("open");
-        showLandingToast("Your volunteer account is ready. Welcome to Sahaaya!", "success");
-        setTimeout(() => window.location.href = "volunteer/", 500);
-      }
-    } catch (error) {
-      setSignupStatus(error.message || "Something went wrong. Please try again.", true);
-      button.disabled = false;
-      button.textContent = signupStage === "request" ? "Send verification code" : "Verify number and create account";
-    }
+  const setSignupStatus = (message, error = false) => { const status=document.getElementById("signupStatus"); if(status){status.textContent=message;status.classList.toggle("error",error);} };
+  if(joinForm) joinForm.addEventListener("submit",async event=>{
+    event.preventDefault(); const button=document.getElementById("joinSubmitBtn"); button.disabled=true; button.textContent="Creating account…";
+    try{
+      const digits=document.getElementById("joinPhone").value.trim().replace(/\\D/g,"");
+      const phone=document.getElementById("joinCountryCode").value+digits;
+      if(!/^\\+[1-9]\\d{7,14}$/.test(phone)) throw new Error("Enter a valid phone number with the selected country code.");
+      const result=await SahaayaAuth.registerVolunteer({
+        name:document.getElementById("joinName").value.trim(),
+        email:document.getElementById("joinEmail").value.trim().toLowerCase(),
+        password:document.getElementById("joinPassword").value,
+        phone, interests:[document.getElementById("joinInterest").value],
+        availability:[document.getElementById("joinAvailability").value], preferred_area:"Bengaluru"
+      });
+      if(result.needsConfirmation){setSignupStatus("Account created. Check your email and click the confirmation link before signing in.");button.textContent="Confirmation email sent";return;}
+      legacyModal.classList.remove("open");showLandingToast("Your volunteer account is ready. Welcome to Sahaaya!","success");setTimeout(()=>window.location.href="volunteer/",500);
+    }catch(error){setSignupStatus(error.message||"Could not create your account. Please try again.",true);button.disabled=false;button.textContent="Create account";}
   });
-  // Passwordless email / phone OTP sign-in.
-  let otpMethod = "email";
-  let otpRequestedFor = "";
-  const otpIdentity = document.getElementById("otpIdentity");
-  const otpIdentityEmail = document.getElementById("otpIdentityEmail");
-  const otpCountryCode = document.getElementById("otpCountryCode");
-  const otpPhoneRow = document.getElementById("otpPhoneRow");
-  const otpLabel = document.getElementById("otpIdentityLabel");
-  const otpRequestForm = document.getElementById("otpRequestForm");
-  const otpVerifyForm = document.getElementById("otpVerifyForm");
-  const otpStatus = document.getElementById("otpStatus");
-  const setOtpStatus = (message, isError = false) => { if (!otpStatus) return; otpStatus.textContent = message; otpStatus.classList.toggle("error", isError); };
-  const setOtpMethod = method => {
-    otpMethod = method;
-    document.querySelectorAll("[data-otp-method]").forEach(button => button.classList.toggle("active", button.dataset.otpMethod === method));
-    otpIdentity.value = ""; otpIdentityEmail.value = "";
-    otpIdentityEmail.hidden = method !== "email"; otpPhoneRow.hidden = method !== "phone";
-    otpIdentity.required = method === "phone"; otpIdentityEmail.required = method === "email";
-    otpLabel.textContent = method === "email" ? "EMAIL ADDRESS" : "PHONE NUMBER";
-    otpVerifyForm.hidden = true; otpRequestForm.hidden = false; otpRequestedFor = "";
-    setOtpStatus("Use the email address or phone number registered with your Sahaaya account.");
-  };
-  document.querySelectorAll("[data-otp-method]").forEach(button => button.addEventListener("click", () => setOtpMethod(button.dataset.otpMethod)));
-  setOtpMethod("email");
-  if (otpRequestForm) otpRequestForm.addEventListener("submit", async event => {
-    event.preventDefault(); const button = document.getElementById("otpSendBtn");
-    const rawIdentity = otpMethod === "email" ? otpIdentityEmail.value.trim() : otpIdentity.value.trim();
-    const identity = otpMethod === "email" ? rawIdentity.toLowerCase() : (rawIdentity.startsWith("+") ? rawIdentity.replace(/[\s()-]/g, "") : otpCountryCode.value + rawIdentity.replace(/\D/g, ""));
-    if (otpMethod === "phone" && !/^\+[1-9]\d{7,14}$/.test(identity)) { setOtpStatus("Enter a valid phone number. Choose the country code and enter the number without it.", true); return; }
-    button.disabled = true; button.querySelector("span").textContent = "Sending code…";
-    try { await SahaayaAuth.requestOtp(identity, otpMethod); otpRequestedFor = identity; otpRequestForm.hidden = true; otpVerifyForm.hidden = false; document.getElementById("otpCode").focus(); setOtpStatus("A verification code has been sent. Check your inbox or SMS messages."); }
-    catch (error) { setOtpStatus(error.message || "Could not send a verification code.", true); }
-    finally { button.disabled = false; button.querySelector("span").textContent = "Send verification code"; }
+
+  // Email/password login and password recovery.
+  const loginForm=document.getElementById("passwordLoginForm"), otpStatus=document.getElementById("otpStatus");
+  const setLoginStatus=(message,isError=false)=>{if(otpStatus){otpStatus.textContent=message;otpStatus.classList.toggle("error",isError);}};
+  if(loginForm) loginForm.addEventListener("submit",async event=>{
+    event.preventDefault();const button=document.getElementById("passwordLoginBtn");button.disabled=true;button.querySelector("span").textContent="Signing in…";
+    try{const user=await SahaayaAuth.loginWithPassword(document.getElementById("loginEmail").value.trim().toLowerCase(),document.getElementById("loginPassword").value);
+      legacyModal.classList.remove("open");showLandingToast("Welcome back, "+(user.name||"to Sahaaya")+"!","success");
+      setTimeout(()=>{const portals={home:"home/",admin:"admin/",volunteer:"volunteer/"};const dest=new URL(portals[user.role]||"volunteer/",window.location.href);const activity=new URLSearchParams(window.location.search).get("activity");if(user.role==="volunteer"&&activity)dest.searchParams.set("activity",activity);window.location.href=dest.href;},450);
+    }catch(error){setLoginStatus(error.message||"Unable to sign in. Check your email and password.",true);button.disabled=false;button.querySelector("span").textContent="Sign in";}
   });
-  const verifyOtp = async () => {
-    const button = document.getElementById("otpVerifyBtn"); button.disabled = true; button.querySelector("span").textContent = "Verifying…";
-    try {
-      const user = await SahaayaAuth.verifyOtp(otpRequestedFor, document.getElementById("otpCode").value.trim(), otpMethod);
-      legacyModal.classList.remove("open"); showLandingToast("Welcome back, " + (user.name || "to Sahaaya") + "!", "success");
-      setTimeout(() => { const portals = { home: "home/", admin: "admin/", volunteer: "volunteer/" }; const destination = new URL(portals[user.role] || "volunteer/", window.location.href); const activity = new URLSearchParams(window.location.search).get("activity"); if (user.role === "volunteer" && activity) destination.searchParams.set("activity", activity); window.location.href = destination.href; }, 450);
-    } catch (error) { setOtpStatus(error.message || "That code could not be verified. Try again.", true); button.disabled = false; button.querySelector("span").textContent = "Verify and continue"; }
-  };
-  if (otpVerifyForm) otpVerifyForm.addEventListener("submit", event => { event.preventDefault(); verifyOtp(); });
-  document.getElementById("otpResendBtn")?.addEventListener("click", async () => { try { await SahaayaAuth.requestOtp(otpRequestedFor, otpMethod); setOtpStatus("A new verification code has been sent."); } catch (error) { setOtpStatus(error.message || "Could not resend the code.", true); } });
+  document.getElementById("forgotPasswordBtn")?.addEventListener("click",async()=>{
+    const email=document.getElementById("loginEmail")?.value.trim().toLowerCase();if(!email){setLoginStatus("Enter your email address first, then select Forgot password.",true);return;}
+    const button=document.getElementById("forgotPasswordBtn");button.disabled=true;
+    try{await SahaayaAuth.sendPasswordReset(email);setLoginStatus("If an account exists for this email, a password-reset link has been sent. Check your inbox and spam folder.");}
+    catch(error){setLoginStatus(error.message||"Could not send the reset email.",true);}finally{button.disabled=false;}
+  });
+  if(new URLSearchParams(window.location.search).has("reset_password")){
+    const recovery=document.createElement("div");recovery.className="modal open";
+    recovery.innerHTML='<div class="modal-backdrop"></div><div class="modal-card"><button class="close" type="button" aria-label="Close">×</button><div class="eyebrow">ACCOUNT RECOVERY</div><h2>Choose a new password.</h2><form class="form" id="newPasswordForm"><div class="field field-wide"><label for="newPassword">New password</label><input required id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></div><button class="btn primary" type="submit">Update password</button><p class="signup-status" id="resetStatus" role="status" aria-live="polite"></p></form></div>';
+    document.body.appendChild(recovery);recovery.querySelector(".close").addEventListener("click",()=>recovery.remove());recovery.querySelector(".modal-backdrop").addEventListener("click",()=>recovery.remove());
+    recovery.querySelector("#newPasswordForm").addEventListener("submit",async event=>{event.preventDefault();const btn=recovery.querySelector('button[type="submit"]'),status=recovery.querySelector("#resetStatus");btn.disabled=true;btn.textContent="Updating…";
+      try{await SahaayaAuth.updatePassword(recovery.querySelector("#newPassword").value);status.textContent="Password updated. You can now sign in.";window.history.replaceState({},document.title,window.location.pathname);setTimeout(()=>recovery.remove(),1800);}
+      catch(error){status.textContent=error.message||"Could not update password. Request a new reset link.";status.classList.add("error");btn.disabled=false;btn.textContent="Update password";}
+    });
+  }
+
   // Home registration
   const homeForm = document.getElementById("homeForm");
   if (homeForm) {
