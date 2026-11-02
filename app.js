@@ -376,36 +376,119 @@ if (window.location.search.includes("login_required=1")) {
 })();
 
 
-/* Signature Sahaaya hour selector */
+/* Unified Your Hour matcher — one source of truth for the picker and floating dock */
 (() => {
-  const hours=document.querySelectorAll('.hour-chip'), days=document.querySelectorAll('.day-chip');
-  const summary=document.getElementById('hourSummary'), match=document.getElementById('hourMatch'), box=document.querySelector('.hour-picker'), explore=document.getElementById('hourExplore');
-  if(!summary||!match) return;
-  let h='1', d='Sunday';
-  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
-  const update=()=>{summary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;match.textContent=(counts[h+'|'+d]||3)+' moments nearby';box.classList.remove('is-updating');void box.offsetWidth;box.classList.add('is-updating');};
-  hours.forEach(x=>x.addEventListener('click',()=>{hours.forEach(y=>y.classList.remove('active'));x.classList.add('active');h=x.dataset.hours;update();}));
-  days.forEach(x=>x.addEventListener('click',()=>{days.forEach(y=>y.classList.remove('active'));x.classList.add('active');d=x.dataset.day;update();}));
-  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  const picker = document.querySelector('.hour-picker');
+  const dock = document.getElementById('hourDock');
+  const hero = document.querySelector('.hero-product');
+  if (!picker || !hero) return;
+
+  const hourButtons = [...picker.querySelectorAll('.hour-chip')];
+  const dayButtons = [...picker.querySelectorAll('.day-chip')];
+  const summary = document.getElementById('hourSummary');
+  const match = document.getElementById('hourMatch');
+  const dockSummary = document.getElementById('dockSummary');
+  const dockCount = document.getElementById('dockCount');
+  const cards = [...document.querySelectorAll('.needs-grid .opp-card')];
+  const liveCount = document.getElementById('liveOpportunityCount');
+  const exploreButtons = [
+    document.getElementById('hourExplore'),
+    document.getElementById('dockExplore')
+  ].filter(Boolean);
+
+  let selectedHours = 1;
+  let selectedDay = 'Sunday';
+
+  const labelForHours = value => value === 3 ? '3+ hours' : value + (value === 1 ? ' hour' : ' hours');
+  const matchingCards = () => cards.filter(card => {
+    const cardDay = card.dataset.day;
+    const duration = Number(card.dataset.hours || 0);
+    const dayMatches = selectedDay === 'Weekday'
+      ? cardDay === 'Weekday'
+      : cardDay === selectedDay;
+    return dayMatches && duration > 0 && duration <= selectedHours;
+  });
+
+  function render() {
+    const matches = matchingCards();
+    const count = matches.length;
+    const timeLabel = labelForHours(selectedHours) + ' · ' + selectedDay;
+    const countLabel = count + (count === 1 ? ' matching moment' : ' matching moments');
+
+    if (summary) summary.textContent = timeLabel;
+    if (match) match.textContent = countLabel;
+    if (dockSummary) dockSummary.textContent = timeLabel;
+    if (dockCount) dockCount.textContent = count + ' nearby';
+    if (liveCount) liveCount.textContent = cards.length + ' listed opportunities near Bengaluru';
+
+    cards.forEach(card => {
+      const isMatch = matches.includes(card);
+      card.hidden = !isMatch;
+      card.setAttribute('aria-hidden', String(!isMatch));
+    });
+
+    const grid = document.querySelector('.needs-grid');
+    let empty = document.getElementById('hourEmptyState');
+    if (count === 0 && grid) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.id = 'hourEmptyState';
+        empty.className = 'hour-empty-state';
+        empty.setAttribute('role', 'status');
+        empty.innerHTML = '<strong>No exact matches for this time yet.</strong><span>Try another day or choose more hours. We will only show opportunities that fit the time you selected.</span>';
+        grid.appendChild(empty);
+      }
+      empty.hidden = false;
+    } else if (empty) {
+      empty.hidden = true;
+    }
+
+    picker.classList.remove('is-updating');
+    void picker.offsetWidth;
+    picker.classList.add('is-updating');
+  }
+
+  hourButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedHours = Number(button.dataset.hours);
+      hourButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      render();
+    });
+  });
+
+  dayButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedDay = button.dataset.day;
+      dayButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      render();
+    });
+  });
+
+  exploreButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      document.getElementById('moments')?.scrollIntoView({
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start'
+      });
+    });
+  });
+
+  const onScroll = () => {
+    if (dock) dock.classList.toggle('visible', scrollY > hero.offsetHeight * 0.72);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  render();
 })();
-
-
-/* Living hour dock — keeps the chosen intention present while exploring */
-(() => {
-  const dock=document.getElementById('hourDock'), dockSummary=document.getElementById('dockSummary'), dockCount=document.getElementById('dockCount'), explore=document.getElementById('dockExplore');
-  const hero=document.querySelector('.hero-product');
-  if(!dock||!hero) return;
-  const counts={"1|Sunday":3,"1|Saturday":5,"1|Weekday":2,"2|Sunday":7,"2|Saturday":4,"2|Weekday":5,"3|Sunday":4,"3|Saturday":3,"3|Weekday":6};
-  let h='1',d='Sunday';
-  const refresh=()=>{dockSummary.textContent=(h==='3'?'3+':h)+' hour'+(h==='1'?'':'s')+' · '+d;dockCount.textContent=(counts[h+'|'+d]||3)+' nearby';};
-  document.querySelectorAll('.hour-chip').forEach(x=>x.addEventListener('click',()=>{h=x.dataset.hours;refresh();}));
-  document.querySelectorAll('.day-chip').forEach(x=>x.addEventListener('click',()=>{d=x.dataset.day;refresh();}));
-  explore?.addEventListener('click',()=>document.getElementById('finder')?.scrollIntoView({behavior:'smooth'}));
-  const onScroll=()=>dock.classList.toggle('visible',scrollY>hero.offsetHeight*.72);
-  addEventListener('scroll',onScroll,{passive:true});onScroll();refresh();
-})();
-
-
+ 
 /* Signature page choreography */
 (() => {
   const nav=document.querySelector('.site-nav'), rail=document.querySelector('.chapter-rail'), fill=document.getElementById('railFill');
