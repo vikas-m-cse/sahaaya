@@ -200,6 +200,6 @@ const SahaayaUI = (() => {
 // Auto-initialize demo bar on every page
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
-    SahaayaUI.initDemoBar();
+    // Demo role switching has been retired. Portal access requires real Supabase authentication.
   });
 }
