@@ -187,6 +187,7 @@ function openLandingModal(type, activity) {
           email:         document.getElementById("homeRegEmail").value.trim(),
           password:      document.getElementById("homeRegPassword").value,
           phone:         document.getElementById("homeRegPhone").value.trim(),
+          residentCapacity: Number(document.getElementById("homeRegResidents").value),
           description:   "Registered community senior home dedicated to active volunteer engagement."
         });
         legacyModal.classList.remove("open");
