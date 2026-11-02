@@ -623,3 +623,9 @@ a,
   cursor:pointer!important;
   touch-action:manipulation!important;
 }
+
+
+/* The live status strip is decorative; it must never intercept controls beneath it. */
+.hero-product .hero-livebar{
+  pointer-events:none!important;
+}
