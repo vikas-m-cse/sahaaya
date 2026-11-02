@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </td>
         <td><code>${home.registration_number}</code></td>
         <td>${home.contact_person}</td>
-        <td>${home.resident_count} residents</td>
+        <td>${home.resident_count ? `${home.resident_count} capacity` : "Not provided"}</td>
         <td>${SahaayaUI.getStatusBadge(home.verification_status)}</td>
         <td>
           ${
