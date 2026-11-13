@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------------------------------------
   let currentProfile        = null;
   let allOpportunities      = [];
+  let allScheduleOpportunities = [];
   let userApplications      = [];
   let userAttendance        = [];
   let allHomes              = [];
@@ -71,8 +72,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    allHomes         = await SahaayaDB.getHomes();
-    allOpportunities = await SahaayaDB.getOpportunities({ status: SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN });
+    allHomes = await SahaayaDB.getHomes();
+    allScheduleOpportunities = await SahaayaDB.getOpportunities();
+    allOpportunities = allScheduleOpportunities.filter(opp => opp.status === SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN);
     userApplications = await SahaayaDB.getApplications({ volunteer_id: session.id });
     userAttendance   = await SahaayaDB.getAttendanceHistoryByVolunteer(session.id);
 
@@ -382,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.className = "portal-grid";
 
     approvedApps.forEach(app => {
-      const opp  = allOpportunities.find(o => o.id === app.opportunity_id);
+      const opp  = allScheduleOpportunities.find(o => o.id === app.opportunity_id);
       const home = allHomes.find(h => h.id === opp?.home_id) || {
         name: "Senior Care Home",
         address: "Bengaluru",
