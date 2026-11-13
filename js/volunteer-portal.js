@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------------------------------------
   let currentProfile        = null;
   let allOpportunities      = [];
+  let allScheduleOpportunities = [];
   let userApplications      = [];
   let userAttendance        = [];
   let allHomes              = [];
@@ -71,8 +72,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    allHomes         = await SahaayaDB.getHomes();
-    allOpportunities = await SahaayaDB.getOpportunities({ status: SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN });
+    allHomes = await SahaayaDB.getHomes();
+    allScheduleOpportunities = await SahaayaDB.getOpportunities();
+    allOpportunities = allScheduleOpportunities.filter(opp => opp.status === SAHAAYA_CONFIG.OPPORTUNITY_STATUS.OPEN);
     userApplications = await SahaayaDB.getApplications({ volunteer_id: session.id });
     userAttendance   = await SahaayaDB.getAttendanceHistoryByVolunteer(session.id);
 
@@ -318,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           volunteer_id: session.id,
           match_score: match.score,
           match_reasons: match.reasons,
-          volunteer_note: note || "Looking forward to contributing!"
+          volunteer_note: note || null
         });
         SahaayaUI.closeModal();
         SahaayaUI.showToast("Application submitted! The old age home will review it.", "success");
@@ -382,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.className = "portal-grid";
 
     approvedApps.forEach(app => {
-      const opp  = allOpportunities.find(o => o.id === app.opportunity_id);
+      const opp  = allScheduleOpportunities.find(o => o.id === app.opportunity_id);
       const home = allHomes.find(h => h.id === opp?.home_id) || {
         name: "Senior Care Home",
         address: "Bengaluru",
@@ -390,6 +392,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         phone: "+91 80 0000 0000"
       };
 
+      const mapQuery = [home.name, home.address, home.area, "Bengaluru"].filter(Boolean).join(", ");
+      const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
       const card = document.createElement("article");
       card.className = "schedule-card portal-card";
       card.innerHTML = `
@@ -408,6 +412,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div><small>DURATION</small><b>${opp?.duration_hours || 2} hrs</b></div>
             <div><small>COORDINATOR</small><b>${home.contact_person || "Home team"}</b></div>
             <div><small>CONTACT</small><b>${home.phone || "On file"}</b></div>
+          </div>
+          <div class="schedule-map" style="margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid var(--portal-border, #e5e7eb);">
+            <iframe
+              title="Map to volunteer activity venue"
+              src="${mapEmbedUrl}"
+              width="100%"
+              height="220"
+              style="display:block;border:0;"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen>
+            </iframe>
           </div>
           ${app.coordinator_note ? `<div class="schedule-note"><span>“</span><div><small>FROM YOUR COORDINATOR</small><p>${app.coordinator_note}</p></div></div>` : ""}
         </div>
