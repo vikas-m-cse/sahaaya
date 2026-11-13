@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           volunteer_id: session.id,
           match_score: match.score,
           match_reasons: match.reasons,
-          volunteer_note: note || "Looking forward to contributing!"
+          volunteer_note: note || null
         });
         SahaayaUI.closeModal();
         SahaayaUI.showToast("Application submitted! The old age home will review it.", "success");
