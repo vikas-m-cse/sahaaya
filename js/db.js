@@ -848,6 +848,7 @@ const SahaayaDB = (() => {
         const { data, error } = await sb.from("applications").insert({
           activity_id: appData.opportunity_id,
           volunteer_id: volunteer.id,
+          volunteer_note: appData.volunteer_note || null,
           status: "applied"
         }).select("*").single();
         if (error) {
