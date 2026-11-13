@@ -23,6 +23,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   let homeApplications = [];
   let allUsers = [];
 
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
   // Tab Switching
   const tabButtons = document.querySelectorAll(".portal-tab-btn");
   const tabContents = document.querySelectorAll(".portal-tab-content");
@@ -216,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               Volunteer's Application Message:
             </strong>
             <p style="margin: 0; font-size: 13px; font-style: italic; color: #2e443f;">
-              "${app.volunteer_note || "Willing and excited to participate!"}"
+              "${app.volunteer_note ? escapeHtml(app.volunteer_note) : "No message was added by this volunteer."}"
             </p>
           </div>
 
