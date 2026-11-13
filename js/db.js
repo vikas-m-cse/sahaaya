@@ -849,6 +849,8 @@ const SahaayaDB = (() => {
           activity_id: appData.opportunity_id,
           volunteer_id: volunteer.id,
           volunteer_note: appData.volunteer_note || null,
+          match_score: Number.isFinite(Number(appData.match_score)) ? Number(appData.match_score) : null,
+          match_reasons: Array.isArray(appData.match_reasons) ? appData.match_reasons : [],
           status: "applied"
         }).select("*").single();
         if (error) {
@@ -868,7 +870,7 @@ const SahaayaDB = (() => {
     updateApplicationStatus: async (applicationId, status, coordinatorNote = "") => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
-        const { data, error } = await sb.from("applications").update({ status, reviewed_at: new Date().toISOString() }).eq("id", applicationId).select("*").single();
+        const { data, error } = await sb.from("applications").update({ status, coordinator_note: coordinatorNote || null, reviewed_at: new Date().toISOString() }).eq("id", applicationId).select("*").single();
         if (error) throw new Error("Could not update application: " + error.message);
         return { ...data, opportunity_id: data.activity_id, volunteer_record_id: data.volunteer_id };
       }
