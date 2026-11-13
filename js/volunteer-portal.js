@@ -214,7 +214,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${
             applied
               ? `<span class="badge ${applied.status === "approved" ? "badge-success" : "badge-warning"}">${applied.status === "approved" ? "Approved & Scheduled" : "Application in Review"}</span>`
-              : match.eligible ? `<button class="btn-primary apply-btn" data-opp-id="${opp.id}">I can show up <span>↗</span></button>` : `<span class="badge badge-warning" title="${match.hardStops.join(" ")}">Needs review · ${match.hardStops.length ? "Eligibility check" : "Low compatibility"}</span>`
+              : match.eligible
+                ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                     <button class="btn-primary apply-btn"
+                       data-opp-id="${opp.id}"
+                       data-needs-review="${match.needsHumanReview ? "true" : "false"}"
+                       data-soft-warnings="${(match.softWarnings || []).join(" | ")}">
+                       I can show up <span>↗</span>
+                     </button>
+                     ${match.needsHumanReview
+                       ? `<span class="badge badge-warning" title="${(match.softWarnings || []).join(" ")}">Soft match · may need review</span>`
+                       : ""}
+                   </div>`
+                : `<span class="badge badge-warning" title="${(match.hardStops || []).join(" ")}">Cannot apply · ${(match.hardStops && match.hardStops[0]) || "Eligibility check"}</span>`
           }
         </div>
       `;
@@ -223,7 +235,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     grid.querySelectorAll(".apply-btn").forEach(btn => {
-      btn.addEventListener("click", () => openApplyModal(btn.dataset.oppId));
+      btn.addEventListener("click", () => {
+        const needsReview = btn.dataset.needsReview === "true";
+        const softWarnings = (btn.dataset.softWarnings || "").trim();
+        if (needsReview) {
+          const msg = "This activity is only a soft match for your profile.\n\n"
+            + (softWarnings ? softWarnings.replace(/ \| /g, "\n") + "\n\n" : "")
+            + "You can still apply. The home coordinator may review it more carefully.\n\nContinue?";
+          if (!confirm(msg)) return;
+        }
+        openApplyModal(btn.dataset.oppId);
+      });
     });
   }
 
@@ -251,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const home  = allHomes.find(h => h.id === opp.home_id) || { name: "Partner Senior Home", address: "Bengaluru" };
     const match = SahaayaMatching.calculateMatch(currentProfile, opp);
     if (!match.eligible) {
-      SahaayaUI.showToast(match.hardStops[0] || "This activity needs a stronger compatibility fit before applying.", "warning");
+      SahaayaUI.showToast(match.hardStops[0] || "This activity cannot be applied to right now.", "warning");
       return;
     }
 
@@ -270,6 +292,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           <strong>Match Assessment (${match.score}%):</strong>
           <ul>${match.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
         </div>
+        ${(match.softWarnings && match.softWarnings.length)
+          ? `<div style="margin-top:10px;padding:10px 12px;background:#fff8e6;border-radius:8px;font-size:13px;color:#7a5c00;">
+               <strong>Note:</strong> ${match.softWarnings.join(" ")}
+             </div>`
+          : ""}
         <div class="form-group">
           <label>A quick note to the coordinator (optional):</label>
           <textarea id="appNoteInput" rows="3" placeholder="Tell the coordinator what excites you about this activity..."></textarea>
