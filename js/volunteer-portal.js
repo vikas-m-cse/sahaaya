@@ -390,6 +390,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         phone: "+91 80 0000 0000"
       };
 
+      const mapQuery = [home.name, home.address, home.area, "Bengaluru"].filter(Boolean).join(", ");
+      const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
       const card = document.createElement("article");
       card.className = "schedule-card portal-card";
       card.innerHTML = `
@@ -408,6 +410,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div><small>DURATION</small><b>${opp?.duration_hours || 2} hrs</b></div>
             <div><small>COORDINATOR</small><b>${home.contact_person || "Home team"}</b></div>
             <div><small>CONTACT</small><b>${home.phone || "On file"}</b></div>
+          </div>
+          <div class="schedule-map" style="margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid var(--portal-border, #e5e7eb);">
+            <iframe
+              title="Map to volunteer activity venue"
+              src="${mapEmbedUrl}"
+              width="100%"
+              height="220"
+              style="display:block;border:0;"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen>
+            </iframe>
           </div>
           ${app.coordinator_note ? `<div class="schedule-note"><span>“</span><div><small>FROM YOUR COORDINATOR</small><p>${app.coordinator_note}</p></div></div>` : ""}
         </div>
