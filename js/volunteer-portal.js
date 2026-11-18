@@ -76,6 +76,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     userApplications = await SahaayaDB.getApplications({ volunteer_id: session.id });
     userAttendance   = await SahaayaDB.getAttendanceHistoryByVolunteer(session.id);
 
+    // Ensure opportunities linked to this volunteer's applications are available
+    // (they may no longer be "open", so they were missing from allOpportunities)
+    const knownIds = new Set(allOpportunities.map(o => o.id));
+    const missingIds = [...new Set(
+      userApplications
+        .map(a => a.opportunity_id)
+        .filter(id => id && !knownIds.has(id))
+    )];
+    if (missingIds.length) {
+      const extras = await Promise.all(
+        missingIds.map(id => SahaayaDB.getOpportunityById(id).catch(() => null))
+      );
+      extras.filter(Boolean).forEach(opp => allOpportunities.push(opp));
+    }
+
     renderKPIs();
     renderOpportunities();
     renderHeroRecommendation();
