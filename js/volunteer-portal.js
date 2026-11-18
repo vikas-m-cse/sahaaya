@@ -228,7 +228,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="moment-spots"><i></i> ${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} open</span>
           ${
             applied
-              ? `<span class="badge ${applied.status === "approved" ? "badge-success" : "badge-warning"}">${applied.status === "approved" ? "Approved & Scheduled" : "Application in Review"}</span>`
+              ? (applied.status === "approved"
+                ? `<button class="btn-secondary btn-sm view-schedule-btn" data-opp-id="${opp.id}">View schedule & directions ↗</button>`
+                : `<span class="badge badge-warning">Application in Review</span>`)
               : match.eligible
                 ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                      <button class="btn-primary apply-btn"
@@ -260,6 +262,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (!confirm(msg)) return;
         }
         openApplyModal(btn.dataset.oppId);
+      });
+    });
+
+    grid.querySelectorAll(".view-schedule-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        switchTab("schedule");
+        const scheduleCard = document.querySelector(`.schedule-card[data-opp-id="${btn.dataset.oppId}"]`);
+        scheduleCard?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
   }
@@ -407,6 +417,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const card = document.createElement("article");
       card.className = "schedule-card portal-card";
+      card.dataset.oppId = app.opportunity_id;
       card.innerHTML = `
         <div class="schedule-card-top">
           <div class="schedule-date-block">
