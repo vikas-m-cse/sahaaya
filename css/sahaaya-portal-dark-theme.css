@@ -998,3 +998,17 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
  .admin-trust-evidence,.admin-trust-rule{grid-column:1}
  .home-evidence-form{grid-template-columns:1fr}
 }
+
+
+/* Production fix: let opportunity cards use the available grid width.
+   auto-fit collapses unused columns, so one result fills the row on desktop;
+   multiple results still form a responsive grid. */
+#volunteerOppGrid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)) !important;
+  align-items: stretch !important;
+}
+@media (max-width: 780px) {
+  #volunteerOppGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
