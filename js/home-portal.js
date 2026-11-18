@@ -200,7 +200,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.innerHTML = `
         <div class="portal-card-header">
           <span class="badge badge-warning">Under Review</span>
-          <span class="match-pill match-high">★ ${app.match_score}% Fit</span>
         </div>
         <div class="portal-card-body">
           <div style="font-size: 11px; font-weight: 700; color: var(--portal-muted); margin-bottom: 6px;">
@@ -220,12 +219,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             </p>
           </div>
 
-          <div class="match-explainer-box">
-            <strong>Compatibility Breakdown:</strong>
-            <ul>
-              ${(app.match_reasons || ["Direct category interest"]).map(r => `<li>${r}</li>`).join("")}
-            </ul>
-          </div>
         </div>
         <div class="portal-card-footer">
           <button class="btn-danger btn-sm decline-btn" data-app-id="${app.id}">
