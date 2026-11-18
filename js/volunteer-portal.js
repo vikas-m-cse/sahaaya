@@ -331,7 +331,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTextSafe("heroOppTime", (opp.duration_hours || 1) + " hr" + (opp.duration_hours === 1 ? "" : "s") + " · " + (opp.date || "Upcoming"));
     setTextSafe("heroNextWindow", "Your next opening · " + (opp.date || "upcoming"));
     const fit = document.getElementById("heroFitLabel");
-    if (fit) fit.textContent = match.matchLevel === "high" ? "BEST FIT" : match.matchLevel === "medium" ? "GOOD FIT" : "WORTH A LOOK";
+    if (fit) fit.textContent = "FEATURED ACTIVITY";
   }
 
   // -----------------------------------------------------------------------
