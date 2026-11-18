@@ -187,16 +187,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     withScores.forEach(({ opp, match, home, applied }, index) => {
       const spotsLeft = Math.max(0, (opp.spots_needed || 1) - (opp.spots_filled || 0));
-      const matchBadgeCls = match.matchLevel === "high" ? "match-high" : match.matchLevel === "medium" ? "match-medium" : "match-general";
-      const fitLabel = index === 0
-        ? "BEST MATCH"
-        : match.score >= 85
-          ? "GREAT FIT"
-          : match.score >= 70
-            ? "GOOD FIT"
-            : match.score >= 55
-              ? "POSSIBLE FIT"
-              : "EXPLORE";
 
       const card = document.createElement("article");
       const visualClass = opp.category === "music" ? "moment-music" : opp.category === "creative" ? "moment-creative" : opp.category === "outdoors" ? "moment-outdoors" : opp.category === "assistive" ? "moment-tech" : "moment-talk";
@@ -205,7 +195,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="moment-visual ${visualClass}">
           <div class="moment-visual-top">
             <span class="moment-category">${SahaayaUI.getCategoryBadge(opp.category)}</span>
-            <span class="moment-fit ${matchBadgeCls}"><b>${match.score}%</b> ${fitLabel}</span>
           </div>
           <span class="moment-visual-label">A MOMENT WORTH SHOWING UP FOR</span>
         </div>
@@ -218,11 +207,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <span>⏱ ${opp.duration_hours} hrs</span>
             <span>⌖ ${home.area}</span>
           </div>
-          <button class="moment-why" type="button">Why this fits you <span>+</span></button>
-          <div class="match-explainer-box moment-explainer">
-            <strong><span>✓</span> Why this matches your profile</strong>
-            <ul>${match.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
-          </div>
         </div>
         <div class="moment-footer">
           <span class="moment-spots"><i></i> ${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} open</span>
@@ -232,35 +216,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? `<button class="btn-secondary btn-sm view-schedule-btn" data-opp-id="${opp.id}">View schedule & directions ↗</button>`
                 : `<span class="badge badge-warning">Application in Review</span>`)
               : match.eligible
-                ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                     <button class="btn-primary apply-btn"
-                       data-opp-id="${opp.id}"
-                       data-needs-review="${match.needsHumanReview ? "true" : "false"}"
-                       data-soft-warnings="${(match.softWarnings || []).join(" | ")}">
-                       I can show up <span>↗</span>
-                     </button>
-                     ${match.needsHumanReview
-                       ? `<span class="badge badge-warning" title="${(match.softWarnings || []).join(" ")}">Soft match · may need review</span>`
-                       : ""}
-                   </div>`
-                : `<span class="badge badge-warning" title="${(match.hardStops || []).join(" ")}">Cannot apply · ${(match.hardStops && match.hardStops[0]) || "Eligibility check"}</span>`
+                ? `<button class="btn-primary apply-btn" data-opp-id="${opp.id}">I can show up <span>↗</span></button>`
+                : `<span class="badge badge-warning" title="${(match.hardStops || []).join(" ")}">Cannot apply · ${(match.hardStops && match.hardStops[0]) || "Safety requirement"}</span>`
           }
         </div>
       `;
       grid.appendChild(card);
-      card.querySelector(".moment-why")?.addEventListener("click", () => card.classList.toggle("why-open"));
     });
 
     grid.querySelectorAll(".apply-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        const needsReview = btn.dataset.needsReview === "true";
-        const softWarnings = (btn.dataset.softWarnings || "").trim();
-        if (needsReview) {
-          const msg = "This activity is only a soft match for your profile.\n\n"
-            + (softWarnings ? softWarnings.replace(/ \| /g, "\n") + "\n\n" : "")
-            + "You can still apply. The home coordinator may review it more carefully.\n\nContinue?";
-          if (!confirm(msg)) return;
-        }
         openApplyModal(btn.dataset.oppId);
       });
     });
@@ -313,15 +278,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <strong>Where:</strong> ${home.name}, ${home.address || "Bengaluru"}
           </p>
         </div>
-        <div class="match-explainer-box" style="margin-bottom: 18px;">
-          <strong>Match Assessment (${match.score}%):</strong>
-          <ul>${match.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
-        </div>
-        ${(match.softWarnings && match.softWarnings.length)
-          ? `<div style="margin-top:10px;padding:10px 12px;background:#fff8e6;border-radius:8px;font-size:13px;color:#7a5c00;">
-               <strong>Note:</strong> ${match.softWarnings.join(" ")}
-             </div>`
-          : ""}
         <div class="form-group">
           <label>A quick note to the coordinator (optional):</label>
           <textarea id="appNoteInput" rows="3" placeholder="Tell the coordinator what excites you about this activity..."></textarea>
@@ -341,8 +297,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await SahaayaDB.submitApplication({
           opportunity_id: opp.id,
           volunteer_id: session.id,
-          match_score: match.score,
-          match_reasons: match.reasons,
           volunteer_note: note || "Looking forward to contributing!"
         });
         SahaayaUI.closeModal();
