@@ -109,12 +109,7 @@ const SahaayaMatching = (() => {
       : "New volunteer; reliability remains neutral until history exists");
 
     const score = applicableWeight ? Math.round(points / applicableWeight * 100) : 0;
-    if (score < 55 && hardStops.length === 0) {
-      softWarnings.push("Compatibility score is lower than usual — the home coordinator may review this application more carefully.");
-    }
-
-    const matchLevel = hardStops.length || score < 55 ? "low"
-      : score >= 85 ? "high"
+    const matchLevel = score >= 85 ? "high"
       : score >= 70 ? "medium"
       : "general";
 
@@ -123,10 +118,7 @@ const SahaayaMatching = (() => {
       weights: WEIGHTS, matchLevel,
       eligible: hardStops.length === 0,
       needsHumanReview: hardStops.length === 0 && softWarnings.length > 0,
-      recommendation: hardStops.length ? "not_eligible"
-        : score >= 70 ? "recommend"
-        : score >= 55 ? "human_review"
-        : "do_not_recommend"
+      recommendation: hardStops.length ? "not_eligible" : "available_for_home_review"
     };
   }
   return { calculateMatch, WEIGHTS };
