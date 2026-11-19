@@ -91,6 +91,10 @@ const SahaayaUI = (() => {
 
   function getStatusBadge(status) {
     const map = {
+      pending: { label: "Application Pending", cls: "badge-warning" },
+      documents_required: { label: "Documents Required", cls: "badge-warning" },
+      verified: { label: "Verified Partner", cls: "badge-success" },
+      rejected: { label: "Not Approved", cls: "badge-danger" },
       applied:   { label: "Under Review",        cls: "badge-warning" },
       approved:  { label: "Approved",             cls: "badge-success" },
       rejected:  { label: "Declined",             cls: "badge-danger"  },
