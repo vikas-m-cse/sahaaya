@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               Volunteer's Application Message:
             </strong>
             <p style="margin: 0; font-size: 13px; font-style: italic; color: #2e443f;">
-              "${app.volunteer_note || "Willing and excited to participate!"}"
+              "${app.volunteer_note ? app.volunteer_note : "No message provided by the volunteer."}"
             </p>
           </div>
 
