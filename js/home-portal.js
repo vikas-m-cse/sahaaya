@@ -541,6 +541,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td><strong>+${opp?.duration_hours || 2.0} hrs</strong></td>
         <td>${SahaayaUI.getStatusBadge(app.status)}</td>
         <td>
+          <button class="btn-secondary btn-sm open-app-chat-btn" data-app-id="${app.id}">Chat</button>
           ${
             app.status === SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED
               ? `<span style="color: var(--portal-primary); font-size: 12px; font-weight: 700;">✓ Hours Credited</span>`
@@ -551,6 +552,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         </td>
       `;
       tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll(".open-app-chat-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const app = homeApplications.find(row => row.id === btn.dataset.appId);
+        if (app) openApplicationChatModal(app);
+      });
     });
 
     tbody.querySelectorAll(".mark-present-btn").forEach(btn => {
