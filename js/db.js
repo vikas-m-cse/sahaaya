@@ -493,6 +493,18 @@ const SahaayaDB = (() => {
     updateVolunteerProfile: async (userId, updateData) => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(userId))) {
+        // Personal identity fields live in profiles; volunteering preferences
+        // live in volunteers. Update both records from this profile form.
+        if (updateData.full_name !== undefined || updateData.phone !== undefined) {
+          const profileUpdate = {};
+          if (updateData.full_name !== undefined) profileUpdate.full_name = updateData.full_name;
+          if (updateData.phone !== undefined) profileUpdate.phone = updateData.phone;
+          const { error: identityError } = await sb.from("profiles")
+            .update(profileUpdate)
+            .eq("id", userId);
+          if (identityError) throw new Error("Could not update your name/contact details: " + identityError.message);
+        }
+
         const payload = {
           profile_id: userId,
           interests: updateData.interests || [],
