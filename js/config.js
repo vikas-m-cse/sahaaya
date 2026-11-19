@@ -24,6 +24,7 @@ const SAHAAYA_CONFIG = {
 
   HOME_STATUS: {
     PENDING: "pending",
+    DOCUMENTS_REQUIRED: "documents_required",
     VERIFIED: "verified",
     REJECTED: "rejected"
   },
