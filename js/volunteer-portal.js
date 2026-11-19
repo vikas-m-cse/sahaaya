@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (logoutBtn) logoutBtn.addEventListener("click", () => SahaayaAuth.logout());
 
-  document.getElementById("editProfileQuickBtn")?.addEventListener("click", () => switchTab("profile"));
+  document.getElementById("editProfileQuickBtn")?.addEventListener("click", openPreferencesModal);
 
   // -----------------------------------------------------------------------
   // 3. State
@@ -672,6 +672,82 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------------------------------------------------
   // 14. Profile Form
   // -----------------------------------------------------------------------
+  function openPreferencesModal() {
+    const interests = currentProfile?.interests || [];
+    const availability = currentProfile?.availability || [];
+
+    SahaayaUI.openModal({
+      title: "Your volunteering preferences",
+      subtitle: "Choose the activities you enjoy and the times that work for you.",
+      bodyHtml: `
+        <div class="preference-modal-intro">
+          <span class="preference-modal-icon">✦</span>
+          <div><strong>Make Sahaaya feel like yours</strong><p>Your choices help us show more relevant volunteering opportunities.</p></div>
+        </div>
+        <div class="form-group">
+          <label for="preferenceBio">A little about you <span class="hint">(optional)</span></label>
+          <textarea id="preferenceBio" rows="3" placeholder="Tell care homes what motivates you to volunteer...">${escapeHtml(currentProfile?.bio || "")}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Activities you're interested in</label>
+          <div class="preference-choice-grid" id="preferenceInterests">
+            ${(SAHAAYA_CONFIG.CATEGORIES || []).map(cat => `
+              <label class="preference-choice">
+                <input type="checkbox" name="preferenceInterest" value="${escapeHtml(cat.id)}" ${interests.includes(cat.id) ? "checked" : ""}>
+                <span>${cat.icon} ${escapeHtml(cat.label)}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>When are you usually available?</label>
+          <div class="preference-choice-grid" id="preferenceAvailability">
+            ${(SAHAAYA_CONFIG.WEEKDAY_SLOTS || []).map(slot => `
+              <label class="preference-choice">
+                <input type="checkbox" name="preferenceAvailability" value="${escapeHtml(slot.id)}" ${availability.includes(slot.id) ? "checked" : ""}>
+                <span>${escapeHtml(slot.label)}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <p class="preference-modal-note">You can change these preferences anytime. Your selections are used to personalise opportunity suggestions.</p>
+      `,
+      footerHtml: `
+        <button class="btn-secondary" id="cancelPreferencesBtn" type="button">Cancel</button>
+        <button class="btn-primary" id="savePreferencesBtn" type="button">Save preferences</button>
+      `
+    });
+
+    document.getElementById("cancelPreferencesBtn")?.addEventListener("click", SahaayaUI.closeModal);
+    document.getElementById("savePreferencesBtn")?.addEventListener("click", async () => {
+      const saveButton = document.getElementById("savePreferencesBtn");
+      if (saveButton) { saveButton.disabled = true; saveButton.textContent = "Saving…"; }
+
+      const updatedInterests = Array.from(document.querySelectorAll("input[name='preferenceInterest']:checked")).map(cb => cb.value);
+      const updatedAvailability = Array.from(document.querySelectorAll("input[name='preferenceAvailability']:checked")).map(cb => cb.value);
+
+      try {
+        currentProfile = await SahaayaDB.updateVolunteerProfile(session.id, {
+          bio: document.getElementById("preferenceBio")?.value.trim() || "",
+          interests: updatedInterests,
+          availability: updatedAvailability
+        });
+        SahaayaUI.closeModal();
+        SahaayaUI.showToast("Your preferences have been saved.", "success");
+        renderOpportunities();
+      } catch (err) {
+        if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Save preferences"; }
+        SahaayaUI.showToast(err.message || "Could not save your preferences. Please try again.", "warning");
+      }
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
   function renderProfileForm() {
     setInputSafe("profName",      session.name);
     setInputSafe("profEmail",     session.email);
