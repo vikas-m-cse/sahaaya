@@ -880,7 +880,11 @@ const SahaayaDB = (() => {
     updateApplicationStatus: async (applicationId, status, coordinatorNote = "") => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
-        const { data, error } = await sb.from("applications").update({ status, reviewed_at: new Date().toISOString() }).eq("id", applicationId).select("*").single();
+        const { data, error } = await sb.from("applications").update({
+          status,
+          coordinator_note: (coordinatorNote || "").trim() || null,
+          reviewed_at: new Date().toISOString()
+        }).eq("id", applicationId).select("*").single();
         if (error) throw new Error("Could not update application: " + error.message);
         return { ...data, opportunity_id: data.activity_id, volunteer_record_id: data.volunteer_id };
       }
