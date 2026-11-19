@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await SahaayaDB.submitApplication({
           opportunity_id: opp.id,
           volunteer_id: session.id,
-          volunteer_note: note || "Looking forward to contributing!"
+          volunteer_note: note || ""
         });
         SahaayaUI.closeModal();
         SahaayaUI.showToast("Application submitted! The old age home will review it.", "success");
