@@ -88,12 +88,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             <span class="notice-icon">⏳</span>
             <div>
               <strong>Home Verification In Progress:</strong>
-              Your registration documents are being verified by Sahaaya Platform Administrators. You can configure requirements, and they will become publicly discoverable once approved.
+              Your home application has been received. A Sahaaya administrator will review the basic details first. If accepted, you will be asked to upload verification documents.
             </div>
           </div>
           <span class="badge badge-warning">Verification Pending</span>
         </div>
       `;
+    } else if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.DOCUMENTS_REQUIRED) {
+      verificationNoticeArea.innerHTML = `<div class="portal-notice notice-warning"><div class="notice-content"><span class="notice-icon">📄</span><div><strong>Initial application accepted:</strong> Please submit the required documents. Your home will be listed as an approved Sahaaya partner only after the administrator verifies them.</div></div><span class="badge badge-warning">Documents Required</span></div>`;
+    } else if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.REJECTED) {
+      verificationNoticeArea.innerHTML = `<div class="portal-notice notice-warning"><div class="notice-content"><span class="notice-icon">!</span><div><strong>Home application not approved:</strong> Your registration or submitted documents were not approved by the Sahaaya administrator.</div></div><span class="badge badge-warning">Not Approved</span></div>`;
     } else if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
       verificationNoticeArea.innerHTML = `
         <div class="portal-notice notice-success">
@@ -115,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderVerificationEvidence() {
     if (!verificationNoticeArea || !currentHome) return;
     document.getElementById("homeEvidencePanel")?.remove();
-    if (currentHome.verification_status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) return;
+    if (currentHome.verification_status !== SAHAAYA_CONFIG.HOME_STATUS.DOCUMENTS_REQUIRED) return;
     const existing = Array.isArray(currentHome.verification_documents) ? currentHome.verification_documents : [];
     const panel = document.createElement("section");
     panel.id = "homeEvidencePanel";
@@ -123,9 +127,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     panel.innerHTML = `
       <div class="portal-card-body">
         <span class="admin-review-kicker">STEP 1 · TRUST & SAFETY</span>
-        <h3>Submit your verification evidence</h3>
-        <p>Upload clear, current documents first. An administrator will review the evidence and complete the home verification decision afterwards.</p>
-        <div class="home-evidence-list">${existing.map(doc => `<div class="home-evidence-item"><strong>${doc.label || doc.file_name || "Verification document"}</strong><span>Uploaded · ${doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "Date unavailable"}</span></div>`).join("") || "<p>No evidence uploaded yet. Submit the required documents to begin review.</p>"}</div>
+        <h3>Your application is accepted — submit verification documents</h3>
+        <p>The Sahaaya team has accepted your initial home application. Upload the required documents below for final verification and approval.</p>
+        <div class="home-evidence-list">${existing.map(doc => `<div class="home-evidence-item"><strong>${doc.label || doc.file_name || "Verification document"}</strong><span>Uploaded · ${doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "Date unavailable"}</span></div>`).join("") || "<p>No documents uploaded yet. Please submit legal registration proof, address proof and your resident safety policy.</p>"}</div>
         <form id="homeEvidenceForm" class="home-evidence-form">
           <label>Document type<select name="kind" required><option value="">Choose evidence</option><option value="legal_registration">Legal registration / trust / society certificate</option><option value="address_proof">Address proof for the residence</option><option value="safety_policy">Resident safety / safeguarding policy</option><option value="care_operations">Care operations / facility evidence</option><option value="coordinator_authority">Coordinator authorization</option></select></label>
           <label>Upload document (PDF, JPG or PNG; max 10 MB)<input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required></label>
@@ -348,14 +352,27 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span style="font-size: 12px; font-weight: 700; color: ${spotsLeft === 0 ? '#991b1b' : 'var(--portal-primary)'};">
             ${spotsLeft === 0 ? "All spots filled" : `${spotsLeft} spots remaining`}
           </span>
-          <button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">
-            Edit Need
-          </button>
+          <button class="btn-secondary btn-sm edit-opp-btn" data-opp-id="${opp.id}">Edit Need</button>
+          <button class="btn-danger btn-sm delete-opp-btn" data-opp-id="${opp.id}" data-title="${opp.title}">Delete</button>
         </div>
       `;
       grid.appendChild(card);
     });
 
+    grid.querySelectorAll(".delete-opp-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!window.confirm(`Delete "${btn.dataset.title}"? Its applications and schedule entries will also be removed. This cannot be undone.`)) return;
+        btn.disabled = true;
+        try {
+          await SahaayaDB.deleteOpportunity(btn.dataset.oppId);
+          SahaayaUI.showToast("Volunteer requirement deleted.", "success");
+          await loadData();
+        } catch (error) {
+          btn.disabled = false;
+          SahaayaUI.showToast(error.message || "Could not delete this requirement.", "error");
+        }
+      });
+    });
     grid.querySelectorAll(".edit-opp-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         SahaayaUI.showToast("Requirement is live and receiving applications.", "info");
@@ -534,14 +551,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const volName = btn.dataset.volunteer;
         const hours = btn.dataset.hours;
 
-        await SahaayaDB.recordAttendance({
-          applicationId: appId,
-          status: "present",
-          markedByUserId: session.id
-        });
-
-        SahaayaUI.showToast(`Attendance verified! ${hours} hours credited to ${volName}.`, "success");
-        await loadData();
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+        try {
+          await SahaayaDB.recordAttendance({ applicationId: appId, status: "present", markedByUserId: session.id });
+          SahaayaUI.showToast(`Attendance verified! ${hours} hours credited to ${volName}.`, "success");
+          await loadData();
+        } catch (error) {
+          btn.disabled = false;
+          btn.textContent = "Mark Present ✓";
+          SahaayaUI.showToast(error.message || "Could not save attendance. Please try again.", "error");
+        }
       });
     });
   }
