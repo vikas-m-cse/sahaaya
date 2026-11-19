@@ -128,7 +128,7 @@ DECLARE
   admin_id UUID;
   event_payload JSONB;
 BEGIN
-  IF NEW.status IS NOT DISTINCT FROM OLD.status THEN RETURN NEW; END IF;
+  IF NEW.status IS NOT DISTINCT FROM OLD.status OR NEW.status = 'attended' THEN RETURN NEW; END IF;
 
   SELECT
     vol.profile_id AS volunteer_profile_id,
@@ -320,3 +320,11 @@ CREATE TRIGGER trg_sahaaya_attendance_email
 AFTER INSERT OR UPDATE ON public.attendance
 FOR EACH ROW EXECUTE FUNCTION public.notify_sahaaya_attendance();
 
+
+-- Trigger-only entry points; browser clients must never enqueue arbitrary mail.
+REVOKE ALL ON FUNCTION public.enqueue_sahaaya_email(UUID, TEXT, JSONB) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_sahaaya_application_created() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_sahaaya_application_status() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_sahaaya_application_message() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_sahaaya_home_verification() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_sahaaya_attendance() FROM PUBLIC, anon, authenticated;
