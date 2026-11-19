@@ -1,0 +1,4 @@
+project_id = "sahaaya"
+
+[functions.send-email-notification]
+verify_jwt = false
