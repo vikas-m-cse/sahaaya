@@ -780,15 +780,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       const updatedInterests    = Array.from(document.querySelectorAll("input[name='interest']:checked")).map(cb => cb.value);
       const updatedAvailability = Array.from(document.querySelectorAll("input[name='availability']:checked")).map(cb => cb.value);
 
-      currentProfile = await SahaayaDB.updateVolunteerProfile(session.id, {
-        bio:              document.getElementById("profBio")?.value.trim(),
-        emergency_contact: document.getElementById("profEmergency")?.value.trim(),
-        interests:        updatedInterests,
-        availability:     updatedAvailability
-      });
+      const updatedName = document.getElementById("profName")?.value.trim();
+      const updatedPhone = document.getElementById("profPhone")?.value.trim();
 
-      SahaayaUI.showToast("Profile preferences saved! Compatibility scores updated.", "success");
-      renderOpportunities();
+      if (!updatedName) {
+        SahaayaUI.showToast("Please enter your full name.", "warning");
+        return;
+      }
+
+      try {
+        currentProfile = await SahaayaDB.updateVolunteerProfile(session.id, {
+          full_name: updatedName,
+          phone: updatedPhone,
+          bio:              document.getElementById("profBio")?.value.trim(),
+          emergency_contact: document.getElementById("profEmergency")?.value.trim(),
+          interests:        updatedInterests,
+          availability:     updatedAvailability
+        });
+
+        session.name = updatedName;
+        session.phone = updatedPhone;
+        if (userName) userName.textContent = updatedName;
+        if (userAvatar) userAvatar.textContent = updatedName.split(/\\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
+        if (welcomeGreeting) welcomeGreeting.textContent = `Welcome back, ${updatedName.split(" ")[0]} 👋`;
+
+        SahaayaUI.showToast("Profile updated successfully.", "success");
+        renderOpportunities();
+      } catch (err) {
+        SahaayaUI.showToast(err.message || "Could not update your profile.", "warning");
+      }
     });
   }
 
