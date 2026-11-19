@@ -1012,3 +1012,25 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+
+/* -------------------------------------------------------------------------
+   Application chat — loaded in the active portal theme bundle
+   ------------------------------------------------------------------------- */
+.chat-context { display:grid; gap:8px; margin-bottom:12px; }
+.chat-context-item { padding:10px 12px; border:1px solid var(--portal-line); border-radius:12px; background:var(--portal-card-2); }
+.chat-context-item strong { display:block; margin-bottom:4px; color:var(--portal-deep); font-size:11px; }
+.chat-context-item p { margin:0; color:var(--portal-ink); font-size:13px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.chat-container { border:1px solid var(--portal-line); border-radius:14px; overflow:hidden; background:var(--portal-card); }
+.chat-messages { display:flex; flex-direction:column; gap:10px; height:min(42vh,380px); min-height:180px; overflow-y:auto; padding:14px; }
+.chat-empty { margin:auto; color:var(--portal-muted); font-size:13px; text-align:center; }
+.chat-bubble { max-width:82%; padding:10px 12px; border-radius:13px; overflow-wrap:anywhere; }
+.chat-msg-outgoing { align-self:flex-end; color:#173c32; background:#e4f2e9; border-bottom-right-radius:4px; }
+.chat-msg-incoming { align-self:flex-start; color:var(--portal-ink); background:var(--portal-card-2); border:1px solid var(--portal-line); border-bottom-left-radius:4px; }
+.chat-message-meta { display:block; margin-bottom:5px; color:var(--portal-muted); font-size:10px; }
+.chat-bubble p { margin:0; font-size:13px; line-height:1.5; white-space:pre-wrap; }
+.chat-input-bar { display:flex; align-items:flex-end; gap:10px; width:100%; }
+.chat-input-bar textarea { flex:1; min-width:0; resize:vertical; min-height:44px; max-height:120px; padding:10px 12px; border:1px solid var(--portal-line); border-radius:10px; background:var(--portal-card); color:var(--portal-ink); font:inherit; }
+.chat-input-bar button { flex-shrink:0; }
+.roster-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+@media (max-width:600px) { .chat-messages { height:48vh; padding:10px; } .chat-bubble { max-width:92%; } .chat-input-bar { align-items:stretch; } }
