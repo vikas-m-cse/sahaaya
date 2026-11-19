@@ -860,6 +860,7 @@ const SahaayaDB = (() => {
         const { data, error } = await sb.from("applications").insert({
           activity_id: appData.opportunity_id,
           volunteer_id: volunteer.id,
+          volunteer_note: (appData.volunteer_note || "").trim() || null,
           status: "applied"
         }).select("*").single();
         if (error) {
@@ -872,7 +873,7 @@ const SahaayaDB = (() => {
       const existing = apps.find(a => a.opportunity_id === appData.opportunity_id && a.volunteer_id === appData.volunteer_id && (a.status === "applied" || a.status === "approved"));
       if (existing) throw new Error("You have already applied for this opportunity.");
       const id = "app_" + Date.now();
-      const newApp = { id, status: SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED, applied_at: new Date().toISOString(), reviewed_at: null, coordinator_note: null, ...appData };
+      const newApp = { id, status: SAHAAYA_CONFIG.APPLICATION_STATUS.APPLIED, applied_at: new Date().toISOString(), reviewed_at: null, coordinator_note: null, ...appData, volunteer_note: (appData.volunteer_note || "").trim() || null };
       apps.push(newApp); save("applications", apps); return newApp;
     },
 
