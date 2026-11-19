@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let userAttendance        = [];
   let allHomes              = [];
   let selectedCategoryFilter = "all";
+  let activeChatPoll = null;
 
   // -----------------------------------------------------------------------
   // 4. Tab Switching
@@ -417,7 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (userApplications.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align: center; padding: 40px; color: var(--portal-muted);">
+          <td colspan="6" style="text-align: center; padding: 40px; color: var(--portal-muted);">
             You haven't submitted any applications yet.
           </td>
         </tr>`;
@@ -447,9 +448,133 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${app.coordinator_note || "Awaiting coordinator review"}
           </span>
         </td>
+        <td>
+          <button class="btn-secondary btn-sm open-app-chat-btn" data-app-id="${app.id}">Chat</button>
+        </td>
       `;
       tbody.appendChild(tr);
     });
+
+    tbody.querySelectorAll(".open-app-chat-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const app = userApplications.find(row => row.id === button.dataset.appId);
+        if (app) openApplicationChatModal(app);
+      });
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // Application chat
+  // -----------------------------------------------------------------------
+  async function openApplicationChatModal(app) {
+    if (activeChatPoll) clearInterval(activeChatPoll);
+    SahaayaUI.openModal({
+      title: "Chat with the care home",
+      subtitle: "Your conversation stays linked to this application.",
+      bodyHtml: `
+        <div class="chat-context" id="applicationChatContext"></div>
+        <div class="chat-container">
+          <div class="chat-messages" id="applicationChatMessages" aria-live="polite">
+            <p class="chat-empty">Loading conversation…</p>
+          </div>
+        </div>
+      `,
+      footerHtml: `
+        <div class="chat-input-bar">
+          <textarea id="applicationChatInput" rows="2" maxlength="4000" placeholder="Write a message…" aria-label="Your message"></textarea>
+          <button class="btn-primary" id="applicationChatSend">Send</button>
+        </div>
+      `
+    });
+
+    const context = document.getElementById("applicationChatContext");
+    const addContext = (label, value) => {
+      if (!value) return;
+      const item = document.createElement("div");
+      item.className = "chat-context-item";
+      const heading = document.createElement("strong");
+      heading.textContent = label;
+      const body = document.createElement("p");
+      body.textContent = value;
+      item.append(heading, body);
+      context.appendChild(item);
+    };
+    addContext("Your original application message", app.volunteer_note);
+    addContext("Earlier reply from the coordinator", app.coordinator_note);
+
+    const list = document.getElementById("applicationChatMessages");
+    const renderMessages = messages => {
+      list.replaceChildren();
+      if (!messages.length) {
+        const empty = document.createElement("p");
+        empty.className = "chat-empty";
+        empty.textContent = "No chat messages yet. Send a message to start the conversation.";
+        list.appendChild(empty);
+      }
+      messages.forEach(message => {
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble " + (message.sender_id === session.id ? "chat-msg-outgoing" : "chat-msg-incoming");
+        const meta = document.createElement("small");
+        meta.className = "chat-message-meta";
+        meta.textContent = (message.sender_id === session.id ? "You" : "Care home") + " · " + new Date(message.created_at).toLocaleString();
+        const body = document.createElement("p");
+        body.textContent = message.message;
+        bubble.append(meta, body);
+        list.appendChild(bubble);
+      });
+      list.scrollTop = list.scrollHeight;
+    };
+
+    const refresh = async (showError = false) => {
+      try {
+        const messages = await SahaayaDB.getApplicationMessages(app.id);
+        if (document.getElementById("applicationChatMessages")) renderMessages(messages);
+      } catch (error) {
+        if (showError) SahaayaUI.showToast(error.message || "Could not load chat.", "error");
+      }
+    };
+    await refresh(true);
+
+    const input = document.getElementById("applicationChatInput");
+    const send = document.getElementById("applicationChatSend");
+    const sendMessage = async () => {
+      const message = input.value.trim();
+      if (!message || send.disabled) return;
+      send.disabled = true;
+      send.textContent = "Sending…";
+      try {
+        await SahaayaDB.sendApplicationMessage({
+          applicationId: app.id,
+          senderId: session.id,
+          senderRole: "volunteer",
+          message
+        });
+        input.value = "";
+        await refresh(true);
+      } catch (error) {
+        SahaayaUI.showToast(error.message || "Could not send message.", "error");
+      } finally {
+        send.disabled = false;
+        send.textContent = "Send";
+      }
+    };
+    send.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    activeChatPoll = setInterval(() => {
+      const modal = document.getElementById("sahaayaSharedModal");
+      if (!modal || !modal.classList.contains("open") || !document.getElementById("applicationChatMessages")) {
+        clearInterval(activeChatPoll);
+        activeChatPoll = null;
+        return;
+      }
+      refresh(false);
+    }, 3500);
   }
 
   // -----------------------------------------------------------------------
