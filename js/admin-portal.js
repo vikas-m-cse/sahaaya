@@ -228,23 +228,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${home.resident_count ? `${home.resident_count} capacity` : "Not provided"}</td>
         <td>${SahaayaUI.getStatusBadge(home.verification_status)}</td>
         <td>
-          ${
-            home.verification_status === "pending"
-              ? `<button class="btn-primary btn-sm quick-verify-btn" data-id="${home.id}">Verify Partner</button>`
-              : `<span style="font-size: 12px; color: var(--portal-primary);">Active & Verified</span>`
-          }
+          <span style="font-size: 12px; color: var(--portal-muted);">
+            ${home.verification_status === "verified" ? "Active & Verified" : home.verification_status === "documents_required" ? "Documents requested" : home.verification_status === "rejected" ? "Not approved" : "Application pending — review in onboarding queue"}
+          </span>
         </td>
       `;
       tbody.appendChild(tr);
     });
 
-    tbody.querySelectorAll(".quick-verify-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        await SahaayaDB.updateHomeStatus(btn.dataset.id, SAHAAYA_CONFIG.HOME_STATUS.VERIFIED);
-        SahaayaUI.showToast("Home verified successfully.", "success");
-        await loadData();
-      });
-    });
+
   }
 
   // Initial Load
