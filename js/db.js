@@ -476,15 +476,14 @@ const SahaayaDB = (() => {
           .eq("profile_id", userId).maybeSingle();
         if (error) throw new Error("Could not load volunteer profile: " + error.message);
         if (!data) return null;
-        const localProfile = load("volunteer_profiles").find(p => p.user_id === userId) || {};
+        const { data: attendance, error: attendanceError } = await sb.from("attendance").select("hours, status").eq("volunteer_id", data.id).eq("status", "present");
+        if (attendanceError) throw new Error("Could not load credited volunteer hours: " + attendanceError.message);
+        const records = attendance || [];
         return {
           id: data.id, user_id: data.profile_id,
-          interests: data.interests || [],
-          availability: data.availability || [],
-          preferred_activity_types: data.preferred_activity_types || [],
-          preferred_area: data.preferred_area || "",
-          total_hours: localProfile.total_hours || 0,
-          completed_count: localProfile.completed_count || 0
+          interests: data.interests || [], availability: data.availability || [],
+          preferred_activity_types: data.preferred_activity_types || [], preferred_area: data.preferred_area || "",
+          total_hours: records.reduce((sum, row) => sum + Number(row.hours || 0), 0), completed_count: records.length
         };
       }
       const localProfiles = load("volunteer_profiles");
@@ -647,13 +646,11 @@ const SahaayaDB = (() => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(homeId))) {
         if (status === SAHAAYA_CONFIG.HOME_STATUS.VERIFIED) {
-          const { data: review, error: reviewError } = await sb.from("old_age_homes").select("trust_score, verification_checks, verification_documents").eq("id", homeId).single();
-          if (reviewError) throw new Error("Could not validate trust assessment: " + reviewError.message);
-          const checks = review.verification_checks || {}, docs = review.verification_documents || [];
-          const has = kind => docs.some(doc => doc.kind === kind);
-          if (Number(review.trust_score || 0) < 80 || !checks.legal_registration || !checks.address_proof || !checks.resident_safety || !has("legal_registration") || !has("address_proof") || !has("safety_policy")) {
-            throw new Error("Approval blocked: score at least 80, all mandatory checks, and legal, address and safety documents are required.");
-          }
+          const { data: review, error: reviewError } = await sb.from("old_age_homes").select("verification_documents").eq("id", homeId).single();
+          if (reviewError) throw new Error("Could not validate submitted documents: " + reviewError.message);
+          const docs = review.verification_documents || [];
+          const missing = ["legal_registration", "address_proof", "safety_policy"].filter(kind => !docs.some(doc => doc.kind === kind));
+          if (missing.length) throw new Error("Final approval requires these documents: " + missing.join(", ") + ".");
         }
         const update = { verification_status: status };
         const { data, error } = await sb
@@ -786,6 +783,21 @@ const SahaayaDB = (() => {
       return null;
     },
 
+    deleteOpportunity: async (opportunityId) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(opportunityId))) {
+        const { error } = await sb.from("activities").delete().eq("id", opportunityId);
+        if (error) throw new Error("Could not delete requirement: " + error.message);
+        return true;
+      }
+      const opps = load("opportunities");
+      const remaining = opps.filter(opp => opp.id !== opportunityId);
+      if (remaining.length === opps.length) throw new Error("Requirement not found.");
+      save("opportunities", remaining);
+      save("applications", load("applications").filter(app => app.opportunity_id !== opportunityId));
+      save("attendance_records", load("attendance_records").filter(record => record.opportunity_id !== opportunityId));
+      return true;
+    },
     getApplications: async (filter = {}) => {
       const sb = window._supabaseClient;
       if (sb) {
@@ -883,59 +895,52 @@ const SahaayaDB = (() => {
     // Attendance & Hours Crediting
     // -------------------------------------------------------------
     recordAttendance: async ({ applicationId, status, markedByUserId }) => {
+      if (status !== "present") throw new Error("Only present attendance can be credited from this screen.");
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
+        const { data: app, error: appError } = await sb.from("applications").select("id, activity_id, volunteer_id, status").eq("id", applicationId).single();
+        if (appError || !app) throw new Error("Could not find this volunteer application: " + (appError?.message || ""));
+        if (!["approved", "attended"].includes(app.status)) throw new Error("Only approved volunteers can be marked present.");
+        const { data: activity, error: activityError } = await sb.from("activities").select("id, title, date, home_id, duration_hours").eq("id", app.activity_id).single();
+        if (activityError || !activity) throw new Error("Could not load the activity: " + (activityError?.message || ""));
+        const hours = Number(activity.duration_hours) || 2;
+        const { error: attendanceError } = await sb.from("attendance").upsert({ activity_id: app.activity_id, volunteer_id: app.volunteer_id, status: "present", hours, marked_at: new Date().toISOString() }, { onConflict: "activity_id,volunteer_id" });
+        if (attendanceError) throw new Error("Could not save attendance: " + attendanceError.message);
+        const { error: updateError } = await sb.from("applications").update({ status: "attended", reviewed_at: new Date().toISOString() }).eq("id", applicationId);
+        if (updateError) throw new Error("Attendance was saved, but application status could not be updated: " + updateError.message);
+        return { id: applicationId, application_id: applicationId, opportunity_id: activity.id, opportunity_title: activity.title, volunteer_record_id: app.volunteer_id, home_id: activity.home_id, date: activity.date, hours_credited: hours, marked_by: markedByUserId, marked_at: new Date().toISOString(), status: "present" };
+      }
       const apps = load("applications");
       const app = apps.find(a => a.id === applicationId);
       if (!app) throw new Error("Application not found");
-
-      const opps = load("opportunities");
-      const opp = opps.find(o => o.id === app.opportunity_id);
+      const opp = load("opportunities").find(o => o.id === app.opportunity_id);
       if (!opp) throw new Error("Opportunity not found");
-
       const attendanceRecords = load("attendance_records");
-      const recordId = "att_" + Date.now();
-
-      const hoursToCredit = status === "present" ? (opp.duration_hours || 2.0) : 0;
-
-      const record = {
-        id: recordId,
-        application_id: app.id,
-        opportunity_id: opp.id,
-        opportunity_title: opp.title,
-        volunteer_id: app.volunteer_id,
-        home_id: opp.home_id,
-        date: opp.date,
-        hours_credited: hoursToCredit,
-        marked_by: markedByUserId,
-        marked_at: new Date().toISOString(),
-        status
-      };
-
-      attendanceRecords.unshift(record);
+      const existing = attendanceRecords.find(record => record.application_id === app.id);
+      const hoursToCredit = Number(opp.duration_hours) || 2;
+      const record = { id: existing?.id || "att_" + Date.now(), application_id: app.id, opportunity_id: opp.id, opportunity_title: opp.title, volunteer_id: app.volunteer_id, home_id: opp.home_id, date: opp.date, hours_credited: hoursToCredit, marked_by: markedByUserId, marked_at: new Date().toISOString(), status: "present" };
+      if (existing) Object.assign(existing, record); else attendanceRecords.unshift(record);
       save("attendance_records", attendanceRecords);
-
-      // Update application status
-      app.status = status === "present" ? SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED : SAHAAYA_CONFIG.APPLICATION_STATUS.ABSENT;
+      app.status = SAHAAYA_CONFIG.APPLICATION_STATUS.ATTENDED;
       save("applications", apps);
-
-      // Credit hours to volunteer profile if present
-      if (status === "present") {
-        const profiles = load("volunteer_profiles");
-        const profile = profiles.find(p => p.user_id === app.volunteer_id);
-        if (profile) {
-          profile.total_hours = parseFloat(((profile.total_hours || 0) + hoursToCredit).toFixed(1));
-          profile.completed_count = (profile.completed_count || 0) + 1;
-          save("volunteer_profiles", profiles);
-        }
-      }
-
+      const profiles = load("volunteer_profiles");
+      const profile = profiles.find(p => p.user_id === app.volunteer_id);
+      if (profile && !existing) { profile.total_hours = parseFloat(((profile.total_hours || 0) + hoursToCredit).toFixed(1)); profile.completed_count = (profile.completed_count || 0) + 1; save("volunteer_profiles", profiles); }
       return record;
     },
 
     getAttendanceHistoryByVolunteer: async (volunteerId) => {
-      const records = load("attendance_records");
-      return records.filter(r => r.volunteer_id === volunteerId);
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(volunteerId))) {
+        const { data: volunteer, error: volunteerError } = await sb.from("volunteers").select("id").eq("profile_id", volunteerId).maybeSingle();
+        if (volunteerError) throw new Error("Could not load volunteer attendance: " + volunteerError.message);
+        if (!volunteer) return [];
+        const { data, error } = await sb.from("attendance").select("*, activities(title, date, home_id)").eq("volunteer_id", volunteer.id).order("marked_at", { ascending: false });
+        if (error) throw new Error("Could not load attendance history: " + error.message);
+        return (data || []).map(row => ({ id: row.id, opportunity_id: row.activity_id, opportunity_title: row.activities?.title || "Volunteer activity", home_id: row.activities?.home_id || "", date: row.activities?.date || "", hours_credited: Number(row.hours || 0), status: row.status, marked_at: row.marked_at }));
+      }
+      return load("attendance_records").filter(record => record.volunteer_id === volunteerId);
     },
-
     // -------------------------------------------------------------
     // Feedback
     // -------------------------------------------------------------
