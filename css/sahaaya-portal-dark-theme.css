@@ -1169,3 +1169,45 @@ body.portal-body{background:#f3f0e7!important}.portal-body .portal-navbar{top:40
   .chat-input-bar { gap: 7px; }
   .chat-input-bar button { min-width: 72px; padding-inline: 12px; }
 }
+
+
+/* Chat modal scrolling fix: keep the dialog inside the viewport and allow
+   the modal body to scroll when the conversation/context exceeds the screen. */
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .sahaaya-modal-header,
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .sahaaya-modal-footer {
+  flex: 0 0 auto;
+}
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .sahaaya-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .chat-container {
+  min-height: 0;
+}
+.portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .chat-messages {
+  height: min(42vh, 360px);
+  min-height: 160px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 600px) {
+  .portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+  .portal-body .sahaaya-modal-dialog:has(#applicationChatMessages) .chat-messages {
+    height: 38vh;
+    min-height: 140px;
+  }
+}
