@@ -775,42 +775,64 @@ document.addEventListener("DOMContentLoaded", async () => {
       `).join("");
     }
 
-    document.getElementById("volunteerProfileForm")?.addEventListener("submit", async e => {
-      e.preventDefault();
-      const updatedInterests    = Array.from(document.querySelectorAll("input[name='interest']:checked")).map(cb => cb.value);
-      const updatedAvailability = Array.from(document.querySelectorAll("input[name='availability']:checked")).map(cb => cb.value);
-
-      const updatedName = document.getElementById("profName")?.value.trim();
-      const updatedPhone = document.getElementById("profPhone")?.value.trim();
-
-      if (!updatedName) {
-        SahaayaUI.showToast("Please enter your full name.", "warning");
-        return;
-      }
-
-      try {
-        currentProfile = await SahaayaDB.updateVolunteerProfile(session.id, {
-          full_name: updatedName,
-          phone: updatedPhone,
-          bio:              document.getElementById("profBio")?.value.trim(),
-          emergency_contact: document.getElementById("profEmergency")?.value.trim(),
-          interests:        updatedInterests,
-          availability:     updatedAvailability
-        });
-
-        session.name = updatedName;
-        session.phone = updatedPhone;
-        if (userName) userName.textContent = updatedName;
-        if (userAvatar) userAvatar.textContent = updatedName.split(/\\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
-        if (welcomeGreeting) welcomeGreeting.textContent = `Welcome back, ${updatedName.split(" ")[0]} 👋`;
-
-        SahaayaUI.showToast("Profile updated successfully.", "success");
-        renderOpportunities();
-      } catch (err) {
-        SahaayaUI.showToast(err.message || "Could not update your profile.", "warning");
-      }
-    });
+    // Save handler is registered once below, not during rendering.
   }
+
+  // Register the profile save handler once, before the first data load.
+  // Phone and emergency contact are optional; they must not silently block form submission.
+  const profileForm = document.getElementById("volunteerProfileForm");
+  const profilePhoneInput = document.getElementById("profPhone");
+  const emergencyInput = document.getElementById("profEmergency");
+  if (profilePhoneInput) profilePhoneInput.required = false;
+  if (emergencyInput) emergencyInput.required = false;
+
+  profileForm?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const saveButton = profileForm.querySelector('button[type="submit"]');
+    if (saveButton?.disabled) return;
+
+    const updatedName = document.getElementById("profName")?.value.trim() || "";
+    const updatedPhone = profilePhoneInput?.value.trim() || "";
+    if (!updatedName) {
+      SahaayaUI.showToast("Please enter your full name.", "warning");
+      document.getElementById("profName")?.focus();
+      return;
+    }
+
+    const originalButtonText = saveButton?.textContent;
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Saving...";
+    }
+
+    try {
+      currentProfile = await SahaayaDB.updateVolunteerProfile(session.id, {
+        full_name: updatedName,
+        phone: updatedPhone,
+        bio: document.getElementById("profBio")?.value.trim() || "",
+        emergency_contact: emergencyInput?.value.trim() || "",
+        interests: Array.from(document.querySelectorAll("input[name='interest']:checked")).map(cb => cb.value),
+        availability: Array.from(document.querySelectorAll("input[name='availability']:checked")).map(cb => cb.value)
+      });
+
+      session.name = updatedName;
+      session.phone = updatedPhone;
+      if (userName) userName.textContent = updatedName;
+      if (userAvatar) userAvatar.textContent = updatedName.split(/\\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
+      if (welcomeGreeting) welcomeGreeting.textContent = `Welcome back, ${updatedName.split(" ")[0]} 👋`;
+
+      SahaayaUI.showToast("Profile updated successfully.", "success");
+      renderOpportunities();
+    } catch (err) {
+      console.error("Sahaaya profile save failed:", err);
+      SahaayaUI.showToast(err?.message || "Could not save your profile. Please try again.", "warning");
+    } finally {
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = originalButtonText || "Save Profile Preferences";
+      }
+    }
+  });
 
   function setInputSafe(id, value) {
     const el = document.getElementById(id);
