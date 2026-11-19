@@ -842,6 +842,75 @@ const SahaayaDB = (() => {
       return apps;
     },
 
+    // -------------------------------------------------------------
+    // Application chat — persistent, append-only conversation history
+    // -------------------------------------------------------------
+    getApplicationMessages: async (applicationId) => {
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
+        const { data, error } = await sb
+          .from("application_messages")
+          .select("id, application_id, sender_id, sender_role, message, created_at")
+          .eq("application_id", applicationId)
+          .order("created_at", { ascending: true })
+          .order("id", { ascending: true });
+        if (error) throw new Error("Could not load conversation: " + error.message);
+        return data || [];
+      }
+      return load("application_messages")
+        .filter(row => row.application_id === applicationId)
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    },
+
+    sendApplicationMessage: async ({ applicationId, senderId, senderRole, message }) => {
+      const cleanMessage = String(message || "").trim();
+      if (!cleanMessage) throw new Error("Please enter a message.");
+      if (cleanMessage.length > 4000) throw new Error("Messages must be 4,000 characters or fewer.");
+      if (!applicationId || !senderId) throw new Error("Conversation or sender information is missing.");
+      if (!["volunteer", "home", "admin"].includes(senderRole)) throw new Error("Invalid sender role.");
+
+      const sb = window._supabaseClient;
+      if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(applicationId))) {
+        const { data, error } = await sb
+          .from("application_messages")
+          .insert({
+            application_id: applicationId,
+            sender_id: senderId,
+            sender_role: senderRole,
+            message: cleanMessage
+          })
+          .select("id, application_id, sender_id, sender_role, message, created_at")
+          .single();
+        if (error) throw new Error("Could not send message: " + error.message);
+        return data;
+      }
+
+      // Demo/local mode mirrors the participant checks enforced by Supabase RLS.
+      const app = load("applications").find(row => row.id === applicationId);
+      const user = load("users").find(row => row.id === senderId);
+      if (!app || !user || user.role !== senderRole) throw new Error("You do not have access to this conversation.");
+      let isParticipant = senderRole === "admin";
+      if (senderRole === "volunteer") isParticipant = app.volunteer_id === senderId;
+      if (senderRole === "home") {
+        const opportunity = load("opportunities").find(row => row.id === app.opportunity_id);
+        isParticipant = !!opportunity && opportunity.home_id === user.home_id;
+      }
+      if (!isParticipant) throw new Error("You do not have access to this conversation.");
+
+      const rows = load("application_messages");
+      const record = {
+        id: "msg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+        application_id: applicationId,
+        sender_id: senderId,
+        sender_role: senderRole,
+        message: cleanMessage,
+        created_at: new Date().toISOString()
+      };
+      rows.push(record);
+      save("application_messages", rows);
+      return record;
+    },
+
     getApplicationById: async (id) => {
       const sb = window._supabaseClient;
       if (sb && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(id))) {
